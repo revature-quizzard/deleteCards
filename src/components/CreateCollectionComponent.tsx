@@ -54,7 +54,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
         }
 
         return (
-            props.currentUser ? <Redirect to="/"/> :
+            !props.currentUser ? <Redirect to="/"/> :
         <>
             <div>
                 <input id="collection-name-input" type="text" onChange={updateCollectionTitle} placeholder="title"/>
@@ -73,7 +73,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
     
     
     return(
-        props.currentUser ? <Redirect to="/"/> :
+        !props.currentUser ? <Redirect to="/"/> :
         <>
              <div>
                 <input id="collection-name-input" type="text" onChange={updateCollectionTitle} placeholder="title"/>
