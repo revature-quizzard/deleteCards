@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Principal} from "../dtos/principal";
 import ErrorMessageComponent from "./ErrorMessageComponent";
 import {Redirect} from "react-router-dom";
-import { createCollection } from "../remote/create-colletion";
+import { createCollection } from "../remote/create-collection";
 
 interface ICreateCollectionProps {
     currentUser: Principal | undefined,
@@ -13,7 +13,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
     let [collectionCategory , setCollectionCategory] = useState('');
     let [collectionDescription, setCollectionDescription] = useState(''); 
     let [collectionAuthor , setCollectionAuthor] = useState('');
-    
+   
 
     let [errorMessage, setErrorMessage] = useState('');
 
@@ -33,6 +33,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
  
 
     async function create() {
+        
         try {
 
            if(props.currentUser) 
@@ -41,7 +42,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
                 if (collectionTitle && collectionDescription && collectionCategory  && collectionAuthor) {              
                     //@ts-ignore
                     
-                    let colectiton = await createCollection({collectionTitle ,collectionDescription ,collectionCategory , collectionAuthor }); 
+                    let collection = await createCollection({collectionTitle ,collectionDescription ,collectionCategory , collectionAuthor }); 
                     
                     
                 } else {
@@ -54,7 +55,6 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
         }
 
         return (
-            !props.currentUser ? <Redirect to="/"/> :
         <>
             <div>
                 <input id="collection-name-input" type="text" onChange={updateCollectionTitle} placeholder="title"/>
@@ -73,7 +73,7 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
     
     
     return(
-        !props.currentUser ? <Redirect to="/"/> :
+        !props.currentUser ? <Redirect to="/login"/> :
         <>
              <div>
                 <input id="collection-name-input" type="text" onChange={updateCollectionTitle} placeholder="title"/>
