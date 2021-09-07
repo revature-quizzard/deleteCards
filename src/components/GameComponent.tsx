@@ -4,11 +4,11 @@ import ErrorMessageComponent from "./ErrorMessageComponent";
 import {Redirect} from "react-router-dom";
 import { createCollection } from "../remote/create-collection";
 
-interface ICreateCollectionProps {
+interface IGameCreateCollectionProps {
     currentUser: Principal | undefined,
 }
 
-function CreateCollectionComponent(props: ICreateCollectionProps) {
+function GameComponent(props: IGameCreateCollectionProps) {
     let [collectionTitle , setCollectionTitle] = useState('');
     let [collectionCategory , setCollectionCategory] = useState('');
     let [collectionDescription, setCollectionDescription] = useState(''); 
@@ -74,4 +74,4 @@ function CreateCollectionComponent(props: ICreateCollectionProps) {
     )
 }
 
-export default CreateCollectionComponent;
+export default GameComponent;

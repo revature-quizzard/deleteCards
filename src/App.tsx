@@ -6,10 +6,14 @@ import {NavbarComponent} from './components/NavbarComponent';
 import LoginComponent from "./components/LoginComponent";
 import HomeComponent from "./components/HomeComponent";
 import RegisterComponent from "./components/RegisterComponent"
+import CreateCollectionComponent from './components/CreateCollectionComponent';
+import CreateQuestionComponent from './components/CreateQuestionComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 import './App.css';
+
+
 
 function App() {
 
@@ -23,6 +27,8 @@ function App() {
             <Route exact path="/" render={() => <HomeComponent currentUser={authUser} /> } />
             <Route path="/login" render={() => <LoginComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
+            <Route path="/create-collection" render={() => <CreateCollectionComponent currentUser={authUser} /> } />
+            <Route path="/create-question" render={() => <CreateQuestionComponent currentUser={authUser} /> } />
         </Switch>
       </Router>
     </>

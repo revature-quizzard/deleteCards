@@ -51,26 +51,6 @@ function RegisterComponent(props: IRegisterProps) {
             setErrorMessage(e.message); 
         }
 
-        return (
-            props.currentUser ? <Redirect to="/"/> :
-        <>
-            <div>
-                <input id="first-name-input" type="text" onChange={updateFirstName} placeholder="First Name"/>
-                <br/><br/>
-                <input id="last-name-input" type="text" onChange={updateLastName} placeholder="Last Name"/>
-                 <br/><br/>
-                <input id="username-input" type="text" onChange={updateUsername} placeholder="UserName"/>
-                <br/><br/>
-                <input id="email-input" type="text" onChange={updateEmail} placeholder="Email"/>
-                <br/><br/>
-                <input id="password-input" type="password" onChange={updatePassword} placeholder="Pa$$word"/>
-                <br/><br/>
-                <button id="register-btn" onClick={register}>Register</button>
-                <br/><br/>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
-        </>
-        )
     }
     
     
