@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Principal} from "../dtos/principal";
 import ErrorMessageComponent from "./ErrorMessageComponent";
 import {Redirect} from "react-router-dom";
-import { createCollection } from "../remote/create-collection";
+import { createCollection } from "../remote/collection-service";
 
 interface ICreateCollectionProps {
     currentUser: Principal | undefined,
