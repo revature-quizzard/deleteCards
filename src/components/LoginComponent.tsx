@@ -40,7 +40,7 @@ function LoginComponent(props: ILoginProps) {
             <div>
                 <input id="username-input" type="text" onChange={updateUsername}/>
                 <br/><br/>
-                <input id="password-input" type="text" onChange={updatePassword}/>
+                <input id="password-input" type="password" onChange={updatePassword}/>
                 <br/><br/>
                 <button id="login-btn" onClick={login}>Login</button>
                 <br/><br/>
@@ -57,7 +57,7 @@ function LoginComponent(props: ILoginProps) {
             <div>
                 <input id="username-input" type="text" onChange={updateUsername}/>
                 <br/><br/>
-                <input id="password-input" type="text" onChange={updatePassword}/>
+                <input id="password-input" type="password" onChange={updatePassword}/>
                 <br/><br/>
                 <button id="login-btn" onClick={login}>Login</button>
                 <br/><br/>
