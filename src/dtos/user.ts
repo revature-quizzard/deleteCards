@@ -6,6 +6,9 @@ export class User {
     firstName: string;
     lastName: string;
     email: string;
+    collections: [];
+    favoritedCollections: [];
+
 
     constructor(id: string, un: string, pw: string, fn: string, ln: string, email: string) {
         this.id = id;
@@ -14,6 +17,8 @@ export class User {
         this.firstName = fn;
         this.lastName = ln;
         this.email = email;
+        this.collections = [];
+        this.favoritedCollections = [];
     }
 
 }

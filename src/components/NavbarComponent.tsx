@@ -14,7 +14,7 @@ export function NavbarComponent(props: INavbarProps){
 
     return(
         <>
-            <Navbar bg="dark" variant="dark">
+            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
                 <Container>
                 {
                     props.currentUser

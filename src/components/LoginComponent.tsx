@@ -33,21 +33,6 @@ function LoginComponent(props: ILoginProps) {
         } catch (e: any) {
             setErrorMessage(e.message);
         }
-
-        return (
-            props.currentUser ? <Redirect to="/"/> :
-        <>
-            <div>
-                <input id="username-input" type="text" onChange={updateUsername}/>
-                <br/><br/>
-                <input id="password-input" type="password" onChange={updatePassword}/>
-                <br/><br/>
-                <button id="login-btn" onClick={login}>Login</button>
-                <br/><br/>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
-        </>
-        )
     }
     
     
