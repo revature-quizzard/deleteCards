@@ -33,8 +33,6 @@ function LoginComponent(props: ILoginProps) {
         } catch (e: any) {
             setErrorMessage(e.message);
         }
-
-        
     }
     
     
