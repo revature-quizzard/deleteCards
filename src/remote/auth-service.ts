@@ -15,7 +15,7 @@ export const authenticate = async (credentials: {username: string, password: str
     }
 
     let token: string | null = resp.headers.get('Authorization');
-
+    console.log(token);
     let principal: Principal = await resp.json();
     if (token && principal) principal.token = token;
 

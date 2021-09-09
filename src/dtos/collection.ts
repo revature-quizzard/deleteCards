@@ -1,18 +1,21 @@
-export class Collection {
+import { Principal } from "./principal";
+
+export class Collections {
 
     id: string;
-    collectionTitle: string; 
-    collectionDescription: string;
-    collectionCategory: string;
-    collectionAuthor: string;
-   
+    title: string; 
+    description: string;
+    category: string;
+    author: Principal;
+    questionList: [];
 
-    constructor(id: string, ct: string, cd: string, cc: string, ca: string) {
+    constructor(id: string, ct: string, cd: string, cc: string, ca: Principal) {
         this.id = id;
-        this.collectionTitle = ct;
-        this.collectionDescription = cd;
-        this.collectionCategory = cc;
-        this.collectionAuthor = ca;
+        this.title = ct;
+        this.description = cd;
+        this.category = cc;
+        this.author = ca;
+        this.questionList = [];
     }
 
 }

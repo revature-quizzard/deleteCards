@@ -8,16 +8,20 @@ import HomeComponent from "./components/HomeComponent";
 import RegisterComponent from "./components/RegisterComponent"
 import CreateCollectionComponent from './components/CreateCollectionComponent';
 import CreateQuestionComponent from './components/CreateQuestionComponent';
+import CustomGameComponent from './components/CustomGameComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 import './App.css';
+import { Collections } from './dtos/collection';
+
+
+
 
 
 
 function App() {
 
   const [authUser, setAuthUser] = useState(undefined as Principal | undefined)
+  const [collection , setCollection] = useState(undefined as  [] | undefined)
 
   return (
     <>
@@ -29,6 +33,7 @@ function App() {
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/create-collection" render={() => <CreateCollectionComponent currentUser={authUser} /> } />
             <Route path="/create-question" render={() => <CreateQuestionComponent currentUser={authUser} /> } />
+            <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentCollection={collection} setCurrentCollection={setCollection} /> } />
         </Switch>
       </Router>
     </>
