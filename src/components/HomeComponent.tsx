@@ -12,16 +12,13 @@ interface IHomeProps {
 
 
 function HomeComponent(props: IHomeProps) {
-
-   // console.log(props.currentUser?.token );
-
     return (
         props.currentUser
         ?
         <>
             <Link to="/" className="btn btn-primary">Join Game</Link>
             <br/><br/>
-            <Link to="/" className="btn btn-primary">Manage Collection</Link>
+            <Link to="/manage-collections" className="btn btn-primary">Manage Collection</Link>
             <br/><br/>
             <Link to="/" className="btn btn-primary">Create Game</Link>
             <br/><br/>
