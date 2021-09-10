@@ -1,34 +1,46 @@
 import {Principal} from "../dtos/principal";
-import {useState, useEffect} from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
+import { Collections } from "../dtos/collection";
+import {deleteCollection} from "../remote/collection-service";
+import { updateUnionTypeNode } from "typescript";
 
 
 interface ICollectionModal {
     current_user: Principal | undefined
-    collection_id : String;
+    collection : Collections | undefined;
+    show: boolean;
+    setShow: (val: boolean) => void
+    updateUI: (collection: Collections) => void
 }
 
 function DeleteCollectionModal(props: ICollectionModal) {
-    const [show, setShow] = useState(true);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleClose = () => {
+      props.setShow(false);
+    }
 
-    handleShow();
-
+    const remove = () => {
+      handleClose();
+      if(props.collection?.id && props.current_user) {
+        console.log("DELETING")
+        deleteCollection(props.collection?.id, props.current_user?.token);
+        //Tells main page to refresh the collections
+        props.updateUI(props.collection);
+      }
+    }
     return (
         <>
-          <Modal show={show} onHide={handleClose}>
+          <Modal show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>Modal heading</Modal.Title>
+              <Modal.Title>Are you sure?</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+            <Modal.Body>Do you want to delete collection "{props.collection?.title}"</Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
-                Close
+                Cancel
               </Button>
-              <Button variant="primary" onClick={handleClose}>
-                Save Changes
+              <Button variant="primary" onClick={remove}>
+                Delete
               </Button>
             </Modal.Footer>
           </Modal>

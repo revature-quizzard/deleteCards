@@ -1,36 +1,33 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
-import {authenticate} from "../remote/auth-service";
-import ErrorMessageComponent from "./ErrorMessageComponent";
 import DeleteCollectionModal from "./DeleteCollectionModal";
 import {Redirect} from "react-router-dom";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getSavedCollections} from "../remote/user-service";
-import { isPropertySignature } from "typescript";
 
 interface IManageProps {
     currentUser: Principal | undefined;
 }
 
 function ManageCollectionComponent(props: IManageProps) {
-    let [collections , setCollections] = useState([]);
+    let [collections , setCollections] = useState([] as Collections[]);
     let [errorMessage, setErrorMessage] = useState('');
-    let [gotCollections, setGotCollections] = useState(false);
+    let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
-    let [currentCollection, setCurrentCollection] = useState("");
+    let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
     useEffect(() => {
-        if(collections.length == 0) {
+        if(!hasCollections) {
             getCollection();
         }
     })
 
     async function getCollection() {    
         try {   
-            if(!gotCollections && props.currentUser) {
-                setGotCollections(true);
+            if(props.currentUser) {
+                setHasCollections(true);
                 //@ts-ignore
                 let user_id = props.currentUser.id;
                 let temp = await getSavedCollections( user_id, props.currentUser.token );
@@ -52,14 +49,29 @@ function ManageCollectionComponent(props: IManageProps) {
         return;
     }
 
-    function remove(collection_id : string | undefined) {
-        if(!collection_id) {
+    function remove(collection : Collections | undefined) {
+        if(!collection) {
             return;
         }
 
         setShowDelete(true);
-        setCurrentCollection(collection_id);
+        setCurrentCollection(collection);
+
         return undefined;
+    }
+
+    function removeUI(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
+        console.log(collection.id)
+        let temp = collections;
+        temp = temp.filter((c : Collections) => {
+            return !(c.id === collection.id)
+        })
+        console.log(temp);
+        setCollections(temp);
     }
 
     async function create() {
@@ -68,12 +80,9 @@ function ManageCollectionComponent(props: IManageProps) {
 
     function getComponent() {
         if(showDelete) {
-            return <DeleteCollectionModal current_user={props.currentUser} collection_id={currentCollection}/>;
+            return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
         }
     }
-
-
-
 
     return (
         props.currentUser
@@ -95,7 +104,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
-                                    <td><Button variant="secondary" onClick={edit}>Edit</Button> <Button variant="secondary" onClick={() => remove(C?.id)}>Delete</Button></td>
+                                    <td><Button variant="secondary" onClick={edit}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
                                 </tr> 
                     })}
                     {getComponent()}
