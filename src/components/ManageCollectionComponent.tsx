@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import DeleteCollectionModal from "./DeleteCollectionModal";
+import EditCollectionModal from "./EditCollectionModal";
 import {Redirect} from "react-router-dom";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
@@ -16,6 +17,7 @@ function ManageCollectionComponent(props: IManageProps) {
     let [errorMessage, setErrorMessage] = useState('');
     let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
+    let [showEdit, setShowEdit] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
     useEffect(() => {
@@ -45,8 +47,9 @@ function ManageCollectionComponent(props: IManageProps) {
             
     }
 
-    async function edit() {
-        return;
+    function edit() {
+        setShowEdit(true);
+        return undefined;
     }
 
     function remove(collection : Collections | undefined) {
@@ -81,6 +84,8 @@ function ManageCollectionComponent(props: IManageProps) {
     function getComponent() {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
+        } else if(showEdit){
+            return <EditCollectionModal current_user={props.currentUser} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
         }
     }
 
