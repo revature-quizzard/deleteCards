@@ -24,34 +24,6 @@ export function NavbarComponent(props: INavbarProps){
         props.setCurrentUser(undefined);
     }
 
-    // return(
-    //     <>
-    //         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-    //             <Container>
-    //             {
-    //                 props.currentUser
-    //                 ?
-    //                 <>
-    //                 <Navbar.Brand href="home">Navbar</Navbar.Brand>
-    //                 <Nav className="me-auto">
-    //                 <Nav.Link href="home">Home</Nav.Link>
-    //                 <Nav.Link href="logout" onClick={logout}>Logout</Nav.Link>
-    //                 </Nav>
-    //                 </>
-    //                 :
-    //                 <>
-    //                 <Navbar.Brand href="home">Navbar</Navbar.Brand>
-    //                 <Nav className="me-auto">
-    //                 <Nav.Link href="login">Login</Nav.Link>
-    //                 <Nav.Link href="register">Register</Nav.Link>
-    //                 </Nav>
-    //                 </>
-    //             }
-    //             </Container>
-    //         </Navbar>
-    //     </>
-    // )
-
     return (
         <>
             <AppBar color="primary" position="static">
