@@ -15,9 +15,24 @@ export const createCollection = async (colleciton: {collectionTitle: string , co
 
 }
 
-export const getCollection = async (colleciton: {collectionTitle: string , collectionDescription: string , collectionCategory: string , collectionAuthor: string}) => {
+export const getCollection = async (collection: {collectionTitle: string , collectionDescription: string , collectionCategory: string , collectionAuthor: string}) => {
     let resp = await fetch(`${env.apiUrl}/collections`, {
         method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(collection)
+    });
+
+    if (resp.status > 299) {
+        throw await resp.json();
+    }
+
+}
+
+export const editCollection = async (colleciton: {collectionTitle: string , collectionDescription: string , collectionCategory: string }) => {
+    let resp = await fetch(`${env.apiUrl}/collections`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         }
