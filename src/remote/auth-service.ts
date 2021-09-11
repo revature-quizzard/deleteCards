@@ -2,7 +2,7 @@ import {Principal} from "../dtos/principal";
 import env from '../util/env.js';
 
 export const authenticate = async (credentials: {username: string, password: string}) => {
-    let resp = await fetch(`${env.apiUrl}/auth`, {
+    let resp = await fetch(`${env.apiUrl}auth`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
