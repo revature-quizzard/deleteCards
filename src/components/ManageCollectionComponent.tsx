@@ -47,8 +47,13 @@ function ManageCollectionComponent(props: IManageProps) {
             
     }
 
-    function edit() {
+    function edit(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
         setShowEdit(true);
+        setCurrentCollection(collection);
         return undefined;
     }
 
@@ -85,7 +90,7 @@ function ManageCollectionComponent(props: IManageProps) {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
         } else if(showEdit){
-            return <EditCollectionModal current_user={props.currentUser} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
+            return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
         }
     }
 
@@ -109,7 +114,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
-                                    <td><Button variant="secondary" onClick={edit}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
+                                    <td><Button variant="secondary" onClick={() => edit(C)}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
                                 </tr> 
                     })}
                     {getComponent()}

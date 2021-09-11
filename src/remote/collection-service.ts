@@ -1,4 +1,5 @@
 import env from '../util/env.js';
+import { Collections } from "../dtos/collection";
 
 export const createCollection = async (colleciton: {collectionTitle: string , collectionDescription: string , collectionCategory: string , collectionAuthor: string}) => {
     let resp = await fetch(`${env.apiUrl}/collections`, {
@@ -20,6 +21,7 @@ export const getCollection = async (collection: {collectionTitle: string , colle
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
+
         },
         body: JSON.stringify(collection)
     });
@@ -30,12 +32,14 @@ export const getCollection = async (collection: {collectionTitle: string , colle
 
 }
 
-export const editCollection = async (colleciton: {collectionTitle: string , collectionDescription: string , collectionCategory: string }) => {
+export const editCollection = async (collection: Collections, token: string) => {
     let resp = await fetch(`${env.apiUrl}/collections`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
+        },
+        body: JSON.stringify(collection)
     });
 
     if (resp.status > 299) {

@@ -8,39 +8,50 @@ import { Collections } from "../dtos/collection";
 
 interface IEditCollectionProps {
     current_user: Principal | undefined
+    collection: Collections | undefined
     show: boolean
     setShow: (val: boolean) => void
     updateUI: (collection: Collections) => void
 
 }
 
-function EditCollectionModal(props: IEditCollectionProps) {
-    let [collectionTitle , setCollectionTitle] = useState('');
-    let [collectionCategory , setCollectionCategory] = useState('');
-    let [collectionDescription, setCollectionDescription] = useState(''); 
+function EditCollectionModal(props: IEditCollectionProps) { 
+    let [editedCollection, setEditedCollection] = useState(props.collection);
 
     let [errorMessage, setErrorMessage] = useState('');
 
     const handleClose = () => props.setShow(false);
 
     function updateCollectionTitle(e: any){
-        setCollectionTitle(e.currentTarget.value);
+        let temp = editedCollection;
+        if (temp){
+            temp.title = e.currentTarget.value;
+            setEditedCollection(temp);
+        };
+
     }
 
     function updateCollectionCategory(e: any){
-        setCollectionCategory(e.currentTarget.value);
+        let temp = editedCollection;
+        if (temp){
+            temp.category = e.currentTarget.value;
+            setEditedCollection(temp);
+        };
     }
 
     function updateCollectionDescription(e: any){
-        setCollectionDescription(e.currentTarget.value);
+        let temp = editedCollection;
+        if (temp){
+            temp.description = e.currentTarget.value;
+            setEditedCollection(temp);
+        };
     }
 
     const edit = ()=> {
         handleClose();
-         if (collectionTitle && collectionCategory && collectionDescription) {
-
+         if (editedCollection && props.current_user) {
                 console.log("EDITING");
-                editCollection({collectionTitle,collectionCategory,collectionDescription}); 
+                editCollection(editedCollection, props.current_user.token); 
                 
                 //TODO UpdateUI
             } else {
