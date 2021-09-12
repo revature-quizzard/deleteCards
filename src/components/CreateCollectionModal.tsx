@@ -12,11 +12,11 @@ interface ICollectionModal {
     current_user: Principal | undefined
     show: boolean;
     setShow: (val: boolean) => void
-    updateUI: (collection: Collections) => void
+    updateUI: (collection: Collections | undefined) => void
 }
 
 function CreateCollectionModal(props: ICollectionModal) {
-    let [collection , setCollection] = useState({title:"", description:"", category:"", author:props.current_user} as Collections);
+    let [collection , setCollection] = useState({title:"", description:"", category:"", author:props.current_user} as Collections | undefined);
     let [errorMessage, setErrorMessage] = useState('');
 
     const handleClose = () => {
@@ -29,7 +29,7 @@ function CreateCollectionModal(props: ICollectionModal) {
 
             if(collection) {
                 try {
-                  await createCollection(collection, props.current_user.token);
+                  collection = await createCollection(collection, props.current_user.token);
                 } catch(e : any) {
                   setErrorMessage(e.message);
                   console.log(e)

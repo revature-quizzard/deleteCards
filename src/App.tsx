@@ -40,7 +40,7 @@ function App() {
             <Route path="/create-question" render={() => <CreateQuestionComponent currentUser={authUser} /> } />
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentCollection={collection} setCurrentCollection={setCollection} /> } />
             <Route path="/manage-collections" render={() => <ManageCollectionComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
-            <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection}/> } />
+            <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}/> } />
         </Switch>
       </Router>
     </>
