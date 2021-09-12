@@ -66,11 +66,11 @@ function EditCollectionModal(props: IEditCollectionProps) {
             <Modal.Header closeButton>
               <Modal.Title>Edit</Modal.Title>
             </Modal.Header>
-            <Modal.Body><input id="collection-title-input" type="text" onChange={updateCollectionTitle} placeholder="Title"/>
+            <Modal.Body><input id="collection-title-input" type="text" defaultValue={props.collection?.title} onChange={updateCollectionTitle} placeholder="Title"/>
                 <br/><br/>
-                <input id="collection-category-input" type="text" onChange={updateCollectionCategory} placeholder="Category"/>
+                <input id="collection-category-input" type="text" defaultValue={props.collection?.category} onChange={updateCollectionCategory} placeholder="Category"/>
                  <br/><br/>
-                <input id="collection-description-input" type="text" onChange={updateCollectionDescription} placeholder="Description"/></Modal.Body>
+                <input id="collection-description-input" type="text" defaultValue={props.collection?.description} onChange={updateCollectionDescription} placeholder="Description"/></Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
                 Close

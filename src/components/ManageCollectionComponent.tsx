@@ -3,14 +3,15 @@ import {Principal} from "../dtos/principal";
 import DeleteCollectionModal from "./DeleteCollectionModal";
 import CreateCollectionModal from "./CreateCollectionModal";
 import EditCollectionModal from "./EditCollectionModal";
-import {Redirect} from "react-router-dom";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getSavedCollections} from "../remote/user-service";
+import { Redirect , Link } from "react-router-dom";
 
 interface IManageProps {
     currentUser: Principal | undefined;
+    setCurrCollection: (nextCollection: Collections | undefined) => void
 }
 
 function ManageCollectionComponent(props: IManageProps) {
@@ -115,6 +116,7 @@ function ManageCollectionComponent(props: IManageProps) {
         props.currentUser
         ?
         <>
+            <h1>{props.currentUser.username}'s Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -131,7 +133,11 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
-                                    <td><Button variant="secondary" onClick={() => edit(C)}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
+                                    <td>
+                                    <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
+                                    <Button variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
+                                    <Link to="/view-collection" className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
+                                    </td>
                                 </tr> 
                     })}
                     {getComponent()}
