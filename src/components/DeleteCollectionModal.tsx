@@ -3,7 +3,6 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
 import { Collections } from "../dtos/collection";
 import {deleteCollection} from "../remote/collection-service";
-import { updateUnionTypeNode } from "typescript";
 
 
 interface ICollectionModal {
