@@ -9,6 +9,7 @@ import RegisterComponent from "./components/RegisterComponent"
 import CreateCollectionComponent from './components/CreateCollectionComponent';
 import CreateQuestionComponent from './components/CreateQuestionComponent';
 import CustomGameComponent from './components/CustomGameComponent';
+import ManageCollectionComponent from './components/ManageCollectionComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { Collections } from './dtos/collection';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/create-collection" render={() => <CreateCollectionComponent currentUser={authUser} /> } />
             <Route path="/create-question" render={() => <CreateQuestionComponent currentUser={authUser} /> } />
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentCollection={collection} setCurrentCollection={setCollection} /> } />
+            <Route path="/manage-collections" render={() => <ManageCollectionComponent currentUser={authUser} /> } />
         </Switch>
       </Router>
     </>
