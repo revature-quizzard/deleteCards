@@ -2,6 +2,7 @@ import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import DeleteCollectionModal from "./DeleteCollectionModal";
 import CreateCollectionModal from "./CreateCollectionModal";
+import EditCollectionModal from "./EditCollectionModal";
 import {Redirect} from "react-router-dom";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
@@ -18,6 +19,7 @@ function ManageCollectionComponent(props: IManageProps) {
     let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
     let [showCreate, setShowCreate] = useState(false);
+    let [showEdit, setShowEdit] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
     useEffect(() => {
@@ -47,8 +49,14 @@ function ManageCollectionComponent(props: IManageProps) {
             
     }
 
-    async function edit() {
-        return;
+    function edit(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
+        setShowEdit(true);
+        setCurrentCollection(collection);
+        return undefined;
     }
 
     function remove(collection : Collections | undefined) {
@@ -98,6 +106,8 @@ function ManageCollectionComponent(props: IManageProps) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
         } else if(showCreate) {
             return <CreateCollectionModal current_user={props.currentUser} show={showCreate} setShow={setShowCreate} updateUI={createUI}/>;
+        } else if(showEdit){
+            return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
         }
     }
 
@@ -121,7 +131,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
-                                    <td><Button variant="secondary" onClick={edit}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
+                                    <td><Button variant="secondary" onClick={() => edit(C)}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
                                 </tr> 
                     })}
                     {getComponent()}
