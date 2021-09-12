@@ -16,7 +16,7 @@ function HomeComponent(props: IHomeProps) {
         props.currentUser
         ?
         <>
-            <Link to="/" className="btn btn-primary">Join Game</Link>
+            <Link to="/join-game" className="btn btn-primary">Join Game</Link>
             <br/><br/>
             <Link to="/manage-collections" className="btn btn-primary">Manage Collection</Link>
             <br/><br/>
