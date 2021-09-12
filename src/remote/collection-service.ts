@@ -1,14 +1,17 @@
+import { Collections } from '../dtos/collection.js';
 import env from '../util/env.js';
 
-export const createCollection = async (colleciton: {collectionTitle: string , collectionDescription: string , collectionCategory: string , collectionAuthor: string}) => {
+export const createCollection = async (collection : Collections | undefined, token : string) => {
     let resp = await fetch(`${env.apiUrl}/collections`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
         },
-        body: JSON.stringify(colleciton)
+        body: JSON.stringify(collection)
     });
 
+    console.log(resp.status)
     if (resp.status > 299) {
         throw await resp.json();
     }

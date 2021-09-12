@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import DeleteCollectionModal from "./DeleteCollectionModal";
+import CreateCollectionModal from "./CreateCollectionModal";
 import {Redirect} from "react-router-dom";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
@@ -16,6 +17,7 @@ function ManageCollectionComponent(props: IManageProps) {
     let [errorMessage, setErrorMessage] = useState('');
     let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
+    let [showCreate, setShowCreate] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
     useEffect(() => {
@@ -74,13 +76,28 @@ function ManageCollectionComponent(props: IManageProps) {
         setCollections(temp);
     }
 
+    function createUI(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
+        console.log(collection.id)
+        let temp = collections;
+        temp.push(collection);
+        console.log(temp);
+        setCollections(temp);
+    }
+
     async function create() {
-        return;
+        setShowCreate(true);
+        return undefined;
     }
 
     function getComponent() {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
+        } else if(showCreate) {
+            return <CreateCollectionModal current_user={props.currentUser} show={showCreate} setShow={setShowCreate} updateUI={createUI}/>;
         }
     }
 
