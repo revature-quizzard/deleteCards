@@ -54,14 +54,17 @@ export const getCollection = async (collection_id : string, token : string) => {
 
 }
 
-export const editCollection = async (collection: Collections, token: string) => {
+export const editCollection = async (collection: {title: string , description: string , category: string} , token: String ) => {
+
     let resp = await fetch(`${env.apiUrl}/collections`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `${token}`
         },
+
         body: JSON.stringify(collection)
+
     });
 
     if (resp.status > 299) {
