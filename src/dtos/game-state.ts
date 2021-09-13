@@ -1,16 +1,17 @@
 export class GameState {
 
-    match_id: string;
-    player1: [];
-   
-   
+    id: string;
+    name: string;
+    category: string;
+    capacity: number;
+    players: string[];
 
-
-
-    constructor(mid: string, plyr1: [] ) {
-        
-        this.match_id = mid;
-        this.player1 = plyr1;
+    constructor(id: string, name: string, category: string, capacity: number, players: string[]) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.capacity = capacity;
+        this.players = players;      
     }
 
 }
