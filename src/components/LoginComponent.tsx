@@ -3,13 +3,26 @@ import {Principal} from "../dtos/principal";
 import {authenticate} from "../remote/auth-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
 import {Redirect} from "react-router-dom";
+// import {Form, Button} from 'react-bootstrap';
+import {Button, FormControl, Input, InputLabel, makeStyles, Typography} from "@material-ui/core";
 
 interface ILoginProps {
     currentUser: Principal | undefined,
     setCurrentUser: (nextUser: Principal | undefined) => void
 }
 
+const useStyles = makeStyles({
+    loginContainer: {
+        justifyContent: "center",
+        marginLeft: "25rem",
+        marginTop: "10rem",
+        padding: 20,
+        width: "25%"
+    }
+});
+
 function LoginComponent(props: ILoginProps) {
+    const classes = useStyles();
     let [username, setUsername] = useState('');
     let [password, setPassword] = useState('');
     let [errorMessage, setErrorMessage] = useState('');
@@ -39,14 +52,45 @@ function LoginComponent(props: ILoginProps) {
     return(
         props.currentUser ? <Redirect to="/"/> :
         <>
-            <div>
-                <input id="username-input" type="text" onChange={updateUsername}/>
-                <br/><br/>
-                <input id="password-input" type="password" onChange={updatePassword}/>
-                <br/><br/>
-                <button id="login-btn" onClick={login}>Login</button>
-                <br/><br/>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
+
+            <div id="login-component" className={classes.loginContainer}>
+
+            <Typography align="center" variant="h4">Please Log In to Your Account</Typography>
+
+            <FormControl margin="normal" fullWidth>
+                <InputLabel htmlFor="username">Username</InputLabel>
+                <Input
+                    onChange={updateUsername}
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                />
+            </FormControl>
+
+            <FormControl margin="normal" fullWidth>
+                <InputLabel htmlFor="password">Password</InputLabel>
+                <Input
+                    onChange={updatePassword}
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                />
+            </FormControl>
+
+            <br/><br/>
+
+            <Button
+                id="login-button"
+                onClick={login}
+                variant="contained"
+                color="primary"
+                size="medium">Login</Button>
+
+            <br/><br/>
+
+            { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </div>
         </>
     )
