@@ -23,22 +23,22 @@ const useStyles = makeStyles({
 
 function LoginComponent(props: ILoginProps) {
     const classes = useStyles();
-    let [username, setUsername] = useState('');
-    let [password, setPassword] = useState('');
     let [errorMessage, setErrorMessage] = useState('');
 
-    function updateUsername(e: any) {
-        setUsername(e.currentTarget.value);
-    }
+    const [formData, setFormData] = useState({
+        username: '',
+        password: ''
+    });
 
-    function updatePassword(e: any) {
-        setPassword(e.currentTarget.value);
+    let handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setFormData({...formData, [name]: value});
     }
 
     async function login() {
         try {
-            if (username && password) {
-                let principal = await authenticate({username, password});
+            if (formData.username && formData.password) {
+                let principal = await authenticate({username: formData.username, password: formData.password});
                 props.setCurrentUser(principal);
             } else {
                 setErrorMessage('You must provide a username and a password!');
@@ -52,7 +52,6 @@ function LoginComponent(props: ILoginProps) {
     return(
         props.currentUser ? <Redirect to="/"/> :
         <>
-
             <div id="login-component" className={classes.loginContainer}>
 
             <Typography align="center" variant="h4">Please Log In to Your Account</Typography>
@@ -60,7 +59,7 @@ function LoginComponent(props: ILoginProps) {
             <FormControl margin="normal" fullWidth>
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input
-                    onChange={updateUsername}
+                    onChange={handleChange}
                     id="username"
                     name="username"
                     type="text"
@@ -71,7 +70,7 @@ function LoginComponent(props: ILoginProps) {
             <FormControl margin="normal" fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <Input
-                    onChange={updatePassword}
+                    onChange={handleChange}
                     id="password"
                     name="password"
                     type="password"
