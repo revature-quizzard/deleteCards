@@ -60,6 +60,23 @@ function ManageCollectionComponent(props: IManageProps) {
         return undefined;
     }
 
+    function editUI(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+        let temp = collections;
+        temp.forEach((c:Collections) => {
+            if(c.id === collection.id) {
+                console.log(c)
+                c.title = collection.title;
+                c.description = collection.description;
+                c.category = collection.category;
+            }
+        })
+        console.log(temp)
+        setCollections(temp);
+    }
+
     function remove(collection : Collections | undefined) {
         if(!collection) {
             return;
@@ -108,7 +125,7 @@ function ManageCollectionComponent(props: IManageProps) {
         } else if(showCreate) {
             return <CreateCollectionModal current_user={props.currentUser} show={showCreate} setShow={setShowCreate} updateUI={createUI}/>;
         } else if(showEdit){
-            return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
+            return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={editUI}/>;
         }
     }
 

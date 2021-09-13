@@ -21,11 +21,12 @@ export const createCollection = async (collection : Collections | undefined, tok
 
 }
 
-export const getAllCollections = async (collection: {collectionTitle: string , collectionDescription: string , collectionCategory: string , collectionAuthor: string}) => {
+export const getAllCollections = async (token: string) => {
     let resp = await fetch(`${env.apiUrl}/collections`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
 
         }
     });
@@ -33,6 +34,9 @@ export const getAllCollections = async (collection: {collectionTitle: string , c
     if (resp.status > 299) {
         throw await resp.json();
     }
+
+    let collections : Collections[] = await resp.json();
+    return collections
 
 }
 
