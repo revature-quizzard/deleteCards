@@ -1,10 +1,10 @@
-import {Principal} from "../dtos/principal";
+import {Principal} from "../../dtos/principal";
 import {useState, useEffect} from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
-import {editCollection} from "../remote/collection-service";
-import ErrorMessageComponent from "./ErrorMessageComponent";
-import { Collections } from "../dtos/collection";
+import {editCollection} from "../../remote/collection-service";
+import ErrorMessageComponent from "../ErrorMessageComponent";
+import { Collections } from "../../dtos/collection";
 
 interface IEditCollectionProps {
     current_user: Principal | undefined

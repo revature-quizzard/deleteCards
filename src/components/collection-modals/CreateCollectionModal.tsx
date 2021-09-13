@@ -1,12 +1,10 @@
-import {Principal} from "../dtos/principal";
+import {Principal} from "../../dtos/principal";
 import {useState, useEffect} from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
-import { Collections } from "../dtos/collection";
-import {createCollection} from "../remote/collection-service";
-import ErrorMessageComponent from "./ErrorMessageComponent";
-import { create } from "domain";
-import { async } from "@firebase/util";
+import { Collections } from "../../dtos/collection";
+import {createCollection} from "../../remote/collection-service";
+import ErrorMessageComponent from "../ErrorMessageComponent";
 
 interface ICollectionModal {
     current_user: Principal | undefined

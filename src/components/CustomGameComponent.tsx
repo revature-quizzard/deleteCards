@@ -172,9 +172,11 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              {/* ////////////////////////////////////////////////////////////////// */}
                                              <td>
                                                 <p>"{C?.title}" (Preview?)</p>
+                                                {} ?
                                                 <ul>
                                                     {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{return <li key={i}>{q?.question}</li> })}
                                                 </ul>
+                                                : <></>
                                                    
                                              </td>
                                               {/* ////////////////////////////////////////////////////////////////// */}
@@ -219,7 +221,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                 Setup som pregame settings here
                                 </Card.Text>
-                                <Button variant="primary">Create Game</Button>
+                                <Button variant="primary">Game View</Button>
                             </Card.Body>
                             </Card>
                             </td>

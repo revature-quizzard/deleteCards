@@ -1,30 +1,31 @@
-import {Principal} from "../dtos/principal";
+import {Principal} from "../../dtos/principal";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
-import { Collections } from "../dtos/collection";
-import {deleteCollection} from "../remote/collection-service";
+import { Collections } from "../../dtos/collection";
+import { Question } from "../../dtos/question";
+import {deleteQuestion} from "../../remote/question-service";
 
 
 interface ICollectionModal {
     current_user: Principal | undefined
-    collection : Collections | undefined;
+    question : Question | undefined;
     show: boolean;
     setShow: (val: boolean) => void
-    updateUI: (collection: Collections) => void
+    updateUI: (question: Question) => void
 }
 
-function DeleteCollectionModal(props: ICollectionModal) {
+function DeleteQuestionModal(props: ICollectionModal) {
     const handleClose = () => {
       props.setShow(false);
     }
 
     const remove = () => {
       handleClose();
-      if(props.collection?.id && props.current_user) {
+      if(props.question?.id && props.current_user) {
         console.log("DELETING")
-        deleteCollection(props.collection?.id, props.current_user?.token);
+        deleteQuestion(props.question?.id, props.current_user?.token);
         //Tells main page to refresh the collections
-        props.updateUI(props.collection);
+        props.updateUI(props.question);
       }
     }
     return (
@@ -33,7 +34,7 @@ function DeleteCollectionModal(props: ICollectionModal) {
             <Modal.Header closeButton>
               <Modal.Title>Are you sure?</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Do you want to delete collection "{props.collection?.title}"</Modal.Body>
+            <Modal.Body>Do you want to delete this question?</Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
                 Cancel
@@ -46,4 +47,5 @@ function DeleteCollectionModal(props: ICollectionModal) {
         </>
       );
 }
-export default DeleteCollectionModal;
+export default DeleteQuestionModal;
+

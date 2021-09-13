@@ -1,14 +1,13 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
-import DeleteCollectionModal from "./DeleteCollectionModal";
-import CreateCollectionModal from "./CreateCollectionModal";
-import editCollectionModal from "./EditCollectionModal";
+import DeleteCollectionModal from "./collection-modals/DeleteCollectionModal";
+import CreateCollectionModal from "./collection-modals/CreateCollectionModal";
+import EditCollectionModal from "./collection-modals/EditCollectionModal";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getSavedCollections} from "../remote/user-service";
 import { Redirect , Link } from "react-router-dom";
-import EditCollectionModal from "./EditCollectionModal";
 
 interface IManageProps {
     currentUser: Principal | undefined;
