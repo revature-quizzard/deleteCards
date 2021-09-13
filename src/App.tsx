@@ -18,12 +18,6 @@ import { Collections } from './dtos/collection';
 import { GameState } from './dtos/game-state';
 
 
-
-
-
-
-
-
 function App() {
 
   const [authUser, setAuthUser] = useState(undefined as Principal | undefined)
