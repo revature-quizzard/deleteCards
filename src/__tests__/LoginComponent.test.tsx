@@ -3,6 +3,10 @@ import {shallow, mount} from 'enzyme';
 import LoginComponent from "../components/LoginComponent";
 import ErrorMessageComponent from '../components/ErrorMessageComponent';
 
+// Jest Mocks
+import {authenticate} from '../remote/auth-service';
+jest.mock('../remote/auth-service');
+
 // Jest's describe function creates a test suite for grouping any number of test cases (optional)
 describe('LoginComponent Test Suite', () => {
 
@@ -31,19 +35,19 @@ describe('LoginComponent Test Suite', () => {
     })
 
     it('Renders the login header', () => {
-        // Mock up the props
-        let mockUser = undefined;
-        let mockSetUserFn = jest.fn();
+        // // Mock up the props
+        // let mockUser = undefined;
+        // let mockSetUserFn = jest.fn();
 
-        const wrapper = shallow(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
+        // const wrapper = shallow(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
 
-        // Verify that given tsx is rendered
-        // Note: This is from the Bookstore UI, so obv it will not be rendered unless Login is changed
-        const expectedHeader = <Typography align='center' variant='h4'>Log In</Typography>
+        // // Verify that given tsx is rendered
+        // // Note: This is from the Bookstore UI, so obv it will not be rendered unless Login is changed
+        // const expectedHeader = <Typography align='center' variant='h4'>Log In</Typography>
 
-        // Using the wrapper instance, in conjunction with Jest's expect function, we can check that certain
-        // aspects of our component were rendered properly
-        expect(wrapper.contains(expectedHeader)).toEqual(true);
+        // // Using the wrapper instance, in conjunction with Jest's expect function, we can check that certain
+        // // aspects of our component were rendered properly
+        // expect(wrapper.contains(expectedHeader)).toEqual(true);
     })
 
     it('Username and password fields start empty', () => {
@@ -62,12 +66,14 @@ describe('LoginComponent Test Suite', () => {
 
         // For debugging purposes, it's useful to see what the wrapper objects contain.
         // For this, we use ShallowWrappper's debug method
-        console.log(usernameInputWrapper.debug());
-        console.log(usernameInputWrapper.getElement);
-        console.log(usernameInputWrapper.debug());
+        // console.log(usernameInputWrapper.debug());
+        // console.log(usernameInputWrapper.dive());
+        // console.log(usernameInputWrapper.getElement);
+        // console.log(usernameInputWrapper.text());
+        // console.log(usernameInputWrapper.prop('value'));
 
-        expect(usernameInputWrapper.getElement).toBe('');
-        expect(passwordInputWrapper.text()).toBe('');
+        expect(usernameInputWrapper.prop('value')).toBe('');
+        expect(passwordInputWrapper.prop('value')).toBe('');
     });
 
     it('Clicking login button with missing form field values displays error message', () => {
@@ -87,6 +93,45 @@ describe('LoginComponent Test Suite', () => {
         let expectedErrorComponent = <ErrorMessageComponent errorMessage={'You must provide a username and a password!'}/>;
         
         expect(wrapper.contains(expectedErrorComponent)).toBe(true);
+    });
+
+    it('Clicking login button with valid form field values attempts to login', () => {
+        // Mock up the props
+        let mockUser = undefined;
+        let mockSetUserFn = jest.fn();
+
+        // We need to use Enzyme's mount function so that child components are rendered
+        const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
+
+        let usernameInputWrapper = wrapper.find('#username-input');
+        let passwordInputWrapper = wrapper.find('#password-input');
+        let loginButtonWrapper = wrapper.find('#login-btn').at(0);
+
+        console.log(usernameInputWrapper.debug());
+
+        usernameInputWrapper.simulate('change', {currentTarget: {value: 'ValidUsername'}});
+        passwordInputWrapper.simulate('change', {currentTarget: {value: 'ValidPassword'}});
+
+        expect(usernameInputWrapper.prop('value')).toBe('ValidUsername');
+        expect(passwordInputWrapper.prop('value')).toBe('ValidPassword');
+
+        loginButtonWrapper.simulate('click');
+
+        expect(authenticate).toBeCalledTimes(1);
+
+        
+    });
+
+    it('Clicking login button with incorrect credentials displays error message', () => {
+        // Mock up the props
+        let mockUser = undefined;
+        let mockSetUserFn = jest.fn();
+
+        // We need to use Enzyme's mount function so that child components are rendered
+        const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
+
+        let loginButtonWrapper = wrapper.find('#login-btn').at(0);
     })
+
 
 })

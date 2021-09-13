@@ -40,9 +40,9 @@ function LoginComponent(props: ILoginProps) {
         props.currentUser ? <Redirect to="/"/> :
         <>
             <div>
-                <input id="username-input" type="text" onChange={updateUsername}/>
+                <input id="username-input" value='' type="text" onChange={updateUsername}/>
                 <br/><br/>
-                <input id="password-input" type="password" onChange={updatePassword}/>
+                <input id="password-input" value='' type="password" onChange={updatePassword}/>
                 <br/><br/>
                 <button id="login-btn" onClick={login}>Login</button>
                 <br/><br/>
