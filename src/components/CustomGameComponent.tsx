@@ -219,7 +219,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                 Setup som pregame settings here
                                 </Card.Text>
-                                <Button variant="primary">Game View</Button>
+                                <Button variant="primary">Create Game</Button>
                             </Card.Body>
                             </Card>
                             </td>
