@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import {shallow, mount} from 'enzyme';
-import LoginComponent from "../components/LoginComponent";
+import LoginComponent from '../components/LoginComponent';
 import ErrorMessageComponent from '../components/ErrorMessageComponent';
 
 // Jest Mocks
@@ -61,8 +61,8 @@ describe('LoginComponent Test Suite', () => {
 
         // The ShallowWrapper instance exposes a find method that can be used to query the rendered component 
         // It returns another instance of ShallowWrapper, containing the selected DOM element
-        let usernameInputWrapper = wrapper.find('#username-input');
-        let passwordInputWrapper = wrapper.find('#password-input');
+        let usernameInputWrapper = wrapper.find('#username');
+        let passwordInputWrapper = wrapper.find('#password');
 
         // For debugging purposes, it's useful to see what the wrapper objects contain.
         // For this, we use ShallowWrappper's debug method
@@ -72,8 +72,8 @@ describe('LoginComponent Test Suite', () => {
         // console.log(usernameInputWrapper.text());
         // console.log(usernameInputWrapper.prop('value'));
 
-        expect(usernameInputWrapper.prop('value')).toBe('');
-        expect(passwordInputWrapper.prop('value')).toBe('');
+        expect(usernameInputWrapper.text()).toBe('');
+        expect(passwordInputWrapper.text()).toBe('');
     });
 
     it('Clicking login button with missing form field values displays error message', () => {
@@ -84,7 +84,7 @@ describe('LoginComponent Test Suite', () => {
         // We need to use Enzyme's mount function so that child components are rendered
         const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
 
-        let loginButtonWrapper = wrapper.find('#login-btn').at(0);
+        let loginButtonWrapper = wrapper.find('#login-button').at(0);
 
         console.log(loginButtonWrapper.debug());
 
@@ -100,21 +100,14 @@ describe('LoginComponent Test Suite', () => {
         let mockUser = undefined;
         let mockSetUserFn = jest.fn();
 
-        // We need to use Enzyme's mount function so that child components are rendered
-        const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
+        const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn}/>);
 
-        let usernameInputWrapper = wrapper.find('#username-input');
-        let passwordInputWrapper = wrapper.find('#password-input');
-        let loginButtonWrapper = wrapper.find('#login-btn').at(0);
+        let usernameInput = wrapper.find('input[name="username"]');
+        let passwordInput =  wrapper.find('input[name="password"]');
+        let loginButtonWrapper = wrapper.find('button');
 
-        console.log(usernameInputWrapper.debug());
-
-        usernameInputWrapper.simulate('change', {currentTarget: {value: 'ValidUsername'}});
-        passwordInputWrapper.simulate('change', {currentTarget: {value: 'ValidPassword'}});
-
-        expect(usernameInputWrapper.prop('value')).toBe('ValidUsername');
-        expect(passwordInputWrapper.prop('value')).toBe('ValidPassword');
-
+        usernameInput.simulate('change', {target: {name: 'username', value: 'test-username'}});
+        passwordInput.simulate('change', {target: {name: 'password', value: 'test-password'}});
         loginButtonWrapper.simulate('click');
 
         expect(authenticate).toBeCalledTimes(1);
@@ -122,6 +115,7 @@ describe('LoginComponent Test Suite', () => {
         
     });
 
+    // Does not currently work, need to figure out how to mock return of authenticate function
     it('Clicking login button with incorrect credentials displays error message', () => {
         // Mock up the props
         let mockUser = undefined;
@@ -130,7 +124,21 @@ describe('LoginComponent Test Suite', () => {
         // We need to use Enzyme's mount function so that child components are rendered
         const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
 
-        let loginButtonWrapper = wrapper.find('#login-btn').at(0);
+        let usernameInput = wrapper.find('input[name="username"]');
+        let passwordInput =  wrapper.find('input[name="password"]');
+        let loginButtonWrapper = wrapper.find('button');
+
+        usernameInput.simulate('change', {target: {name: 'username', value: 'test-username'}});
+        passwordInput.simulate('change', {target: {name: 'password', value: ''}});
+        loginButtonWrapper.simulate('click');
+        
+
+        expect(authenticate).toBeCalledTimes(1);
+        // authenticate.mockReturnValueOnce();
+
+        let expectedErrorComponent = <ErrorMessageComponent errorMessage={'Invalid credentials provided!'}/>;
+        
+        expect(wrapper.contains(expectedErrorComponent)).toBe(true);
     })
 
 

@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import { Collections } from "../../dtos/collection";
 import {createCollection} from "../../remote/collection-service";
 import ErrorMessageComponent from "../ErrorMessageComponent";
+import { ButtonGroup, Dropdown, DropdownButton } from "react-bootstrap";
 
 interface ICollectionModal {
     current_user: Principal | undefined
@@ -49,10 +50,19 @@ function CreateCollectionModal(props: ICollectionModal) {
         setCollection(temp);
     }
 
-    function updateCategory(e : any) {
+    function updateCategory(e : any , key : Number) {
       let temp = collection;
       if(temp) {
-        temp.category = e.currentTarget.value;
+        if(key === 1)
+        temp.category = "Entertainment";
+        else if(key === 2)
+        temp.category = "Education";
+        else if(key === 3)
+        temp.category = "Food";
+        else if(key === 4)
+        temp.category = "Love";
+        else
+        temp.category = "Misc";
       }
       setCollection(temp);
     }
@@ -74,7 +84,13 @@ function CreateCollectionModal(props: ICollectionModal) {
             <Modal.Body>
               <input id="title-input" type="text" onChange={updateTitle} placeholder="Title"/>
               <br/><br/>
-              <input id="category-input" type="text" onChange={updateCategory} placeholder="Category"/>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${collection?.category}`}>
+              <Dropdown.Item eventKey="1"  onClick={(e) => updateCategory(e , 1)}>Entertainment</Dropdown.Item>
+                <Dropdown.Item eventKey="2"  onClick={(e) => updateCategory(e , 2)}>Education</Dropdown.Item>
+                <Dropdown.Item eventKey="3"  onClick={(e) => updateCategory(e , 3)}>Food</Dropdown.Item>
+                <Dropdown.Item eventKey="4"  onClick={(e) => updateCategory(e , 4)}>Love</Dropdown.Item>
+                <Dropdown.Item eventKey="5"  onClick={(e) => updateCategory(e , 5)}>Misc</Dropdown.Item>
+              </DropdownButton>
               <br/><br/>
               <input id="description-input" type="text" onChange={updateDescription} placeholder="Description"/>
               <br/><br/>

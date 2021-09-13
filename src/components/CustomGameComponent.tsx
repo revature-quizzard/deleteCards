@@ -7,13 +7,15 @@ import { Redirect , Link } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
-import { Card } from "react-bootstrap";
-import GameSettingsModal from "./GameSettingsModal";
+import { Card, ListGroup } from "react-bootstrap";
+import GameSettingsModal from "./collection-modals/GameSettingsModal";
 import { Question } from "../dtos/question";
+import { stringify } from "querystring";
 
 
 let targetsCollections :  [] | undefined;
 let targetCollectionQuestionsList :  [] | undefined;
+let globalKey : Number | undefined;
 let collectionVisible : boolean = false;
 let collectionQLVisible : boolean = false;
 let showCollectionText = "Show Collections";
@@ -102,7 +104,15 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
     {
         if(collectionVisible && targetsCollections)
         {
+              
               setCurrentCollection(targetsCollections[key]);
+                let maxPlayers: Number = 2;
+                let matchTimer : Number = 60;
+                let collection : Collections = currentCollection as Collections;
+                let category : string | undefined = currentCollection?.category;
+                let name: string = 'name';
+              props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+              
               console.log("key : " , key ,  " value : " , targetsCollections[key]);
         }
       
@@ -162,7 +172,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     <tbody>
                     {/* god loop */}
                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */}
-                    {targetsCollections?.map((C : Collections | undefined , i) =>{
+                    {targetsCollections?.map((C : Collections | undefined , i ) =>{
                            return  <tr key={i} >
                                              <td>{C?.title} </td>
                                              <td>{C?.category}</td>
@@ -170,22 +180,20 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.author.username.toString()}</td>
                                              {/* mini loop cell*/}
                                              {/* ////////////////////////////////////////////////////////////////// */}
+                                            
                                              <td>
                                                 <p>"{C?.title}" (Preview?)</p>
-                                                {} ?
                                                 <ul>
                                                     {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{return <li key={i}>{q?.question}</li> })}
-                                                </ul>
-                                                : <></>
-                                                   
-                                             </td>
+                                                </ul> 
+                                             </td> 
                                               {/* ////////////////////////////////////////////////////////////////// */}
                                              <td><Button variant="secondary" onClick={(e) => displayQuestions( e , i)}> {showQuestionListText.toString()}</Button> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
                     </tbody>
-                </Table>
+                </Table >
 
                 <table>
                     <tbody>
@@ -194,10 +202,19 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                             <Card style={{ width: '18rem' }}>
                             <Card.Body>
                                 <Card.Title>Game Manager</Card.Title>
-                                <Card.Text>
-                                Setup some pregame settings here
-                                </Card.Text>
+                                
                                 <Button variant="success" onClick={displayModal}>Game Settings</Button>
+                                <Card.Text>
+                                    <br />
+                                <ListGroup  >
+                                    <ListGroup.Item  ><h6>Summary</h6>Collection : "{props.currentGameSettings_?.collection?.title}"</ListGroup.Item>
+                                    <ListGroup.Item  >Match time : {props.currentGameSettings_?.matchTimer} (seconds)</ListGroup.Item>
+                                    <ListGroup.Item  >Category : {currentCollection?.category}</ListGroup.Item>
+                                    <ListGroup.Item  >Max Players : {props.currentGameSettings_?.maxPlayers}</ListGroup.Item>
+                                    <ListGroup.Item  > Name : {props.currentGameSettings_?.name}</ListGroup.Item>
+                                </ListGroup>
+                                </Card.Text>
+                                    
                                 {getModal()}
                             </Card.Body>
                             </Card> 
@@ -212,6 +229,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 </Card.Text>
                                 <Link to="/" className="btn btn-primary">Start Game</Link>
                             </Card.Body>
+                         
                             </Card>
                             </td>
                             <td>
@@ -221,7 +239,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                 Setup som pregame settings here
                                 </Card.Text>
-                                <Button variant="primary">Game View</Button>
+                                <Button variant="primary">Confirm</Button>
                             </Card.Body>
                             </Card>
                             </td>
