@@ -1,14 +1,18 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import DeleteCollectionModal from "./DeleteCollectionModal";
-import {Redirect} from "react-router-dom";
+import CreateCollectionModal from "./CreateCollectionModal";
+import editCollectionModal from "./EditCollectionModal";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getSavedCollections} from "../remote/user-service";
+import { Redirect , Link } from "react-router-dom";
+import EditCollectionModal from "./EditCollectionModal";
 
 interface IManageProps {
     currentUser: Principal | undefined;
+    setCurrCollection: (nextCollection: Collections | undefined) => void
 }
 
 function ManageCollectionComponent(props: IManageProps) {
@@ -16,6 +20,8 @@ function ManageCollectionComponent(props: IManageProps) {
     let [errorMessage, setErrorMessage] = useState('');
     let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
+    let [showCreate, setShowCreate] = useState(false);
+    let [showEdit, setShowEdit] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
     useEffect(() => {
@@ -45,8 +51,14 @@ function ManageCollectionComponent(props: IManageProps) {
             
     }
 
-    async function edit() {
-        return;
+    function edit(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
+        setShowEdit(true);
+        setCurrentCollection(collection);
+        return undefined;
     }
 
     function remove(collection : Collections | undefined) {
@@ -74,13 +86,30 @@ function ManageCollectionComponent(props: IManageProps) {
         setCollections(temp);
     }
 
+    function createUI(collection : Collections | undefined) {
+        if(!collection) {
+            return;
+        }
+
+        console.log(collection.id)
+        let temp = collections;
+        temp.push(collection);
+        console.log(temp);
+        setCollections(temp);
+    }
+
     async function create() {
-        return;
+        setShowCreate(true);
+        return undefined;
     }
 
     function getComponent() {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
+        } else if(showCreate) {
+            return <CreateCollectionModal current_user={props.currentUser} show={showCreate} setShow={setShowCreate} updateUI={createUI}/>;
+        } else if(showEdit){
+            return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={removeUI}/>;
         }
     }
 
@@ -88,6 +117,7 @@ function ManageCollectionComponent(props: IManageProps) {
         props.currentUser
         ?
         <>
+            <h1>{props.currentUser.username}'s Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -104,7 +134,11 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
-                                    <td><Button variant="secondary" onClick={edit}>Edit</Button> <Button variant="secondary" onClick={() => remove(C)}>Delete</Button></td>
+                                    <td>
+                                    <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
+                                    <Button variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
+                                    <Link to="/view-collection" className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
+                                    </td>
                                 </tr> 
                     })}
                     {getComponent()}

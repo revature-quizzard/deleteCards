@@ -17,7 +17,7 @@ let targetCollectionQuestionsList :  [] | undefined;
 let collectionVisible : boolean = false;
 let collectionQLVisible : boolean = false;
 let showCollectionText = "Show Collections";
-let showQuestionListText ="Veiw Questions";
+let showQuestionListText ="Preview";
 
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
@@ -49,27 +49,58 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
 
 
     function displayQuestions(e : any , key: any) {
-        
-        if(collectionVisible && collectionQLVisible)
-        {
-            if(targetsCollections)
-            {
-                  setCurrentCollection(targetsCollections[key]);
-                  console.log("key : " , key ,  " value : " , targetsCollections[key]);
-                  targetCollectionQuestionsList = currentCollection?.questionList;
-            }
-            
-        }else{
-            setCurrentCollection(undefined);
-            targetCollectionQuestionsList = currentCollection?.questionList;
-        }
 
-        collectionQLVisible = !collectionQLVisible;
+       
+
+       if(collectionVisible && targetsCollections)
+       {
+           
+           setCurrentCollection(targetsCollections[key]);
+       
+           console.log("key :  " , key ,  " value : " , targetsCollections[key]);
+           // return early if there are no questions in list
+           if(currentCollection?.questionList.length === 0 )
+           { 
+               collectionQLVisible = false;
+               
+               return;
+           }
+
+           if(collectionQLVisible === false)
+           {
+                targetCollectionQuestionsList = currentCollection?.questionList;
+                collectionQLVisible = true;
+                showQuestionListText = "Preview";
+               
+           }else if(collectionQLVisible === true && currentCollection){
+                setCurrentCollection(undefined);
+             //  currentCollection.questionList = [];
+                targetCollectionQuestionsList = currentCollection?.questionList;   
+                collectionQLVisible = false;
+                showQuestionListText = "Hide";
+
+           }else{
+            console.log("Questions Visiblity : " + collectionQLVisible);
+           }
+
+        
+            
+        }
+        else
+        {
+            setCurrentCollection(undefined);
+             //  currentCollection.questionList = [];
+                targetCollectionQuestionsList = currentCollection?.questionList; 
+            collectionQLVisible = false;
+            
+        } 
+        
+        
     }
 
     function selectCollection(e: any , key: any)
     {
-        if(targetsCollections)
+        if(collectionVisible && targetsCollections)
         {
               setCurrentCollection(targetsCollections[key]);
               console.log("key : " , key ,  " value : " , targetsCollections[key]);
@@ -94,6 +125,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     showCollectionText = "Show Collections" ;
                     props.setCurrentCollection(undefined);
                     targetsCollections = undefined;
+                    
                 }else {
 
                     setErrorMessage('signed in You must be');
@@ -101,6 +133,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
 
                 collectionVisible = !collectionVisible;
                 console.log("Collections Visiblity : " + collectionVisible);
+                console.log("Questions Visiblity : " + collectionQLVisible);
 
            }catch (e: any) {
             setErrorMessage(e.message); 
@@ -121,11 +154,9 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>Collection Title</td>
                           <td>Collection Category</td>
                           <td>Collection Description</td>
-                          <td>By</td>
+                          <td>Author</td>
                           <td>Questions</td>
                           <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
-                          
-                <br/><br/>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,20 +168,17 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.category}</td>
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
+                                             {/* mini loop cell*/}
+                                             {/* ////////////////////////////////////////////////////////////////// */}
                                              <td>
-                                            <Button variant="secondary" onClick={(e) => displayQuestions( e , i)}>{showQuestionListText.toString()}</Button> 
-                                            <ul>
-                                            {/* mini loop */}
-                                            {/* ////////////////////////////////////////////////////////////////// */}
-                                            {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{
-                                             return <tr key={i}>
-                                             <td>{q?.question}</td>
-                                             </tr> 
-                                                 })}
-                                            {/* ////////////////////////////////////////////////////////////////// */}
-                                            </ul>
+                                                <p>"{C?.title}" (Preview?)</p>
+                                                <ul>
+                                                    {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{return <li key={i}>{q?.question}</li> })}
+                                                </ul>
+                                                   
                                              </td>
-                                             <td><Button variant="secondary" key={i} onClick={(e) => selectCollection( e , i)}>Select</Button></td>
+                                              {/* ////////////////////////////////////////////////////////////////// */}
+                                             <td><Button variant="secondary" onClick={(e) => displayQuestions( e , i)}> {showQuestionListText.toString()}</Button> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
@@ -167,7 +195,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                 Setup some pregame settings here
                                 </Card.Text>
-                                <Button variant="secondary" onClick={displayModal}>Game Settings</Button>
+                                <Button variant="success" onClick={displayModal}>Game Settings</Button>
                                 {getModal()}
                             </Card.Body>
                             </Card> 
