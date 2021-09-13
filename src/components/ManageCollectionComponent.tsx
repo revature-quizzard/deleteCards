@@ -1,8 +1,8 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
-import DeleteCollectionModal from "./DeleteCollectionModal";
-import CreateCollectionModal from "./CreateCollectionModal";
-import EditCollectionModal from "./EditCollectionModal";
+import DeleteCollectionModal from "./collection-modals/DeleteCollectionModal";
+import CreateCollectionModal from "./collection-modals/CreateCollectionModal";
+import EditCollectionModal from "./collection-modals/EditCollectionModal";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";

@@ -67,7 +67,6 @@ export const editCollection = async (collection: Collections, token: string) => 
     if (resp.status > 299) {
         throw await resp.json();
     }
-
 }
 
 export const deleteCollection = async (collection_id: String, token: String) => {
