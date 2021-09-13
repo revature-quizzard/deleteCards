@@ -17,8 +17,16 @@ interface IEditCollectionProps {
 }
 
 function EditCollectionModal(props: IEditCollectionProps) { 
-    let [editedCollection, setEditedCollection] = useState(props.collection);
+    let [editedCollection, setEditedCollection] = useState({
+                                                            id: props.collection?.id,
+                                                            title: props.collection?.title, 
+                                                            description: props.collection?.description,
+                                                            category: props.collection?.category,
+                                                            author:props.collection?.author,
+                                                            questionList:props.collection?.questionList
+                                                            } as Collections);
 
+    let [category, setCategory] = useState(props.collection?.category);
     let [errorMessage, setErrorMessage] = useState('');
 
     const handleClose = () => props.setShow(false);
@@ -45,8 +53,8 @@ function EditCollectionModal(props: IEditCollectionProps) {
         temp.category = "Love";
         else
         temp.category = "Misc";
-        
       }
+      setCategory(temp.category);
       setEditedCollection(temp);
     }
 
@@ -58,16 +66,17 @@ function EditCollectionModal(props: IEditCollectionProps) {
         };
     }
 
-    const edit = ()=> {
-        handleClose();
-         if (editedCollection && props.current_user) {
-                console.log("EDITING");
-                editCollection(editedCollection, props.current_user.token); 
-                
-                //TODO UpdateUI
-            } else {
-                setErrorMessage('You must provide all fields!');
-            }
+    const edit = async ()=> {
+        if (editedCollection && props.current_user) {
+          try {
+              await editCollection(editedCollection, props.current_user.token);
+          } catch(e : any) {
+              setErrorMessage(e.message);
+              return
+          }
+          props.updateUI(editedCollection)
+          handleClose();       
+      }
 
     }
 
@@ -79,7 +88,7 @@ function EditCollectionModal(props: IEditCollectionProps) {
             </Modal.Header>
             <Modal.Body><input id="collection-title-input" type="text" defaultValue={props.collection?.title} onChange={updateCollectionTitle} placeholder="Title"/>
                 <br/><br/>
-              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${editedCollection?.category}`}>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {category}>
                 <Dropdown.Item eventKey="1"  onClick={(e) => updateCategory(e , 1)}>Entertainment</Dropdown.Item>
                 <Dropdown.Item eventKey="2"  onClick={(e) => updateCategory(e , 2)}>Education</Dropdown.Item>
                 <Dropdown.Item eventKey="3"  onClick={(e) => updateCategory(e , 3)}>Food</Dropdown.Item>

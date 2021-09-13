@@ -24,6 +24,8 @@ function HomeComponent(props: IHomeProps) {
             <br/><br/>
             <Link to="/custom-game" className="btn btn-primary">Custom Game (Testing)</Link>
             <br/><br/>
+            <Link to="/discover" className="btn btn-primary">Discover</Link>
+            <br/><br/>
         </>
         :
         <Redirect to="/login"/>
