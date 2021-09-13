@@ -35,19 +35,18 @@ describe('LoginComponent Test Suite', () => {
     })
 
     it('Renders the login header', () => {
-        // // Mock up the props
-        // let mockUser = undefined;
-        // let mockSetUserFn = jest.fn();
+        // Mock up the props
+        let mockUser = undefined;
+        let mockSetUserFn = jest.fn();
 
-        // const wrapper = shallow(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
+        const wrapper = shallow(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
 
-        // // Verify that given tsx is rendered
-        // // Note: This is from the Bookstore UI, so obv it will not be rendered unless Login is changed
-        // const expectedHeader = <Typography align='center' variant='h4'>Log In</Typography>
+        // Verify that given tsx is rendered
+        const expectedHeader = <Typography align="center" variant="h4">Please Log In to Your Account</Typography>
 
-        // // Using the wrapper instance, in conjunction with Jest's expect function, we can check that certain
-        // // aspects of our component were rendered properly
-        // expect(wrapper.contains(expectedHeader)).toEqual(true);
+        // Using the wrapper instance, in conjunction with Jest's expect function, we can check that certain
+        // aspects of our component were rendered properly
+        expect(wrapper.contains(expectedHeader)).toEqual(true);
     })
 
     it('Username and password fields start empty', () => {
@@ -129,7 +128,7 @@ describe('LoginComponent Test Suite', () => {
         let loginButtonWrapper = wrapper.find('button');
 
         usernameInput.simulate('change', {target: {name: 'username', value: 'test-username'}});
-        passwordInput.simulate('change', {target: {name: 'password', value: ''}});
+        passwordInput.simulate('change', {target: {name: 'password', value: 'test-password'}});
         loginButtonWrapper.simulate('click');
         
 
