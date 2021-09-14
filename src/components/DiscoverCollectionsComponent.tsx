@@ -91,6 +91,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                           <td>Collection Category</td>
                           <td>Collection Description</td>
                           <td>Author</td>
+                          <td>Question Count</td>
                           <td>Manage</td>
                         </tr>
                     </thead>
@@ -102,6 +103,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
                                     <td>{C?.author.username}</td>
+                                    <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
                                     </td>

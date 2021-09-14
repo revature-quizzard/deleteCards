@@ -148,20 +148,6 @@ function ManageCollectionComponent(props: IManageProps) {
         }
     }
 
-    function removeFav(collection : Collections | undefined) {
-        if(!collection) {
-            return;
-        }
-
-        console.log(collection.id)
-        let temp = collections;
-        temp = temp.filter((c : Collections) => {
-            return !(c.id === collection.id)
-        })
-        console.log(temp);
-        setCollections(temp);
-    }
-
     function getComponent() {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
@@ -180,9 +166,10 @@ function ManageCollectionComponent(props: IManageProps) {
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
-                          <td>Collection Title</td>
-                          <td>Collection Category</td>
-                          <td>Collection Description</td>
+                          <td>Title</td>
+                          <td>Category</td>
+                          <td>Description</td>
+                          <td>Author</td>
                           <td>Question Count</td>
                           <td>Manage</td>
                         </tr>
@@ -194,6 +181,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
+                                    <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
@@ -213,9 +201,10 @@ function ManageCollectionComponent(props: IManageProps) {
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
-                          <td>Collection Title</td>
-                          <td>Collection Category</td>
-                          <td>Collection Description</td>
+                          <td>Title</td>
+                          <td>Category</td>
+                          <td>Description</td>
+                          <td>Author</td>
                           <td>Question Count</td>
                           <td>Manage</td>
                         </tr>
@@ -227,6 +216,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
+                                    <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
