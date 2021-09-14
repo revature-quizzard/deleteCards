@@ -14,10 +14,12 @@ const useStyles = makeStyles({
         marginLeft: "10rem",
         marginTop: "5rem",
         padding: 250,
-        width: "75%"
+        width: "75%",
+        borderRadius: "8em",
+        border: "white",
     },
      btn: {
-
+        backgroundColor: '#5f2568',
     }
 });
 
