@@ -202,7 +202,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             {/* @ts-ignore */}
                                             <td>{game.start_time}</td>
                                             {/* @ts-ignore */}
-                                            <td>{0 + '/' + game.capacity}</td>
+                                            <td>{game.players.length + '/' + game.capacity}</td>
                                             <td>
                                                 <Link to="/game" className="btn btn-secondary" onClick={() => props.setCurrentGame(game)}>Join Game</Link>
                                             </td>
