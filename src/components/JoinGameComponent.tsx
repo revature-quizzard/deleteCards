@@ -7,6 +7,14 @@ import { Redirect , Link, withRouter, useHistory } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import { Alert, Card, InputGroup, Table, Button, FormControl } from "react-bootstrap";
 
+import * as firestore from 'firebase/firestore';
+import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+import app from '../util/Firebase';
+
+const db = firestore.getFirestore(app);
+
 
 interface IJoinGameProps {
     currentUser: Principal | undefined;
@@ -32,11 +40,44 @@ function JoinGameComponent(props: IJoinGameProps) {
     let [errorMessage, setErrorMessage] = useState('');
     let history = useHistory();
 
+    const gamesRef = firestore.collection(db, 'games');
+
     // TODO Set up firestore snapshot listener to get up to date active games
     useEffect(() => {
+
+        // Initialize messages with data from db
+        // if (activeGames.length == 0) {
+        //     getGames().then(games => {
+        //     //@ts-ignore
+        //     setMessages(messages)
+        //     })
+        //     .catch(err => console.log(err));
+        // }
+
+        const unsub = firestore.onSnapshot((gamesRef), (querySnapshot) => {
+            let games : GameState[] = [];
+            querySnapshot.docs.forEach((docu) => {
+
+                console.log('Snapshot Document: \n', docu);
+                // @ts-ignore
+                console.log('Document info dug up: \n', docu['_document']['data']['value']['mapValue']['fields'])
+                
+                // @ts-ignore
+                let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
+                console.log('Newly assigned game: \n', newGame);
+                games.push(newGame);
+            })
+            // console.log('List of messages to be assigned to state: \n', msgs);  
+            // @ts-ignore
+            console.log(games[0]);
+            //@ts-ignore
+            console.log(games[0].start_time.timestampValue);
+            setActiveGames(games);
+        })
         
         return () => {
             // Unsubscribe from snapshot listener
+            unsub();
         }
     }, []);
     
@@ -47,9 +88,14 @@ function JoinGameComponent(props: IJoinGameProps) {
         let test_game : GameState = {
             id: '1',
             name: 'Test Game',
-            category: 'Testing',
             capacity: 10,
-            players: []
+            match_state: 0,
+            question_index: 0,
+            question_timer: 10,
+            start_time: new firestore.Timestamp(1, 1),
+            end_time: new firestore.Timestamp(1, 1),
+            players: [],
+            questions: []
         }
     
         let test_list : GameState[] = [];
@@ -83,11 +129,16 @@ function JoinGameComponent(props: IJoinGameProps) {
         // TODO Do firebase magic to return GameState object if it exists, or else undefined
         if (id == '111')
             return {
-                id: '111',
+                id: '1',
                 name: 'Test Game',
-                category: 'Testing',
                 capacity: 10,
-                players: []
+                match_state: 0,
+                question_index: 0,
+                question_timer: 10,
+                start_time: new firestore.Timestamp(1, 1),
+                end_time: new firestore.Timestamp(1, 1),
+                players: [],
+                questions: []
             }
         else return undefined;
     }
@@ -111,19 +162,23 @@ function JoinGameComponent(props: IJoinGameProps) {
                         <tr>
                             <td>Game ID</td>
                             <td>Name</td>
-                            <td>Category</td>
+                            <td>Start Time</td>
                             <td>Capacity</td>
                             <td></td>
                         </tr>
                     </thead>                    
                     <tbody>
-                    {activeGames?.map((game : GameState, i) =>{
+                    {activeGames?.map((game, i) =>{
                         
                         return  <tr key={i} >
-                                            <td>{game?.id} </td>
-                                            <td>{game?.name}</td>
-                                            <td>{game?.category}</td>
-                                            <td>{game?.capacity}</td>
+                                            {/* @ts-ignore */}
+                                            <td></td>
+                                            {/* @ts-ignore */}
+                                            <td>{game.name.stringValue}</td>
+                                            {/* @ts-ignore */}
+                                            <td>{game.start_time.timestampValue}</td>
+                                            {/* @ts-ignore */}
+                                            <td>{0 + '/' + game.capacity.integerValue}</td>
                                             <td>
                                                 <Link to="/game" className="btn btn-secondary" onClick={() => props.setCurrentGame(game)}>Join Game</Link>
                                             </td>

@@ -3,7 +3,9 @@ import { Alert, Button, Card, Carousel } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { Container } from "@material-ui/core";
+import { makeStyles, withStyles } from "@material-ui/styles";
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 
 
 
@@ -15,53 +17,90 @@ interface IGameProps {
     setCurrentGame: (game: GameState | undefined) => void;
 
 }
+
+const CssTextField = withStyles({
+    root: {
+      '& label.Mui-focused': {
+        color: 'green',
+      },
+      '& .MuiInput-underline:after': {
+        borderBottomColor: 'green',
+      },
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+          borderColor: 'red',
+        },
+        '&:hover fieldset': {
+          borderColor: 'yellow',
+        },
+        '&.Mui-focused fieldset': {
+          borderColor: 'green',
+        },
+      },
+    },
+  })(TextField);
+
 const useStyles= makeStyles({
     question : {
-          backgroundColor : 'black',
-          justifyContent : 'center',
-          color : 'white',
-          width : '35rem',
-          height : '20rem',
-        
-          
+        backgroundColor : 'black',
+        justifyContent : 'center',
+        color : 'white',
+        width : '35rem',
+        height : '20rem',
+        border : '1em black',
+        borderRadius : '2em' 
+    },
+    questionAnswer : {
+        // backgroundColor : 'limegreen',
+        width: '50%',
+        border : '2em black',
+        borderRadius : '2em' 
+    },
+    input : {
+        paddingTop : '1em',
+        marginLeft : '2em',
+        marginRight : '2em'
     }
+
 })
 
 function GameComponent(props: IGameProps) {
+
     const classes = useStyles();
-let [answer , setAnswer] = useState('');
+    let [answer , setAnswer] = useState('');
 
+    function updateAnswer(e:any)
+    {
+    setAnswer(e.target.value);
+    } 
 
-function updateAnswer(e:any)
-{
-  setAnswer(e.target.value);
-} 
+    function enterQuestion(e:any)
+    {
+        if(answer)
+        {
 
-function enterQuestion(e:any)
-{
-   if(answer)
-   {
-
-   }
-}
-    // let actualGame : GameState = location.state.currentGame;
+        }
+    }
 
     console.log('Inside GameComponent...');
     console.log(props);
     console.log(props.currentUser, props.currentGame);
-    // console.log(props.location.state.currentGame);
 
     return (
         props.currentUser //&& props.currentGame
         ?
         <>
-            <div id="div-for-question" className={classes.question}>
-              <p>What the capital of uranus?</p>
-             
-            </div>
-            <input id="password-input" type="text" onChange={updateAnswer}/>
-            <Button className="btn btn-primary" id="direct-join-game" onClick={enterQuestion} title="enter">Enter</Button>
-            <Alert variant="warning">{props.currentGame?.name}</Alert>
+            <Container className={classes.questionAnswer}>
+                <Container id="div-for-question" className={classes.question}>
+                <p>What the capital of uranus?</p>
+                
+                </Container>
+                <Container id="input-container" className={classes.input}>
+                    <CssTextField id="answer-input" type="text"/>
+                    <Button className="btn btn-primary" id="submit-answer" onClick={enterQuestion} title="enter">Answer</Button>
+                </Container>
+            </Container>
+            
         </>
         :
         <Redirect to="/login"/>
