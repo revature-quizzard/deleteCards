@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getAllCollections} from "../remote/collection-service";
 import { Redirect , Link } from "react-router-dom";
+import { getFavorites, favorite, unfavorite} from "../remote/user-service";
 
 interface IDiscoverProps {
     currentUser: Principal | undefined;
@@ -26,8 +27,18 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
         }
     })
 
-    function favorite(collection : Collections | undefined) {
-
+    function favoriteCollection(collection : Collections | undefined) {
+        if(collection) {
+            try{
+                favorite(props.currentUser?.id as string, collection.id, props.currentUser?.token as string)
+                let temp : Collections[] = collections.filter((c : Collections) => {
+                    return !(c.id === collection.id)
+                })
+                setCollections(temp);
+            } catch (e : any) {
+                setErrorMessage(e);
+            }
+        }
     }
 
     async function getCollection() {    
@@ -37,10 +48,26 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                 //@ts-ignore
                 let user_id = props.currentUser.id;
                 let temp = await getAllCollections(props.currentUser.token );
+                let favorited : Collections[] = await getFavorites(props.currentUser.id, props.currentUser.token) as Collections[]
                 if(temp) {
+                    console.log("TEMP", temp)
                     temp = temp.filter((c : Collections) => {
                         return (c.author.username != props.currentUser?.username)
                     })
+                    console.log("TEMP", temp)
+                    console.log("FAVS", favorited)
+
+                    let toShow : Collections[] = []
+                    temp = temp.filter((c : Collections) => {
+                        for(let i = 0; i < favorited?.length; i++) {
+                            if(favorited[i].id === c.id) {
+                                console.log("MATCH", favorited[i].title, c.title)
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    console.log("TEMP", temp)
                     setCollections(temp);
                 } else {
                     return;
@@ -64,6 +91,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                           <td>Collection Category</td>
                           <td>Collection Description</td>
                           <td>Author</td>
+                          <td>Question Count</td>
                           <td>Manage</td>
                         </tr>
                     </thead>
@@ -75,8 +103,9 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
                                     <td>{C?.author.username}</td>
+                                    <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => favorite(C)}>Favorite</Button> {  }
+                                    <Button variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
                                     </td>
                                 </tr> 
                     })}

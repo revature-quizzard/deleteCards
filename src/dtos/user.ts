@@ -7,7 +7,7 @@ export class User {
     lastName: string;
     email: string;
     collections: [];
-    favoritedCollections: [];
+    favorites: [];
 
 
     constructor(id: string, un: string, pw: string, fn: string, ln: string, email: string) {
@@ -18,7 +18,7 @@ export class User {
         this.lastName = ln;
         this.email = email;
         this.collections = [];
-        this.favoritedCollections = [];
+        this.favorites = [];
     }
 
 }
