@@ -48,22 +48,22 @@ function JoinGameComponent(props: IJoinGameProps) {
     let gameid;
     let playersRef: firestore.CollectionReference<unknown>;
     
-    useEffect(() => {
-        console.log('UseEffect activeGames', activeGames);
-        setDummy('test');
-        return () => {
+    // useEffect(() => {
+    //     console.log('UseEffect activeGames', activeGames);
+    //     setDummy('test');
+    //     return () => {
             
-        }
-    }, [activeGames])
+    //     }
+    // }, [activeGames])
 
     // TODO Set up firestore snapshot listener to get up to date active games
     useEffect(() => {
 
-        const unsub = firestore.onSnapshot((gamesRef),  (querySnapshot) => {
+        const unsub = firestore.onSnapshot((gamesRef), async (querySnapshot) => {
             console.log('Query snapshot: ', querySnapshot)
             // Every time collection updates, get list of players?
             let games : GameState[] = [];
-             querySnapshot.docs.forEach(async (docu) => {
+            querySnapshot.docs.forEach(async (docu) => {
 
                 console.log('Snapshot Document: \n', docu);
 
@@ -88,7 +88,7 @@ function JoinGameComponent(props: IJoinGameProps) {
             // console.log(await games[0].start_time.timestampValue);
             console.log('Games before setGames', games);
             console.log('Active games before set: ', activeGames);
-            setActiveGames(games);
+            await setActiveGames(games);
             console.log('Active games after set: ', activeGames);
         })        
         
@@ -143,7 +143,7 @@ function JoinGameComponent(props: IJoinGameProps) {
         let test_list : GameState[] = [];
         test_list.push(test_game);
     
-        setActiveGames(test_list);
+        // setActiveGames(test_list);
     }
 
     function joinGame(e: any) {
@@ -194,7 +194,8 @@ function JoinGameComponent(props: IJoinGameProps) {
         
         !props.currentUser ? <Redirect to="/login"/> :
         <>
-            {console.log('Rerendered page. activeGames: ', activeGames)}
+            {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
+            {console.log('Rerendered page. activeGames: ', activeGames[0])}
             {console.log('And activeGames.length: ', activeGames.length)}
              <div>
                
@@ -213,6 +214,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     </thead>                    
                     <tbody>
                         {console.log('active games before map + length: ', activeGames, activeGames.length)}
+                        {/* {console.log(activeGames, activeGames[0])} */}
                         {/* @ts-ignore */}
                     {activeGames?.map((game, i) =>{ 
                         
