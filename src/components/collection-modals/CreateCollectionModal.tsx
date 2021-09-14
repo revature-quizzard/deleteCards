@@ -84,7 +84,7 @@ function CreateCollectionModal(props: ICollectionModal) {
             <Modal.Body>
               <input id="title-input" type="text" onChange={updateTitle} placeholder="Title"/>
               <br/><br/>
-              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${collection?.category}`}>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {collection?.category}>
               <Dropdown.Item eventKey="1"  onClick={(e) => updateCategory(e , 1)}>Entertainment</Dropdown.Item>
                 <Dropdown.Item eventKey="2"  onClick={(e) => updateCategory(e , 2)}>Education</Dropdown.Item>
                 <Dropdown.Item eventKey="3"  onClick={(e) => updateCategory(e , 3)}>Food</Dropdown.Item>

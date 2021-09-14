@@ -3,12 +3,13 @@ import {Principal} from "../../dtos/principal";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
 import {GameSettings} from "../../dtos/game-settings";
-import { ButtonGroup, Dropdown, DropdownButton } from "react-bootstrap";
+import { Alert, ButtonGroup, Dropdown, DropdownButton } from "react-bootstrap";
 import { Collections } from "../../dtos/collection";
 
 
 interface IGameSettingsModal {
     current_user: Principal | undefined
+    selectedCollection: Collections | undefined,
     currentGameSettings:  GameSettings | undefined,
     setCurrentGameSettings: (nextCollection: GameSettings | undefined) => void
     show: boolean;
@@ -49,7 +50,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
 
   function updateName(e: any) {
     setName(e.currentTarget.value);
-}
+  }
 
 
 
@@ -57,15 +58,16 @@ function GameSettingsModal(props: IGameSettingsModal) {
       
       handleClose();
         
-      if(maxPlayers && matchTimer && props.currentGameSettings?.collection && category && name) {
+      if(maxPlayers && matchTimer && props.selectedCollection && category && name) {
       
         
-        let collection : Collections | undefined = props.currentGameSettings?.collection;
+        let collection : Collections | undefined = props.selectedCollection;
         props.setCurrentGameSettings({maxPlayers   , matchTimer , collection  , category  , name });
         
       }
     }
     return (
+      
         <>
           <Modal show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -85,11 +87,11 @@ function GameSettingsModal(props: IGameSettingsModal) {
             
             <p> 
               <h5>Summery</h5>
-              Collection : "{props.currentGameSettings?.collection?.title}"
+              Collection : "{props.selectedCollection?.title}"
               <br/><br/>
               Match time : {matchTimer} (seconds)
               <br/><br/>
-              Category : {props.currentGameSettings?.collection?.category}
+              Category : {props.selectedCollection?.category}
               <br/><br/>
               Max Players : {maxPlayers}
               <br/><br/>
@@ -99,12 +101,15 @@ function GameSettingsModal(props: IGameSettingsModal) {
             <p>More Settings Comming Soon....</p>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button variant="primary" onClick={update}>
-                Apply
-              </Button>
+              <Button variant="secondary" onClick={handleClose}> Cancel</Button>
+
+             { matchTimer == 0
+               ? 
+              <Alert variant="warning">
+               Set Match Time
+              </Alert>
+               :
+              <Button variant="primary" onClick={update}>Apply</Button>} 
             </Modal.Footer>
           </Modal>
         </>

@@ -7,8 +7,8 @@ import { Redirect , Link } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
-import { Card, ListGroup } from "react-bootstrap";
-import GameSettingsModal from "./collection-modals/GameSettingsModal";
+import { Alert, Card, ListGroup } from "react-bootstrap";
+import GameSettingsModal from "./game-modals/GameSettingsModal";
 import { Question } from "../dtos/question";
 import { stringify } from "querystring";
 
@@ -23,11 +23,14 @@ let showQuestionListText ="Preview";
 
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
-    currentCollection:  [] | undefined,
+    selectedCollection: Collections | undefined,
+    setSelectedCollection: (nextCollection: Collections | undefined) => void
+    currentCollections:  [] | undefined,
     setCurrentCollection: (nextCollection:  [] | undefined) => void,
     currentGameSettings_:  GameSettings | undefined,
     setCurrentGameSettings_: (nextCollection: GameSettings | undefined) => void
 }
+
 
 function CustomGameComponent(props: IGameCustomCollectionProps) {
     let [collectionTitle , setCollectionTitle] = useState('');
@@ -45,74 +48,63 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
 
     function getModal() {
         if(showSettings) {
-            return <GameSettingsModal  current_user={props.currentUser} currentGameSettings={props.currentGameSettings_} setCurrentGameSettings={props.setCurrentGameSettings_} show={showSettings} setShow={setShowSettings} />;
+            props.setSelectedCollection(currentCollection);
+            return <GameSettingsModal  current_user={props.currentUser} selectedCollection={props.selectedCollection} currentGameSettings={props.currentGameSettings_} setCurrentGameSettings={props.setCurrentGameSettings_} show={showSettings} setShow={setShowSettings} />;
         }
     }
 
 
-    function displayQuestions(e : any , key: any) {
+    function displayQuestions(e : any) { 
+        
+       console.log("pressed");
+         
 
-       
+           if(collectionQLVisible === false){
 
-       if(collectionVisible && targetsCollections)
-       {
-           
-           setCurrentCollection(targetsCollections[key]);
-       
-           console.log("key :  " , key ,  " value : " , targetsCollections[key]);
-           // return early if there are no questions in list
-           if(currentCollection?.questionList.length === 0 )
-           { 
-               collectionQLVisible = false;
-               
-               return;
-           }
-
-           if(collectionQLVisible === false)
-           {
-                targetCollectionQuestionsList = currentCollection?.questionList;
+                   console.log(" on");
                 collectionQLVisible = true;
                 showQuestionListText = "Preview";
-               
-           }else if(collectionQLVisible === true && currentCollection){
-                setCurrentCollection(undefined);
-             //  currentCollection.questionList = [];
-                targetCollectionQuestionsList = currentCollection?.questionList;   
-                collectionQLVisible = false;
-                showQuestionListText = "Hide";
-
+                targetCollectionQuestionsList = currentCollection?.questionList;
+                props.setSelectedCollection(currentCollection);
+           
            }else{
-            console.log("Questions Visiblity : " + collectionQLVisible);
+            console.log(" off ");
+            if(currentCollection)
+             currentCollection.questionList = [];
+
+                collectionQLVisible = false;
+                showQuestionListText = "-";  
+             
+                
+                targetCollectionQuestionsList = currentCollection?.questionList;
+                 props.setSelectedCollection(currentCollection);
+               
            }
 
-        
-            
-        }
-        else
-        {
-            setCurrentCollection(undefined);
+                
              //  currentCollection.questionList = [];
-                targetCollectionQuestionsList = currentCollection?.questionList; 
-            collectionQLVisible = false;
+             
+             
+           }
             
-        } 
-        
-        
-    }
+  
+    
 
     function selectCollection(e: any , key: any)
     {
-        if(collectionVisible && targetsCollections)
+        if(targetsCollections)
         {
-              
+              targetCollectionQuestionsList = [];
+              showQuestionListText = "Preview";
               setCurrentCollection(targetsCollections[key]);
+              props.setSelectedCollection(currentCollection);
                 let maxPlayers: Number = 2;
-                let matchTimer : Number = 60;
+                let matchTimer : Number = 30;
                 let collection : Collections = currentCollection as Collections;
                 let category : string | undefined = currentCollection?.category;
-                let name: string = 'name';
+                let name: string = 'new collection';
               props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
-              
+             
               console.log("key : " , key ,  " value : " , targetsCollections[key]);
         }
       
@@ -133,8 +125,9 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                 } else if (collectionVisible === true && props.currentUser)  {
 
                     showCollectionText = "Show Collections" ;
-                    props.setCurrentCollection(undefined);
                     targetsCollections = undefined;
+                    props.setCurrentCollection(targetsCollections);
+                    
                     
                 }else {
 
@@ -165,7 +158,6 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>Collection Category</td>
                           <td>Collection Description</td>
                           <td>Author</td>
-                          <td>Questions</td>
                           <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
                         </tr>
                     </thead>
@@ -178,17 +170,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.category}</td>
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
-                                             {/* mini loop cell*/}
-                                             {/* ////////////////////////////////////////////////////////////////// */}
-                                            
-                                             <td>
-                                                <p>"{C?.title}" (Preview?)</p>
-                                                <ul>
-                                                    {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{return <li key={i}>{q?.question}</li> })}
-                                                </ul> 
-                                             </td> 
-                                              {/* ////////////////////////////////////////////////////////////////// */}
-                                             <td><Button variant="secondary" onClick={(e) => displayQuestions( e , i)}> {showQuestionListText.toString()}</Button> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                             <td> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
@@ -199,47 +181,65 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     <tbody>
                         <tr>
                             <td>
-                            <Card style={{ width: '18rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white" >
                             <Card.Body>
                                 <Card.Title>Game Manager</Card.Title>
                                 
-                                <Button variant="success" onClick={displayModal}>Game Settings</Button>
+                                
                                 <Card.Text>
-                                    <br />
-                                <ListGroup  >
-                                    <ListGroup.Item  ><h6>Summary</h6>Collection : "{props.currentGameSettings_?.collection?.title}"</ListGroup.Item>
-                                    <ListGroup.Item  >Match time : {props.currentGameSettings_?.matchTimer} (seconds)</ListGroup.Item>
-                                    <ListGroup.Item  >Category : {currentCollection?.category}</ListGroup.Item>
-                                    <ListGroup.Item  >Max Players : {props.currentGameSettings_?.maxPlayers}</ListGroup.Item>
-                                    <ListGroup.Item  > Name : {props.currentGameSettings_?.name}</ListGroup.Item>
-                                </ListGroup>
+                                  Set up your game
                                 </Card.Text>
-                                    
+                                <Button variant="success" onClick={displayModal}>Game Settings</Button>
                                 {getModal()}
                             </Card.Body>
                             </Card> 
                             
                             </td>
                             <td>
-                            <Card style={{ width: '20rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white">
+                           
                             <Card.Body>
                                 <Card.Title>Game Initiator</Card.Title>
+
                                 <Card.Text>
-                                Setup som pregame settings here
+                                <br />
+                                <ListGroup  >
+                                    <ListGroup.Item><h6>Summary</h6></ListGroup.Item>
+                                    <ListGroup.Item>  Collection : "{currentCollection?.title}"</ListGroup.Item>
+                                    <ListGroup.Item>Match time : {props.currentGameSettings_?.matchTimer} (seconds)</ListGroup.Item>
+                                    <ListGroup.Item>Category : {currentCollection?.category}</ListGroup.Item>
+                                    <ListGroup.Item>Max Players : {props.currentGameSettings_?.maxPlayers}</ListGroup.Item>
+                                    <ListGroup.Item> Name : {props.currentGameSettings_?.name}</ListGroup.Item>
+                                </ListGroup>
+                               
                                 </Card.Text>
-                                <Link to="/" className="btn btn-primary">Start Game</Link>
+                                {
+                                     currentCollection?.category ? 
+                                     <Link to="/game" className="btn btn-success">Start Game</Link>
+                                     :
+
+                                     <Alert variant="danger">
+                                     <Alert.Heading>Oh snap! You got forgot to pick a Collection!</Alert.Heading>
+                                   </Alert>
+                                     
+                                }
+                                
                             </Card.Body>
                          
                             </Card>
                             </td>
                             <td>
-                            <Card style={{ width: '18rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white">
                             <Card.Body>
                                 <Card.Title>Game Inspect</Card.Title>
                                 <Card.Text>
-                                Setup som pregame settings here
+                                 See the "{currentCollection?.title}" Preview here! 
                                 </Card.Text>
-                                <Button variant="primary">Confirm</Button>
+                                <Button variant="success" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
+                                <br />
+                                 <ul>
+                                   {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{ return <li key={i}>{q?.question}</li> })}
+                                 </ul> 
                             </Card.Body>
                             </Card>
                             </td>
