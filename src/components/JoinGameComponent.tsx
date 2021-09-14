@@ -74,9 +74,37 @@ function JoinGameComponent(props: IJoinGameProps) {
                         players: playersArr,
                         questions: temp.questions
                     }
-                    console.log(newGame)
-                    setActiveGames(prevGames => [...prevGames, newGame])
+                    console.log(newGame);
+                    let gameIndex = 0;
+                    switch(doc.type) {
+                        // Handle case of new game being created
+                        case 'added':
+                            console.log('A game was added');
+                            setActiveGames(prevGames => [...prevGames, newGame])
+                            break;
+                        // Handle case of existing game being updated
+                        case 'modified':
+                            console.log('A game was modified');
+                            gameIndex = activeGames.findIndex(game => game.id = _id);
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex),
+                                newGame
+                                // ...prevGames.slice(gameIndex+1)
+                            ])
+                            break;
+                        // Handle existing game being deleted
+                        // TODO Game could be at end of array, address that
+                        case 'removed':
+                            console.log('A game was removed');
+                            gameIndex = activeGames.findIndex(game => game.id = _id);
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex),
+                                ...prevGames.slice(gameIndex+1)
+                            ])
+                            break;
+                    }
                     console.log(activeGames)
+                    
                 })
             })
           
