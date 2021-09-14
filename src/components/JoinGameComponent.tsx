@@ -12,6 +12,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import app from '../util/Firebase';
+import { act } from "react-dom/test-utils";
 
 const db = firestore.getFirestore(app);
 
@@ -37,48 +38,113 @@ function JoinGameComponent(props: IJoinGameProps) {
     // Current list of games in realtime database
     let [activeGames, setActiveGames] = useState([] as GameState[]);
     let [gameID, setGameID] = useState('');
+    let [dummy, setDummy] = useState('');
     let [errorMessage, setErrorMessage] = useState('');
     let history = useHistory();
 
     const gamesRef = firestore.collection(db, 'games');
+    // game id = FsvUzbk9Ql4nhrEmrK1v
+
+    let gameid;
+    let playersRef: firestore.CollectionReference<unknown>;
+    // let test = async () => {
+    //     //@ts-ignore
+    //     gameid = await firestore.getDocs(gamesRef);
+    //     console.log('Game ID: ', gameid['docs'][0]['id'])
+
+    //     console.log(`${gameid}/players`)
+    //     const playersRef = firestore.collection(gamesRef, `${gameid}/players`)
+    // }
+    // test();
+    
+    useEffect(() => {
+        console.log('UseEffect activeGames', activeGames);
+        setDummy('test');
+        return () => {
+            
+        }
+    }, [activeGames])
 
     // TODO Set up firestore snapshot listener to get up to date active games
     useEffect(() => {
+        
+        let gameids : string[];
 
-        // Initialize messages with data from db
-        // if (activeGames.length == 0) {
-        //     getGames().then(games => {
-        //     //@ts-ignore
-        //     setMessages(messages)
-        //     })
-        //     .catch(err => console.log(err));
-        // }
+        // Get players from collections
+        async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
+            console.log('Players collection: ', await firestore.getDocs(playersRef));
+            let game = activeGames.find(g => {
+                return g.id == gameid;
+            })
+            let gameplayers = await firestore.getDocs(playersRef)
+            //@ts-ignore
+            let playerarr = [];
+            gameplayers.forEach(player => {
+                //@ts-ignore
+                console.log(player['_document']['data']['value']['mapValue']['fields'])
+                //@ts-ignore
+                playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
+                //@ts-ignore
+                // game?.players.push(player['_document']['data']['value']['mapValue']['fields'])
+            })
+            //@ts-ignore
+            console.log('Players array', playerarr);
+            //@ts-ignore
+            // game.players = playerarr;
+            // console.log('Game in array',game);
+            return playerarr
+        }
 
         const unsub = firestore.onSnapshot((gamesRef), (querySnapshot) => {
+            console.log('Query snapshot: ', querySnapshot)
+            // Every time collection updates, get list of players?
+            // getPlayers();
             let games : GameState[] = [];
-            querySnapshot.docs.forEach((docu) => {
+            querySnapshot.docs.forEach(async (docu) => {
 
                 console.log('Snapshot Document: \n', docu);
+
+                gameid = docu['id'];
+                playersRef = firestore.collection(gamesRef, `${gameid}/players`);
+                let playersarr = await getPlayers(gameid, playersRef);
+                console.log('Returned players array', playersarr);
+                
                 // @ts-ignore
                 console.log('Document info dug up: \n', docu['_document']['data']['value']['mapValue']['fields'])
                 
                 // @ts-ignore
                 let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
                 newGame.id = docu['id'];
+                newGame.players = playersarr;
                 console.log('Newly assigned game: \n', newGame);
                 games.push(newGame);
+                // const collections = docu.collection;
             })
             // console.log('List of messages to be assigned to state: \n', msgs);  
             // @ts-ignore
             console.log(games[0]);
             //@ts-ignore
-            console.log(games[0].start_time.timestampValue);
+            // console.log(await games[0].start_time.timestampValue);
+            console.log('Games before setGames', games);
+            console.log('Active games before: ', activeGames);
             setActiveGames(games);
+            console.log('Active games after: ', activeGames);
         })
+
+        // const unsub2 = firestore.onSnapshot((playersRef), (querySnapshot) => {
+        //     console.log('unsub2 snapshot: ')
+        //     console.log(querySnapshot);
+        //     querySnapshot.docs.forEach((docu) => {
+        //         console.log('doc: ', docu)
+        //     })
+        // })
+        
         
         return () => {
-            // Unsubscribe from snapshot listener
+            console.log('Active games in return: ', activeGames);
+            // Unsubscribe from snapshot listeners
             unsub();
+            // unsub2();
         }
     }, []);
     
@@ -192,8 +258,10 @@ function JoinGameComponent(props: IJoinGameProps) {
                     (activeGames.length == 0)
                     ?
                         <>
+                        {console.log('activeGames length before', activeGames.length)}
                         <Alert variant="warning">There are currently no active games!</Alert>
-                        {console.log('no active games :(')}
+                        {console.log('no active games :(', activeGames)}
+                        {console.log('activeGames length after', activeGames.length)}
                         </>                    
                     :
                         <>{console.log('there are active games')}</>
