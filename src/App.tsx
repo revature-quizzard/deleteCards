@@ -14,7 +14,6 @@ import JoinGameComponent from './components/JoinGameComponent';
 import GameComponent from './components/GameComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import './custom.scss';
 import { Collections } from './dtos/collection';
 import { GameState } from './dtos/game-state';
 import { createTheme, ThemeProvider } from '@material-ui/core';
