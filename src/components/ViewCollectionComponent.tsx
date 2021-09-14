@@ -171,7 +171,7 @@ function ViewCollectionComponent(props: IViewProps) {
                     {getComponent()}
                     </tbody>
                 </Table>
-                <Button variant="secondary" onClick={create}>Create New Collection</Button>
+                <Button variant="secondary" onClick={create}>Create New Question</Button>
         </>
         :
         <Redirect to="/login"/>

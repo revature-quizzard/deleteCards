@@ -79,7 +79,6 @@ function EditQuestionModal(props: IEditCollectionProps) {
             try {
                 await editQuestion(editedQuestion, props.current_user.token);
             } catch(e : any) {
-                console.log("HERE")
                 setErrorMessage(e.message);
                 return
             }
