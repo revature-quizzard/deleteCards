@@ -47,15 +47,6 @@ function JoinGameComponent(props: IJoinGameProps) {
 
     let gameid;
     let playersRef: firestore.CollectionReference<unknown>;
-    // let test = async () => {
-    //     //@ts-ignore
-    //     gameid = await firestore.getDocs(gamesRef);
-    //     console.log('Game ID: ', gameid['docs'][0]['id'])
-
-    //     console.log(`${gameid}/players`)
-    //     const playersRef = firestore.collection(gamesRef, `${gameid}/players`)
-    // }
-    // test();
     
     useEffect(() => {
         console.log('UseEffect activeGames', activeGames);
@@ -67,40 +58,12 @@ function JoinGameComponent(props: IJoinGameProps) {
 
     // TODO Set up firestore snapshot listener to get up to date active games
     useEffect(() => {
-        
-        let gameids : string[];
 
-        // Get players from collections
-        async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
-            console.log('Players collection: ', await firestore.getDocs(playersRef));
-            let game = activeGames.find(g => {
-                return g.id == gameid;
-            })
-            let gameplayers = await firestore.getDocs(playersRef)
-            //@ts-ignore
-            let playerarr = [];
-            gameplayers.forEach(player => {
-                //@ts-ignore
-                console.log(player['_document']['data']['value']['mapValue']['fields'])
-                //@ts-ignore
-                playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
-                //@ts-ignore
-                // game?.players.push(player['_document']['data']['value']['mapValue']['fields'])
-            })
-            //@ts-ignore
-            console.log('Players array', playerarr);
-            //@ts-ignore
-            // game.players = playerarr;
-            // console.log('Game in array',game);
-            return playerarr
-        }
-
-        const unsub = firestore.onSnapshot((gamesRef), (querySnapshot) => {
+        const unsub = firestore.onSnapshot((gamesRef),  (querySnapshot) => {
             console.log('Query snapshot: ', querySnapshot)
             // Every time collection updates, get list of players?
-            // getPlayers();
             let games : GameState[] = [];
-            querySnapshot.docs.forEach(async (docu) => {
+             querySnapshot.docs.forEach(async (docu) => {
 
                 console.log('Snapshot Document: \n', docu);
 
@@ -110,7 +73,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                 console.log('Returned players array', playersarr);
                 
                 // @ts-ignore
-                console.log('Document info dug up: \n', docu['_document']['data']['value']['mapValue']['fields'])
+                // console.log('Document info dug up: \n', docu['_document']['data']['value']['mapValue']['fields'])
                 
                 // @ts-ignore
                 let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
@@ -118,27 +81,16 @@ function JoinGameComponent(props: IJoinGameProps) {
                 newGame.players = playersarr;
                 console.log('Newly assigned game: \n', newGame);
                 games.push(newGame);
-                // const collections = docu.collection;
             })
-            // console.log('List of messages to be assigned to state: \n', msgs);  
             // @ts-ignore
-            console.log(games[0]);
+            // console.log(games[0]);
             //@ts-ignore
             // console.log(await games[0].start_time.timestampValue);
             console.log('Games before setGames', games);
-            console.log('Active games before: ', activeGames);
+            console.log('Active games before set: ', activeGames);
             setActiveGames(games);
-            console.log('Active games after: ', activeGames);
-        })
-
-        // const unsub2 = firestore.onSnapshot((playersRef), (querySnapshot) => {
-        //     console.log('unsub2 snapshot: ')
-        //     console.log(querySnapshot);
-        //     querySnapshot.docs.forEach((docu) => {
-        //         console.log('doc: ', docu)
-        //     })
-        // })
-        
+            console.log('Active games after set: ', activeGames);
+        })        
         
         return () => {
             console.log('Active games in return: ', activeGames);
@@ -147,6 +99,29 @@ function JoinGameComponent(props: IJoinGameProps) {
             // unsub2();
         }
     }, []);
+
+    // Get players from collections
+    async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
+        console.log('Players collection: ', await firestore.getDocs(playersRef));
+        let game = activeGames.find(g => {
+            return g.id == gameid;
+        })
+        let gameplayers = await firestore.getDocs(playersRef)
+        //@ts-ignore
+        let playerarr = [];
+        gameplayers.forEach(player => {
+            //@ts-ignore
+            // console.log(player['_document']['data']['value']['mapValue']['fields'])
+            //@ts-ignore
+            playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
+        })
+        //@ts-ignore
+        // console.log('Players array', playerarr);
+        //@ts-ignore
+        // game.players = playerarr;
+        // console.log('Game in array',game);
+        return playerarr;
+    }
     
     // This function is used for testing to spoof existence of active games
     function generateGames() {
@@ -216,9 +191,11 @@ function JoinGameComponent(props: IJoinGameProps) {
      *  Displays search for direct game id and a join game button.
      */
     return(
+        
         !props.currentUser ? <Redirect to="/login"/> :
         <>
-        
+            {console.log('Rerendered page. activeGames: ', activeGames)}
+            {console.log('And activeGames.length: ', activeGames.length)}
              <div>
                
              <br/><br/>
@@ -235,7 +212,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                         </tr>
                     </thead>                    
                     <tbody>
-                    {activeGames?.map((game, i) =>{
+                        {console.log('active games before map + length: ', activeGames, activeGames.length)}
+                        {/* @ts-ignore */}
+                    {activeGames?.map((game, i) =>{ 
                         
                         return  <tr key={i} >
                                             {/* @ts-ignore */}
@@ -251,20 +230,27 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             </td>
                                             </tr> 
                                     })}
+                        {/* {console.log(activeGames, activeGames[0])} */}
+                        {/* <tr>{activeGames[0].name}</tr> */}
+                                    {console.log('active games after map: ', activeGames)}
                     </tbody>
                     
                 </Table>
                 {
-                    (activeGames.length == 0)
+                    (!activeGames)
                     ?
                         <>
-                        {console.log('activeGames length before', activeGames.length)}
-                        <Alert variant="warning">There are currently no active games!</Alert>
+                        
+                        <Alert variant="warning">There are currently no active games!</Alert>                        
                         {console.log('no active games :(', activeGames)}
-                        {console.log('activeGames length after', activeGames.length)}
+                        
                         </>                    
                     :
-                        <>{console.log('there are active games')}</>
+                        <>
+                        {console.log('activeGames length before', activeGames.length)}
+                        {console.log('there are active games')}
+                        {console.log(activeGames)}
+                        {console.log('activeGames length after', activeGames.length)}</>
                 }
 
                 <InputGroup className="mb-3">
@@ -285,6 +271,19 @@ function JoinGameComponent(props: IJoinGameProps) {
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </div>
         </>
+    )
+}
+
+function GameListComponent(props: any) {
+    console.log('Inside GameList');
+    return (
+    <tr>
+        <td>props.name</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
     )
 }
 
