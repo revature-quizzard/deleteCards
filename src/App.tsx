@@ -9,6 +9,7 @@ import HomeComponent from "./components/HomeComponent";
 import RegisterComponent from "./components/RegisterComponent"
 import CustomGameComponent from './components/CustomGameComponent';
 import ManageCollectionComponent from './components/ManageCollectionComponent';
+import DiscoverCollectionsComponent from './components/DiscoverCollectionsComponent';
 import ViewCollectionComponent from './components/ViewCollectionComponent';
 import JoinGameComponent from './components/JoinGameComponent';
 import GameComponent from './components/GameComponent';
@@ -46,6 +47,7 @@ function App() {
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentCollection={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings}/> } />
             <Route path="/manage-collections" render={() => <ManageCollectionComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
+            <Route path="/discover" render={() => <DiscoverCollectionsComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
             <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}/> } />
             <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/> } />
             <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/>} />

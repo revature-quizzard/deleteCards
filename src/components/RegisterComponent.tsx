@@ -1,8 +1,10 @@
-import {useState} from "react";
+import '../App.css';
+import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import {registration} from "../remote/user-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
 import {Redirect} from "react-router-dom";
+import {FormControl, Input, InputLabel, Button, Typography} from '@material-ui/core'
 
 interface IRegisterProps {
     currentUser: Principal | undefined,
@@ -10,43 +12,49 @@ interface IRegisterProps {
 }
 
 function RegisterComponent(props: IRegisterProps) {
-    let [firstName , setFirstName] = useState('');
-    let [lastName , setLastName] = useState('');
-    let [username, setUsername] = useState(''); 
-    let [email , setEmail] = useState('');
-    let [password, setPassword] = useState('');
 
     let [errorMessage, setErrorMessage] = useState('');
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
 
-    function updateUsername(e: any) {
-        setUsername(e.currentTarget.value);
+    useEffect(() => {
+        if (formData.password !== formData.confirmPassword)
+            setErrorMessage('Passwords must match!');
+        else setErrorMessage('');
+     }, [formData]);
+
+    let handleChange = async (e: any) => {
+        const { name, value } = e.target;
+        setFormData({...formData, [name]: value});        
     }
 
-    function updatePassword(e: any) {
-        setPassword(e.currentTarget.value);
-    }
-
-    function updateEmail(e: any) {
-        setEmail(e.currentTarget.value);
-    }
-
-    function updateFirstName(e: any) {
-        setFirstName(e.currentTarget.value);
-    }
-
-    function updateLastName(e: any) {
-        setLastName(e.currentTarget.value);
+    let validateUser = () => {
+        setErrorMessage('');
+        if (formData.username && formData.password && formData.email && formData.lastName && formData.firstName && formData.confirmPassword) {
+            if (formData.password !== formData.confirmPassword) {
+                setErrorMessage('Passwords must match!')
+                return false;
+            }
+            return true;
+        } else {
+            setErrorMessage('Please fill in all fields.');
+            return false;
+        }
     }
 
     async function register() {
         try {
-            if (username && password && email  && lastName && firstName) {
-                let principal = await registration({username , password , firstName , lastName , email}); // user: {username: string, password: string , firstname: string , lastname: string ,  email: string })
+            if (validateUser()) {
+                let principal = await registration(formData); 
                 console.log(principal);
                 props.setCurrentUser(principal);
-            } else {
-                setErrorMessage('You must provide all fields!');
-            }
+            } else return;
         } catch (e: any) {
             setErrorMessage(e.message); 
         }
@@ -57,18 +65,83 @@ function RegisterComponent(props: IRegisterProps) {
     return(
         props.currentUser ? <Redirect to="/"/> :
         <>
-            <div>
-                <input id="first-name-input" type="text" onChange={updateFirstName} placeholder="First Name"/>
+            <div id="register-form">
+            <Typography align="center" variant="h4">Register for a new account!</Typography>
+            <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="firstName">First Name</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        placeholder="Enter your first name"
+                    />
+                </FormControl>
+
+                <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="lastName">Last Name</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        placeholder="Enter your last name"
+                    />
+                </FormControl>
+
+                <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="email">Email Address</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="email"
+                        name="email"
+                        type="text"
+                        placeholder="Enter your email address"
+                    />
+                </FormControl>
+
+
+                <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="username">Username</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="username"
+                        name="username"
+                        type="text"
+                        placeholder="Enter your username"
+                    />
+                </FormControl>
+
+                <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="password">Password</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                    />
+                </FormControl>
+                <FormControl margin="normal" fullWidth>
+                    <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
+                    <Input
+                        onChange={handleChange}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="Confirm your password"
+                    />
+                </FormControl>
+
                 <br/><br/>
-                <input id="last-name-input" type="text" onChange={updateLastName} placeholder="Last Name"/>
-                 <br/><br/>
-                <input id="username-input" type="text" onChange={updateUsername} placeholder="UserName"/>
-                <br/><br/>
-                <input id="email-input" type="text" onChange={updateEmail} placeholder="Email"/>
-                <br/><br/>
-                <input id="password-input" type="password" onChange={updatePassword} placeholder="Pa$$word"/>
-                <br/><br/>
-                <button id="register-btn" onClick={register}>Register</button>
+
+                <Button
+                    id="register-button"
+                    onClick={register}
+                    variant="contained"
+                    color="primary"
+                    size="medium">Register</Button>
+
                 <br/><br/>
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </div>

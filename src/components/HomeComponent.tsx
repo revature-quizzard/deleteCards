@@ -47,8 +47,10 @@ function HomeComponent(props: IHomeProps) {
             <br/><br/>
             <Link to="/custom-game" style = {linkStyle} className="w-100 btn btn-primary">Custom Game (Testing)</Link>
             <br/><br/>
+            <Link to="/discover" style = {linkStyle} className="w-100 btn btn-primary">Discover</Link>
+            <br/><br/>
             </div>
-        </>    
+        </>
         :
         <Redirect to="/login"/>
     )
