@@ -64,6 +64,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                 
                 // @ts-ignore
                 let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
+                newGame.id = docu['id'];
                 console.log('Newly assigned game: \n', newGame);
                 games.push(newGame);
             })
@@ -172,7 +173,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         
                         return  <tr key={i} >
                                             {/* @ts-ignore */}
-                                            <td></td>
+                                            <td>{game.id.stringValue}</td>
                                             {/* @ts-ignore */}
                                             <td>{game.name.stringValue}</td>
                                             {/* @ts-ignore */}
