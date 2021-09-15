@@ -191,7 +191,6 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     </tbody>
                 </Table >
                 <Table  striped bordered hover variant="dark">
-                    <title>Favorites</title>
                     <thead>
                         <tr>
                           <td>Collection Title</td>

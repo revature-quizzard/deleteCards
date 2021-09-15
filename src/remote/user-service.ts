@@ -64,7 +64,7 @@ export const getFavorites = async (ID : string , token : string) => {
     }
 
     let user: User | null = await resp.json();
-    let fav: Collections[] | undefined = user?.favoritedCollections;
+    let fav: [] | undefined = user?.favorites;
     console.log(fav);
 
     return fav;
