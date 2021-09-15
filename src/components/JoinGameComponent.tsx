@@ -89,7 +89,6 @@ function JoinGameComponent(props: IJoinGameProps) {
                             setActiveGames(prevGames => [
                                 ...prevGames.slice(0,gameIndex),
                                 newGame
-                                // ...prevGames.slice(gameIndex+1)
                             ])
                             break;
                         // Handle existing game being deleted
@@ -153,21 +152,39 @@ function JoinGameComponent(props: IJoinGameProps) {
         // setActiveGames(test_list);
     }
 
-    function joinGame(e: any) {
+    async function joinGame(game : GameState) {
         console.log('Redirecting user to new game...');
         setErrorMessage('');
 
-        // Pull game ID from state, and check to see if it is valid
-        // Ensure gameID is not undefined first
-        if (!gameId) return;
-        let game = findGame(gameId);
-
         // If game is valid, redirect to lobby
         if (game) {
+
             console.log(game);
+            let playersRef = firestore.collection(gamesRef, `${game.id}/players`);
+            let newPlayer = {
+                answered: false,
+                name: props.currentUser?.username,
+                points : 0,
+                answered_at: new firestore.Timestamp(1,1)
+            }
+            let playerDoc = await firestore.addDoc(playersRef, newPlayer);
+            
+            let newPlayerTemp = await firestore.getDoc(playerDoc);
+            let player = {
+                answered: newPlayer.answered,
+                name: newPlayer.name,
+                points: newPlayer.points,
+                answered_at: newPlayer.answered_at,
+                id: newPlayerTemp.id
+            }
+            // ALL DIS SHIT IS TO TRIGGER AN UPDATE
+            let triggerDocRef = await firestore.doc(gamesRef, `${game.id}`);
+            let triggerDoc = await firestore.getDoc(triggerDocRef);
+            console.log('Trigger Doc', triggerDoc);
+            //@ts-ignore
+            await firestore.updateDoc(triggerDocRef, 'trigger', !triggerDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+            game.players.push(player);
             props.setCurrentGame(game);
-            history.push('/game');
-            // <Redirect to="/game" />
         }
 
         else setErrorMessage('Game with given ID does not exist!');
@@ -232,7 +249,11 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             {/* @ts-ignore */}
                                             <td>{game.players.length + '/' + game.capacity}</td>
                                             <td>
-                                                <Link to="/game" className="btn btn-secondary" onClick={() => props.setCurrentGame(game)}>Join Game</Link>
+                                                {(game.capacity > game.players.length) ?
+                                                
+                                                <Link to="/game" className="btn btn-secondary" onClick={() => joinGame(game)}>Join Game</Link>
+                                                : <></>
+                                                }
                                             </td>
                                             </tr> 
                                     })}
@@ -262,9 +283,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                     id="direct-join-id"
                     onChange={e => setGameId(e.target.value)}
                     />
-                    <Button className="btn btn-primary" id="direct-join-game" onClick={joinGame}>
+                    {/* <Button className="btn btn-primary" id="direct-join-game" onClick={joinGame}> */}
                     Join Game
-                    </Button>
+                    {/* </Button> */}
                 </InputGroup>
 
                 <Button variant="secondary" onClick={() => generateGames()}>Generate Games</Button>

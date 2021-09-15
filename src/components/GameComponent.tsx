@@ -12,9 +12,8 @@ import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 
 
 interface IGameProps {
-    currentUser: Principal | undefined;
-    currentGame: GameState | undefined;
-    setCurrentGame: (game: GameState | undefined) => void;
+  currentUser: Principal | undefined;
+  currentGameId : string | undefined;
 
 }
 
@@ -84,7 +83,7 @@ function GameComponent(props: IGameProps) {
 
     console.log('Inside GameComponent...');
     console.log(props);
-    console.log(props.currentUser, props.currentGame);
+    console.log(props.currentUser, props.currentGameId);
 
     return (
         props.currentUser //&& props.currentGame
