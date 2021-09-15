@@ -85,7 +85,6 @@ function GameComponent(props: IGameProps) {
     useEffect(() => {
       const retrieveCollection = () => {
           firestore.onSnapshot(gameDocRef, async snapshot => {
-              
               console.log('gameDocSnapshot: ', snapshot);
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
@@ -97,7 +96,8 @@ function GameComponent(props: IGameProps) {
                 playersArr.push(player);
               })
               console.log('Player array before set:', ...playersArr);
-              setPlayers(prevPlayers => [...playersArr]);
+              //setActiveGames(prevGames => [...prevGames, newGame])
+              setPlayers(playersArr);
               console.log(players);
           })
         
