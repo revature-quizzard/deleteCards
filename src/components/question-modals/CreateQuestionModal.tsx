@@ -18,6 +18,12 @@ interface IQuestionModal {
     updateUI: (question: Question | undefined) => void
 }
 
+const buttonStyle = {
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
+  color: "lime",
+}
+
 function CreateQuestionModal(props: IQuestionModal) {
     let [question , setQuestion] = useState({question:"", collection_id: props.current_collection?.id, answer:"", category:"", value:""} as Question | undefined);
     let [errorMessage, setErrorMessage] = useState('');
@@ -53,22 +59,6 @@ function CreateQuestionModal(props: IQuestionModal) {
         setQuestion(temp);
     }
 
-    function updateCategory(e : any , key : Number) {
-      let temp = question;
-      if(temp) {
-        if(key === 1)
-        temp.category = "Entertainment";
-        else if(key === 2)
-        temp.category = "Education";
-        else if(key === 3)
-        temp.category = "Food";
-        else if(key === 4)
-        temp.category = "Love";
-        else
-        temp.category = "Misc";
-      }
-      setQuestion(temp);
-    }
 
     function updateAnswer(e : any) {
       let temp = question;
@@ -82,13 +72,13 @@ function CreateQuestionModal(props: IQuestionModal) {
       let temp = question;
       if(temp) {
         if(key === 1)
-        temp.category = "1";
+        temp.value = "1";
         else if(key === 2)
-        temp.category = "2";
+        temp.value = "2";
         else if(key === 3)
-        temp.category = "3";
+        temp.value = "3";
         else if(key === 4)
-        temp.category = "4";
+        temp.value = "4";
       }
           setQuestion(temp);
       }
@@ -105,11 +95,11 @@ function CreateQuestionModal(props: IQuestionModal) {
               <input id="answer-input" type="text" onChange={updateAnswer} placeholder="Answer"/>
               <br/><br/>
               <p>Difficulty:</p>
-              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {question?.value}>
-              <Dropdown.Item eventKey="1"  onClick={(e) => updateDifficulty(e , 1)}>Easy</Dropdown.Item>
-                <Dropdown.Item eventKey="2"  onClick={(e) => updateDifficulty(e , 2)}>Medium</Dropdown.Item>
-                <Dropdown.Item eventKey="3"  onClick={(e) => updateDifficulty(e , 3)}>Hard</Dropdown.Item>
-                <Dropdown.Item eventKey="4"  onClick={(e) => updateDifficulty(e , 4)}>Extreme</Dropdown.Item>
+              <DropdownButton as={ButtonGroup} style = {buttonStyle} key={1} id={`dropdown-variants-primary`} variant="primary" title= {question?.value}>
+              <Dropdown.Item eventKey="1"  onClick={(e) => updateDifficulty(e , 1)}>1</Dropdown.Item>
+                <Dropdown.Item eventKey="2"  onClick={(e) => updateDifficulty(e , 2)}>2</Dropdown.Item>
+                <Dropdown.Item eventKey="3"  onClick={(e) => updateDifficulty(e , 3)}>3</Dropdown.Item>
+                <Dropdown.Item eventKey="4"  onClick={(e) => updateDifficulty(e , 4)}>4</Dropdown.Item>
               </DropdownButton>
               <br/><br/>
               { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }

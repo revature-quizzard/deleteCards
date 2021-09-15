@@ -19,6 +19,11 @@ interface IViewProps {
     collection: Collections | undefined;
     setCollection: (nextCollection: Collections | undefined) => void
 }
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "lime",
+  }
 
 function ViewCollectionComponent(props: IViewProps) {
     let [questions , setQuestions] = useState([] as Question[]);
@@ -165,15 +170,15 @@ function ViewCollectionComponent(props: IViewProps) {
                                     <td>{Q?.value}</td>
                                     
                                     <td>
-                                    <Button variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
-                                    <Button variant="secondary" onClick={() => remove(Q)}>Delete</Button> {  }
+                                    <Button style = {buttonStyle} variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
+                                    <Button  style = {buttonStyle}variant="secondary" onClick={() => remove(Q)}>Delete</Button> {  }
                                     </td>
                                 </tr> 
                     })}
                     {getComponent()}
                     </tbody>
                 </Table>
-                <Button variant="secondary" onClick={create}>Create New Question</Button>
+                <Button style = {buttonStyle} variant="secondary" onClick={create}>Create New Question</Button>
         </>
         :
         <Redirect to="/login"/>

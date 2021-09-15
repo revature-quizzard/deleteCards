@@ -43,10 +43,7 @@ function HomeComponent(props: IHomeProps) {
             <br/><br/>
             <Link to="/manage-collections" style = {linkStyle} className="w-100 btn btn-primary">Manage Collection</Link>
             <br/><br/>
-
             <Link to="/custom-game" style = {linkStyle} className="w-100 btn btn-primary">Create Game</Link>
-            <br/><br/>
-
             <br/><br/>
             <Link to="/discover" style = {linkStyle} className="w-100 btn btn-primary">Discover</Link>
             <br/><br/>
