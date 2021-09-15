@@ -151,8 +151,8 @@ function ViewCollectionComponent(props: IViewProps) {
                     <thead>
                         <tr>
                           <td>Question</td>
-                          <td>Category</td>
                           <td>Answer</td>
+                          <td>Difficulty</td>
                           <td>Manage</td>
                         </tr>
                     </thead>
@@ -161,8 +161,8 @@ function ViewCollectionComponent(props: IViewProps) {
                            
                         return  <tr key={i}>
                                     <td>{Q?.question} </td>
-                                    <td>{Q?.category}</td>
                                     <td>{Q?.answer}</td>
+                                    <td>{Q?.value}</td>
                                     
                                     <td>
                                     <Button variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
