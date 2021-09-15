@@ -12,6 +12,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import app from '../util/Firebase';
+import { act } from "react-dom/test-utils";
 
 const db = firestore.getFirestore(app);
 
@@ -36,53 +37,98 @@ function JoinGameComponent(props: IJoinGameProps) {
 
     // Current list of games in realtime database
     let [activeGames, setActiveGames] = useState([] as GameState[]);
-    let [gameID, setGameID] = useState('');
     let [errorMessage, setErrorMessage] = useState('');
+    let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
+    let [gameId, setGameId] = useState('');
+
     let history = useHistory();
 
-    const gamesRef = firestore.collection(db, 'games');
 
-    // TODO Set up firestore snapshot listener to get up to date active games
+    // game id = FsvUzbk9Ql4nhrEmrK1v
+
     useEffect(() => {
-
-        // Initialize messages with data from db
-        // if (activeGames.length == 0) {
-        //     getGames().then(games => {
-        //     //@ts-ignore
-        //     setMessages(messages)
-        //     })
-        //     .catch(err => console.log(err));
-        // }
-
-        const unsub = firestore.onSnapshot((gamesRef), (querySnapshot) => {
-            let games : GameState[] = [];
-            querySnapshot.docs.forEach((docu) => {
-
-                console.log('Snapshot Document: \n', docu);
-                // @ts-ignore
-                console.log('Document info dug up: \n', docu['_document']['data']['value']['mapValue']['fields'])
-                
-                // @ts-ignore
-                let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
-                // @ts-ignore
-                let users : [] =  docu['_document']['data']['value'];
-                console.log("mapvalue = " , users);
-                console.log('Newly assigned game: \n', newGame);
-                games.push(newGame);
+        const retrieveCollection = () => {
+            firestore.onSnapshot(gamesRef, snapshot => {
+                let games = snapshot.docChanges()
+                games.forEach(async doc => {
+                    // @ts-ignore
+                    let _id = doc.doc.id;
+                    let playersRef = firestore.collection(gamesRef, `${_id}/players`);
+                    let playersArr = await getPlayers(gameId, playersRef);
+                    console.log('Returned players array', playersArr);
+                    // @ts-ignore
+                    let temp = doc.doc['_document']['data']['value']['mapValue']['fields'];
+                    if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.start_time || !temp.end_time) {
+                        console.log("INVALID COLLECTION IN FIREBASE", temp);
+                        return;
+                    }
+                    let newGame : GameState = {
+                        id: _id,
+                        name: temp.name.stringValue,
+                        capacity: temp.capacity.integerValue,
+                        match_state: temp.match_state,
+                        question_index: temp.question_index,
+                        question_timer: temp.question_timer,
+                        start_time: temp.start_time.timestampValue,
+                        end_time: temp.end_time.timestampValue,
+                        players: playersArr,
+                        collection: temp.collection
+                    }
+                    console.log(newGame);
+                    let gameIndex = 0;
+                    switch(doc.type) {
+                        // Handle case of new game being created
+                        case 'added':
+                            console.log('A game was added');
+                            setActiveGames(prevGames => [...prevGames, newGame])
+                            break;
+                        // Handle case of existing game being updated
+                        case 'modified':
+                            console.log('A game was modified');
+                            gameIndex = activeGames.findIndex(game => game.id = _id);
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex),
+                                newGame
+                            ])
+                            console.log('activeGames:', activeGames);
+                            break;
+                        // Handle existing game being deleted
+                        // TODO Game could be at end of array, address that
+                        case 'removed':
+                            console.log('A game was removed');
+                            gameIndex = activeGames.findIndex(game => game.id = _id);
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex),
+                                ...prevGames.slice(gameIndex+1)
+                            ])
+                            break;
+                    }
+                    console.log(activeGames)
+                    
+                })
             })
-            // console.log('List of messages to be assigned to state: \n', msgs);  
-            // @ts-ignore
-            console.log(games[0]);
-            //@ts-ignore
-            console.log(games[0].start_time.timestampValue);
-            setActiveGames(games);
-        })
-        
-        return () => {
-            // Unsubscribe from snapshot listener
-            unsub();
+          
         }
-    }, []);
+        retrieveCollection()
+    }, [])
+
+    // Get players from collections
+    async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
+        console.log('Players collection: ', await firestore.getDocs(playersRef));
+        let game = activeGames?.find(g => {
+            return g.id == gameid;
+        })
+        let gameplayers = await firestore.getDocs(playersRef)
+        //@ts-ignore
+        let playerarr = [];
+        gameplayers.forEach(player => {
+            //@ts-ignore
+            playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
+        })
+
+        //@ts-ignore
+        return playerarr;
+    }
     
     // This function is used for testing to spoof existence of active games
     function generateGames() {
@@ -98,30 +144,48 @@ function JoinGameComponent(props: IJoinGameProps) {
             start_time: new firestore.Timestamp(1, 1),
             end_time: new firestore.Timestamp(1, 1),
             players: [],
-            questions: []
+            collection: new Collections('1', 1, 'test', 'test', 'test', new Principal('1', 'test', '1'))
         }
     
         let test_list : GameState[] = [];
         test_list.push(test_game);
     
-        setActiveGames(test_list);
+        // setActiveGames(test_list);
     }
 
-    function joinGame(e: any) {
+    async function joinGame(game : GameState) {
         console.log('Redirecting user to new game...');
         setErrorMessage('');
 
-        // Pull game ID from state, and check to see if it is valid
-        // Ensure gameID is not undefined first
-        if (!gameID) return;
-        let game = findGame(gameID);
-
         // If game is valid, redirect to lobby
         if (game) {
+
             console.log(game);
+            let playersRef = firestore.collection(gamesRef, `${game.id}/players`);
+            let newPlayer = {
+                answered: false,
+                name: props.currentUser?.username,
+                points : 0,
+                answered_at: new firestore.Timestamp(1,1)
+            }
+            let playerDoc = await firestore.addDoc(playersRef, newPlayer);
+            
+            let newPlayerTemp = await firestore.getDoc(playerDoc);
+            let player = {
+                answered: newPlayer.answered,
+                name: newPlayer.name,
+                points: newPlayer.points,
+                answered_at: newPlayer.answered_at,
+                id: newPlayerTemp.id
+            }
+            // ALL DIS SHIT IS TO TRIGGER AN UPDATE
+            let triggerDocRef = await firestore.doc(gamesRef, `${game.id}`);
+            let triggerDoc = await firestore.getDoc(triggerDocRef);
+            console.log('Trigger Doc', triggerDoc);
+            //@ts-ignore
+            await firestore.updateDoc(triggerDocRef, 'trigger', !triggerDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+            game.players.push(player);
             props.setCurrentGame(game);
-            history.push('/game');
-            // <Redirect to="/game" />
         }
 
         else setErrorMessage('Game with given ID does not exist!');
@@ -141,7 +205,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                 start_time: new firestore.Timestamp(1, 1),
                 end_time: new firestore.Timestamp(1, 1),
                 players: [],
-                questions: []
+                collection: new Collections('1', 1, 'test', 'test', 'test', new Principal('1', 'test', '1'))
             }
         else return undefined;
     }
@@ -152,9 +216,10 @@ function JoinGameComponent(props: IJoinGameProps) {
      *  Displays search for direct game id and a join game button.
      */
     return(
+        
         !props.currentUser ? <Redirect to="/login"/> :
         <>
-        
+            {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
              <div>
                
              <br/><br/>
@@ -171,34 +236,44 @@ function JoinGameComponent(props: IJoinGameProps) {
                         </tr>
                     </thead>                    
                     <tbody>
-                    {activeGames?.map((game, i) =>{
+                        {/* {console.log(activeGames, activeGames[0])} */}
+                        {/* @ts-ignore */}
+                    {activeGames?.map((game, i) =>{ 
                         
                         return  <tr key={i} >
                                             {/* @ts-ignore */}
-                                            <td></td>
+                                            <td>{game.id}</td>
                                             {/* @ts-ignore */}
-                                            <td>{game.name.stringValue}</td>
+                                            <td>{game.name}</td>
                                             {/* @ts-ignore */}
-                                            <td>{game.start_time.timestampValue}</td>
+                                            <td>{game.start_time}</td>
                                             {/* @ts-ignore */}
-                                            <td>{0 + '/' + game.capacity.integerValue}</td>
+                                            <td>{game.players.length + '/' + game.capacity}</td>
                                             <td>
-                                                <Link to="/game" className="btn btn-secondary" onClick={() => props.setCurrentGame(game)}>Join Game</Link>
+                                                {(game.capacity > game.players.length) ?
+                                                
+                                                <Link to="/game" className="btn btn-secondary" onClick={() => joinGame(game)}>Join Game</Link>
+                                                : <></>
+                                                }
                                             </td>
                                             </tr> 
                                     })}
+                        {/* {console.log(activeGames, activeGames[0])} */}
+                        {/* <tr>{activeGames[0].name}</tr> */}
                     </tbody>
                     
                 </Table>
                 {
-                    (activeGames.length == 0)
+                    (!activeGames)
                     ?
                         <>
+                        
                         <Alert variant="warning">There are currently no active games!</Alert>
-                        {console.log('no active games :(')}
+                        
                         </>                    
                     :
-                        <>{console.log('there are active games')}</>
+                        <>
+                        </>
                 }
 
                 <InputGroup className="mb-3">
@@ -207,11 +282,11 @@ function JoinGameComponent(props: IJoinGameProps) {
                     aria-label="Enter Game ID"
                     aria-describedby="basic-addon2"
                     id="direct-join-id"
-                    onChange={e => setGameID(e.target.value)}
+                    onChange={e => setGameId(e.target.value)}
                     />
-                    <Button className="btn btn-primary" id="direct-join-game" onClick={joinGame}>
+                    {/* <Button className="btn btn-primary" id="direct-join-game" onClick={joinGame}> */}
                     Join Game
-                    </Button>
+                    {/* </Button> */}
                 </InputGroup>
 
                 <Button variant="secondary" onClick={() => generateGames()}>Generate Games</Button>
@@ -219,6 +294,19 @@ function JoinGameComponent(props: IJoinGameProps) {
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </div>
         </>
+    )
+}
+
+function GameListComponent(props: any) {
+    console.log('Inside GameList');
+    return (
+    <tr>
+        <td>props.name</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
     )
 }
 

@@ -51,7 +51,7 @@ function App() {
             <Route path="/discover" render={() => <DiscoverCollectionsComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
             <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}/> } />
             <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/> } />
-            <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/>} />
+            <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGameId={currentGame?.id} />} />
         </Switch>
        </Router>
       </ThemeProvider>
