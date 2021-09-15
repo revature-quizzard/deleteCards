@@ -47,3 +47,55 @@ export const getSavedCollections = async (ID : string , token : string) => {
 
     return coll;
 }
+
+export const getFavorites = async (ID : string , token : string) => {
+
+    let resp = await fetch(`${env.apiUrl}/users/${ID}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization':token
+        },
+        
+    });
+
+    if (resp.status > 299) {
+        throw await resp.json();
+    }
+
+    let user: User | null = await resp.json();
+    let fav: Collections[] | undefined = user?.favoritedCollections;
+    console.log(fav);
+
+    return fav;
+}
+
+export const favorite = async(user_id: string, collection_id : string, token : string) => {
+    let resp = await fetch(`${env.apiUrl}/users/favorites?user_id=${user_id}&collection_id=${collection_id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        
+    });
+
+    if (resp.status > 299) {
+        throw await resp.json();
+    }
+}
+
+export const unfavorite = async(user_id: string, collection_id : string, token : string) => {
+    let resp = await fetch(`${env.apiUrl}/users/favorites?user_id=${user_id}&collection_id=${collection_id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        
+    });
+
+    if (resp.status > 299) {
+        throw await resp.json();
+    }
+}

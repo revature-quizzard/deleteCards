@@ -37,6 +37,10 @@
   }
 }
 
+body {
+  background-color: #AEB3B9; 
+}
+
 /* RegisterComponent */
 #register-form {
   margin-left: 5em;

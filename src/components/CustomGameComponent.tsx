@@ -19,6 +19,7 @@ import { stringify } from "querystring";
 const db = firestore.getFirestore(app);
 
 let targetsCollections :  [] | undefined;
+let targetsFavoriteCollections :  [] | undefined;
 let targetCollectionQuestionsList :  [] | undefined;
 let globalKey : Number | undefined;
 let collectionVisible : boolean = false;
@@ -178,6 +179,32 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     {/* god loop */}
                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */}
                     {targetsCollections?.map((C : Collections | undefined , i ) =>{
+                           return  <tr key={i} >
+                                             <td>{C?.title} </td>
+                                             <td>{C?.category}</td>
+                                             <td>{C?.description}</td>
+                                             <td>{C?.author.username.toString()}</td>
+                                             <td> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                            </tr> 
+                                      })}
+                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
+                    </tbody>
+                </Table >
+                <Table  striped bordered hover variant="dark">
+                    <title>Favorites</title>
+                    <thead>
+                        <tr>
+                          <td>Collection Title</td>
+                          <td>Collection Category</td>
+                          <td>Collection Description</td>
+                          <td>Author</td>
+                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {/* god loop */}
+                    {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */}
+                    {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
                            return  <tr key={i} >
                                              <td>{C?.title} </td>
                                              <td>{C?.category}</td>

@@ -151,6 +151,7 @@ function ViewCollectionComponent(props: IViewProps) {
                     <thead>
                         <tr>
                           <td>Question</td>
+                          <td>Category</td>
                           <td>Answer</td>
                           <td>Manage</td>
                         </tr>
@@ -160,6 +161,7 @@ function ViewCollectionComponent(props: IViewProps) {
                            
                         return  <tr key={i}>
                                     <td>{Q?.question} </td>
+                                    <td>{Q?.category}</td>
                                     <td>{Q?.answer}</td>
                                     
                                     <td>
