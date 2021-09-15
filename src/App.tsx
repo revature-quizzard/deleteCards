@@ -35,6 +35,7 @@ function App() {
   const [currCollection , setCurrCollection] = useState(undefined as  Collections | undefined)
   const [selectedCollection , setSelectCollection] = useState(undefined as  Collections | undefined)
   const [currentGame, setCurrentGame] = useState(undefined as GameState | undefined)
+  const [currentGameId, setCurrentGameId] = useState('')
 
   return (
     <>
@@ -46,12 +47,12 @@ function App() {
             <Route path="/home" render={() => <HomeComponent currentUser={authUser} /> } />
             <Route path="/login" render={() => <LoginComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
-            <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} selectedCollection={selectedCollection} setSelectedCollection={setSelectCollection} currentCollections={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings}/> } />
+            <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId} selectedCollection={selectedCollection} setSelectedCollection={setSelectCollection} currentCollections={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings}/> } />
             <Route path="/manage-collections" render={() => <ManageCollectionComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
             <Route path="/discover" render={() => <DiscoverCollectionsComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
             <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}/> } />
-            <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/> } />
-            <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGameId={currentGame?.id} />} />
+            <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId}/> } />
+            <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGameId={currentGameId} />} />
         </Switch>
        </Router>
       </ThemeProvider>

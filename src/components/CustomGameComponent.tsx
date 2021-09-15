@@ -3,7 +3,7 @@ import {Principal} from "../dtos/principal";
 import {GameSettings} from "../dtos/game-settings";
 import {getFavorites, getSavedCollections} from "../remote/user-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
-import { Redirect , Link } from "react-router-dom";
+import { Redirect , Link, useHistory } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
@@ -14,6 +14,7 @@ import * as firestore from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import app from '../util/Firebase';
 import { getRandQuestion } from "../remote/question-service";
+import { GameState } from "../dtos/game-state";
 
 
 const db = firestore.getFirestore(app);
@@ -31,6 +32,8 @@ let showQuestionListText ="Preview";
 
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
+    currentGameId: string,
+    setCurrentGameId: ((gameId: string) => void),
     selectedCollection: Collections | undefined,
     setSelectedCollection: (nextCollection: Collections | undefined) => void
     currentCollections:  [] | undefined,
@@ -48,6 +51,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
     let [showSettings, setShowSettings] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
+    let history = useHistory();
 
     function displayModal() {
         setShowSettings(true);
@@ -61,11 +65,38 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
         }
     }
 
-    function sendGameSettings()
+    // Translate game settings into a Game State and store in Firestore db
+    async function sendGameSettings()
     {
-          const gamesRef = firestore.collection(db , "games");
+        const gamesRef = firestore.collection(db , "games");
+        console.log('Current Game Settings:', props.currentGameSettings_);
+        if (!props.currentGameSettings_) {
+            console.log('Current Game Settings:', props.currentGameSettings_);
+            return;
+        } else console.log('Props are truthy!');
+        let newGame = {
+            name: props.currentGameSettings_.name,
+            capacity: props.currentGameSettings_.maxPlayers,
+            match_state: 0,
+            question_index: 0,
+            question_timer: props.currentGameSettings_.matchTimer,
+            start_time: new firestore.Timestamp(1,1),
+            end_time: new firestore.Timestamp(1,1),
+            collection: props.currentGameSettings_.collection,
+            trigger: true
+        };          
 
-          firestore.addDoc(gamesRef , props.currentGameSettings_);
+        let gameDocRef = await firestore.addDoc(gamesRef , newGame);
+        props.setCurrentGameId(gameDocRef.id);
+        let playersRef = firestore.collection(gamesRef, `${gameDocRef.id}/players`);
+        let newPlayer = {
+            answered: false,
+            name: props.currentUser?.username,
+            points : 0,
+            answered_at: new firestore.Timestamp(1,1)
+        }
+        let playerDoc = await firestore.addDoc(playersRef, newPlayer);
+        history.push('/game');
     }
 
 
@@ -335,7 +366,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 </Card.Text>
                                 {
                                      currentCollection?.category ? 
-                                     <Link to="/game" className="btn btn-success" onClick={sendGameSettings} >Start Game</Link>
+                                     <Button className="btn btn-success" onClick={sendGameSettings} >Start Game</Button>
                                      :
 
                                      <Alert variant="warning">
