@@ -3,7 +3,7 @@ import {Principal} from "../../dtos/principal";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal'
 import {GameSettings} from "../../dtos/game-settings";
-import { Alert, ButtonGroup, Dropdown, DropdownButton } from "react-bootstrap";
+import { Alert, ButtonGroup, Dropdown, DropdownButton, ListGroup } from "react-bootstrap";
 import { Collections } from "../../dtos/collection";
 
 
@@ -85,19 +85,15 @@ function GameSettingsModal(props: IGameSettingsModal) {
             <br/><br/>
             <input id="collection-name-input" type="text" onChange={updateName} placeholder="Name"/>
             
-            <p> 
-              <h5>Summery</h5>
-              Collection : "{props.selectedCollection?.title}"
-              <br/><br/>
-              Match time : {matchTimer} (seconds)
-              <br/><br/>
-              Category : {props.selectedCollection?.category}
-              <br/><br/>
-              Max Players : {maxPlayers}
-              <br/><br/>
-              Name : {name}
-              </p>
-          
+            <ListGroup>
+              <ListGroup.Item ><h6>Summary</h6></ListGroup.Item>
+              <ListGroup.Item variant="light">  Collection : "{props.selectedCollection?.title}"</ListGroup.Item>
+              <ListGroup.Item variant="light"> Match time : {matchTimer} (seconds)</ListGroup.Item>
+              <ListGroup.Item variant="light">Category : {props.selectedCollection?.category}</ListGroup.Item>
+              <ListGroup.Item variant="light">Max Players : {maxPlayers}</ListGroup.Item>
+              <ListGroup.Item variant="light"> Name : {name}</ListGroup.Item>
+            </ListGroup>
+       
             <p>More Settings Comming Soon....</p>
             </Modal.Body>
             <Modal.Footer>

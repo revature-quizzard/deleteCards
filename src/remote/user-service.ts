@@ -44,7 +44,6 @@ export const getSavedCollections = async (ID : string , token : string) => {
 
     let user: User | null = await resp.json();
     let coll: [] | undefined = user?.collections;
-    console.log(coll);
 
     return coll;
 }
@@ -65,7 +64,7 @@ export const getFavorites = async (ID : string , token : string) => {
     }
 
     let user: User | null = await resp.json();
-    let fav: Collections[] | undefined = user?.favorites;
+    let fav: [] | undefined = user?.favorites;
     console.log(fav);
 
     return fav;

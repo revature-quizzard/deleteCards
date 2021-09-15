@@ -21,6 +21,8 @@ interface IJoinGameProps {
     currentUser: Principal | undefined;
     currentGame: GameState | undefined;
     setCurrentGame: (game: GameState | undefined) => void;
+    currentGameId: string;
+    setCurrentGameId: ((gameId: string) => void);
 }
 
 /**
@@ -186,6 +188,8 @@ function JoinGameComponent(props: IJoinGameProps) {
             await firestore.updateDoc(triggerDocRef, 'trigger', !triggerDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
             game.players.push(player);
             props.setCurrentGame(game);
+            console.log('Setting game id to: ', game.id);
+            props.setCurrentGameId(game.id);
         }
 
         else setErrorMessage('Game with given ID does not exist!');

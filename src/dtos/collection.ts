@@ -1,4 +1,5 @@
 import { Principal } from "./principal";
+import { Question } from "./question";
 
 export class Collections {
 
@@ -8,7 +9,7 @@ export class Collections {
     description: string;
     category: string;
     author: Principal;
-    questionList: [];
+    questionList: Question[];
 
     constructor(id: string, key_: number, ct: string, cd: string, cc: string, ca: Principal) {
         this.id = id;

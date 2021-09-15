@@ -49,3 +49,27 @@ export const deleteQuestion = async (question_id: String, token: String) => {
         throw await resp.json();
     }
 }
+
+export const getRandQuestion = async(collectionId: string) => {
+    let resp = await fetch(`${env.apiUrl}/questions/random`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        
+    });
+    if (resp.status > 299) {
+        throw await resp.json();
+    }
+
+    let body = await resp.json();
+    let question = {
+        id: body[0].id,
+        collection_id: collectionId,
+        question: body[0].question,
+        answer: body[0].answer,
+        category: 'Random',
+        value: body[0].value
+    }
+    return question
+}
