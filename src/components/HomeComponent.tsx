@@ -20,9 +20,7 @@ function HomeComponent(props: IHomeProps) {
             <br/><br/>
             <Link to="/manage-collections" className="btn btn-primary">Manage Collection</Link>
             <br/><br/>
-            <Link to="/" className="btn btn-primary">Create Game</Link>
-            <br/><br/>
-            <Link to="/custom-game" className="btn btn-primary">Custom Game (Testing)</Link>
+            <Link to="/custom-game" className="btn btn-primary">Create Game</Link>
             <br/><br/>
             <Link to="/discover" className="btn btn-primary">Discover</Link>
             <br/><br/>

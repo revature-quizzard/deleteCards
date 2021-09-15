@@ -64,6 +64,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                 
                 // @ts-ignore
                 let newGame : GameState = docu['_document']['data']['value']['mapValue']['fields'];
+                // @ts-ignore
+                let users : [] =  docu['_document']['data']['value'];
+                console.log("mapvalue = " , users);
                 console.log('Newly assigned game: \n', newGame);
                 games.push(newGame);
             })

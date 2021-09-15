@@ -10,8 +10,13 @@ import Button from 'react-bootstrap/Button'
 import { Alert, Card, ListGroup } from "react-bootstrap";
 import GameSettingsModal from "./game-modals/GameSettingsModal";
 import { Question } from "../dtos/question";
+import * as firestore from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import app from '../util/Firebase';
 import { stringify } from "querystring";
 
+
+const db = firestore.getFirestore(app);
 
 let targetsCollections :  [] | undefined;
 let targetCollectionQuestionsList :  [] | undefined;
@@ -51,6 +56,13 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             props.setSelectedCollection(currentCollection);
             return <GameSettingsModal  current_user={props.currentUser} selectedCollection={props.selectedCollection} currentGameSettings={props.currentGameSettings_} setCurrentGameSettings={props.setCurrentGameSettings_} show={showSettings} setShow={setShowSettings} />;
         }
+    }
+
+    function sendGameSettings()
+    {
+          const gamesRef = firestore.collection(db , "games");
+
+          firestore.addDoc(gamesRef , props.currentGameSettings_);
     }
 
 
@@ -118,7 +130,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     showCollectionText = "Hide Collections" ;
                     //@ts-ignore
                     let user_id = props.currentUser.id;
-                     targetsCollections = await getSavedCollections( user_id, props.currentUser.token );  
+                    targetsCollections = await getSavedCollections( user_id, props.currentUser.token );  
+                    
                     
                     props.setCurrentCollection(targetsCollections);
                     
@@ -215,7 +228,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 </Card.Text>
                                 {
                                      currentCollection?.category ? 
-                                     <Link to="/game" className="btn btn-success">Start Game</Link>
+                                     <Link to="/game" className="btn btn-success" onClick={sendGameSettings} >Start Game</Link>
                                      :
 
                                      <Alert variant="danger">
