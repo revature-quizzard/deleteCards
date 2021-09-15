@@ -72,7 +72,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         start_time: temp.start_time.timestampValue,
                         end_time: temp.end_time.timestampValue,
                         players: playersArr,
-                        questions: temp.questions
+                        collection: temp.collection
                     }
                     console.log(newGame);
                     let gameIndex = 0;
@@ -90,6 +90,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                 ...prevGames.slice(0,gameIndex),
                                 newGame
                             ])
+                            console.log('activeGames:', activeGames);
                             break;
                         // Handle existing game being deleted
                         // TODO Game could be at end of array, address that
@@ -143,7 +144,7 @@ function JoinGameComponent(props: IJoinGameProps) {
             start_time: new firestore.Timestamp(1, 1),
             end_time: new firestore.Timestamp(1, 1),
             players: [],
-            questions: []
+            collection: new Collections('1', 1, 'test', 'test', 'test', new Principal('1', 'test', '1'))
         }
     
         let test_list : GameState[] = [];
@@ -204,7 +205,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                 start_time: new firestore.Timestamp(1, 1),
                 end_time: new firestore.Timestamp(1, 1),
                 players: [],
-                questions: []
+                collection: new Collections('1', 1, 'test', 'test', 'test', new Principal('1', 'test', '1'))
             }
         else return undefined;
     }
