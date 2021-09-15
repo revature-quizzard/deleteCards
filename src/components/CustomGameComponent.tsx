@@ -13,14 +13,14 @@ import { Question } from "../dtos/question";
 import * as firestore from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import app from '../util/Firebase';
-import { stringify } from "querystring";
+import { getRandQuestion } from "../remote/question-service";
 
 
 const db = firestore.getFirestore(app);
 
 let targetsCollections :  [] | undefined;
 let targetsFavoriteCollections :  [] | undefined;
-let targetCollectionQuestionsList :  [] | undefined;
+let targetCollectionQuestionsList :  Question[] | undefined;
 let globalKey : Number | undefined;
 let collectionVisible : boolean = false;
 let favCollectionVisible : boolean = false;
@@ -212,6 +212,29 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             setErrorMessage(e.message); 
              }  
     }
+
+    async function generateRandom() {
+        let collection : Collections = {
+            id: '-1',
+            key_: -1,
+            title: 'Random Collection',
+            description: 'Randomly generated from jservice.io API',
+            category: 'Random',
+            author: {
+                id: '',
+                username: '',
+                token: ''
+            },
+            questionList: [] as Question[]
+        }
+
+        for(let i = 0; i < 10; i++) {
+            let question = await getRandQuestion(collection.id);
+            collection.questionList.push(question)
+        }
+        console.log(collection)
+        setCurrentCollection(collection)
+    }
     
     
     return(
@@ -271,6 +294,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     </tbody>
                 </Table >
                
+
+                <Button variant="primary" onClick={generateRandom} > Create Random Collection</Button>
 
                 <table>
                     <tbody>
