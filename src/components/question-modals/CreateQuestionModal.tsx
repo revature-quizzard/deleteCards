@@ -78,11 +78,18 @@ function CreateQuestionModal(props: IQuestionModal) {
         setQuestion(temp);
     }
 
-    function updateDifficulty(e : any) {
-        let temp = question;
-          if(temp) {
-            temp.value = e.currentTarget.value;
-          }
+    function updateDifficulty(e : any , key : Number) {
+      let temp = question;
+      if(temp) {
+        if(key === 1)
+        temp.category = "1";
+        else if(key === 2)
+        temp.category = "2";
+        else if(key === 3)
+        temp.category = "3";
+        else if(key === 4)
+        temp.category = "4";
+      }
           setQuestion(temp);
       }
 
@@ -97,15 +104,13 @@ function CreateQuestionModal(props: IQuestionModal) {
               <br/><br/>
               <input id="answer-input" type="text" onChange={updateAnswer} placeholder="Answer"/>
               <br/><br/>
-              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {question?.category}>
-              <Dropdown.Item eventKey="1"  onClick={(e) => updateCategory(e , 1)}>Entertainment</Dropdown.Item>
-                <Dropdown.Item eventKey="2"  onClick={(e) => updateCategory(e , 2)}>Education</Dropdown.Item>
-                <Dropdown.Item eventKey="3"  onClick={(e) => updateCategory(e , 3)}>Food</Dropdown.Item>
-                <Dropdown.Item eventKey="4"  onClick={(e) => updateCategory(e , 4)}>Love</Dropdown.Item>
-                <Dropdown.Item eventKey="5"  onClick={(e) => updateCategory(e , 5)}>Misc</Dropdown.Item>
+              <p>Difficulty:</p>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {question?.value}>
+              <Dropdown.Item eventKey="1"  onClick={(e) => updateDifficulty(e , 1)}>Easy</Dropdown.Item>
+                <Dropdown.Item eventKey="2"  onClick={(e) => updateDifficulty(e , 2)}>Medium</Dropdown.Item>
+                <Dropdown.Item eventKey="3"  onClick={(e) => updateDifficulty(e , 3)}>Hard</Dropdown.Item>
+                <Dropdown.Item eventKey="4"  onClick={(e) => updateDifficulty(e , 4)}>Extreme</Dropdown.Item>
               </DropdownButton>
-              <br/><br/>
-              <input id="difficulty-input" type="text" onChange={updateDifficulty} placeholder="Difficulty"/>
               <br/><br/>
               { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </Modal.Body>
