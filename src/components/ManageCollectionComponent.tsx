@@ -13,7 +13,11 @@ interface IManageProps {
     currentUser: Principal | undefined;
     setCurrCollection: (nextCollection: Collections | undefined) => void
 }
-
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "lime",
+  }
 function ManageCollectionComponent(props: IManageProps) {
     let [collections , setCollections] = useState([] as Collections[]);
     let [favorites , setFavorites] = useState([] as Collections[]);
@@ -184,9 +188,9 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
-                                    <Button variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
-                                    <Link to="/view-collection" className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
+                                    <Button style ={buttonStyle}variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
+                                    <Button style ={buttonStyle} variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
+                                    <Link to="/view-collection" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}
@@ -194,7 +198,7 @@ function ManageCollectionComponent(props: IManageProps) {
                     </tbody>
                 </Table>
 
-                <Button variant="secondary" onClick={create}>Create New Collection</Button>
+                <Button style ={buttonStyle} variant="secondary" onClick={create}>Create New Collection</Button>
 
                 <br></br>
                 <h1>{props.currentUser.username}'s Favorites</h1>
@@ -219,7 +223,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
+                                    <Button style= {buttonStyle} variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
                                     </td>
                                 </tr> 
                     })}
