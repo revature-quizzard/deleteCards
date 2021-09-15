@@ -87,6 +87,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
         };          
 
         let gameDocRef = await firestore.addDoc(gamesRef , newGame);
+        console.log('Setting game Id to: ', gameDocRef.id);
         props.setCurrentGameId(gameDocRef.id);
         let playersRef = firestore.collection(gamesRef, `${gameDocRef.id}/players`);
         let newPlayer = {
@@ -140,18 +141,18 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
     {
         if(targetsCollections)
         {
-              targetCollectionQuestionsList = [];
-              showQuestionListText = "Preview";
-              setCurrentCollection(targetsCollections[key]);
-              props.setSelectedCollection(currentCollection);
-                let maxPlayers: Number = 2;
-                let matchTimer : Number = 30;
-                let collection : Collections = currentCollection as Collections;
-                let category : string | undefined = currentCollection?.category;
-                let name: string = 'new collection';
-              props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
-             
-              console.log("key : " , key ,  " value : " , targetsCollections[key]);
+            targetCollectionQuestionsList = [];
+            showQuestionListText = "Preview";
+            setCurrentCollection(targetsCollections[key]);
+            props.setSelectedCollection(currentCollection);
+            let maxPlayers: Number = 2;
+            let matchTimer : Number = 30;
+            let collection : Collections = targetsCollections[key] as Collections;
+            let category : string | undefined = currentCollection?.category;
+            let name: string = 'new collection';
+            props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+            
+            console.log("key : " , key ,  " value : " , targetsCollections[key]);
         }
       
     }
@@ -160,18 +161,18 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
     {
         if(targetsFavoriteCollections)
         {
-              targetCollectionQuestionsList = [];
-              showQuestionListText = "Preview";
-              setCurrentCollection(targetsFavoriteCollections[key]);
-              props.setSelectedCollection(currentCollection);
-                let maxPlayers: Number = 2;
-                let matchTimer : Number = 30;
-                let collection : Collections = currentCollection as Collections;
-                let category : string | undefined = currentCollection?.category;
-                let name: string = 'new collection';
-              props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
-             
-              console.log("key : " , key ,  " value : " , targetsFavoriteCollections[key]);
+            targetCollectionQuestionsList = [];
+            showQuestionListText = "Preview";
+            setCurrentCollection(targetsFavoriteCollections[key]);
+            props.setSelectedCollection(currentCollection);
+            let maxPlayers: Number = 2;
+            let matchTimer : Number = 30;
+            let collection : Collections = targetsFavoriteCollections[key] as Collections;
+            let category : string | undefined = currentCollection?.category;
+            let name: string = 'new collection';
+            props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+            
+            console.log("key : " , key ,  " value : " , targetsFavoriteCollections[key]);
         }
       
     }
