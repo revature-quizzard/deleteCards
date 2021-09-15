@@ -1,5 +1,6 @@
 import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
+import {Player} from "../dtos/player";
 import { GameState } from "../dtos/game-state";
 import {getSavedCollections} from "../remote/user-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
@@ -164,32 +165,50 @@ function JoinGameComponent(props: IJoinGameProps) {
 
             console.log(game);
             let playersRef = firestore.collection(gamesRef, `${game.id}/players`);
-            let newPlayer = {
-                answered: false,
-                name: props.currentUser?.username,
-                points : 0,
-                answered_at: new firestore.Timestamp(1,1)
+            let players = await firestore.getDocs(playersRef);
+            let inGame = false;
+            let player : Player
+            players.forEach((p) => {
+                //@ts-ignore
+                if(p['_document']['data']['value']['mapValue']['fields']['name'].stringValue == props.currentUser?.username) {
+                    inGame = true;
+                    //@ts-ignore
+                    player = p['_document']['data']['value']['mapValue']['fields']
+                }
+                console.log(p)
+            })
+
+            let playerDoc;
+            if(!inGame) {
+                let newPlayer = {
+                    answered: false,
+                    name: props.currentUser?.username,
+                    points : 0,
+                    answered_at: new firestore.Timestamp(1,1)
+                }
+                playerDoc = await firestore.addDoc(playersRef, newPlayer);
+                let newPlayerTemp = await firestore.getDoc(playerDoc);
+                player = {
+                    answered: newPlayer.answered,
+                    name: newPlayer.name,
+                    points: newPlayer.points,
+                    answered_at: newPlayer.answered_at,
+                    id: newPlayerTemp.id
+                }
             }
-            let playerDoc = await firestore.addDoc(playersRef, newPlayer);
             
-            let newPlayerTemp = await firestore.getDoc(playerDoc);
-            let player = {
-                answered: newPlayer.answered,
-                name: newPlayer.name,
-                points: newPlayer.points,
-                answered_at: newPlayer.answered_at,
-                id: newPlayerTemp.id
-            }
             // ALL DIS SHIT IS TO TRIGGER AN UPDATE
             let triggerDocRef = await firestore.doc(gamesRef, `${game.id}`);
             let triggerDoc = await firestore.getDoc(triggerDocRef);
             console.log('Trigger Doc', triggerDoc);
             //@ts-ignore
             await firestore.updateDoc(triggerDocRef, 'trigger', !triggerDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+            //@ts-ignore
             game.players.push(player);
             props.setCurrentGame(game);
             console.log('Setting game id to: ', game.id);
             props.setCurrentGameId(game.id);
+            history.push("/game")
         }
 
         else setErrorMessage('Game with given ID does not exist!');
@@ -256,7 +275,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             <td>
                                                 {(game.capacity > game.players.length) ?
                                                 
-                                                <Link to="/game" className="btn btn-secondary" onClick={() => joinGame(game)}>Join Game</Link>
+                                                <Button className="btn btn-secondary" onClick={async() => joinGame(game)}>Join Game</Button>
                                                 : <></>
                                                 }
                                             </td>

@@ -80,9 +80,17 @@ function GameComponent(props: IGameProps) {
     let [players, setPlayers] = useState([] as Player[]);
     let [collection, setCollection] = useState({} as Collections);
     let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
-    let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `${props.currentGameId}`))
+    let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `dummy`))
+    let [init, setInit] = useState(false);
 
     useEffect(() => {
+      console.log("HERE")
+      if(props.currentGameId) {
+        setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
+      } else {
+        return;
+      }
+      console.log(props.currentGameId)
       const retrieveCollection = () => {
           firestore.onSnapshot(gameDocRef, async snapshot => {
               console.log('gameDocSnapshot: ', snapshot);
@@ -121,13 +129,20 @@ function GameComponent(props: IGameProps) {
         return playerarr;
     }
 
+    function checkInit() {
+      if(!init) {
+        setInit(true)
+      }
+    }
+
     /**
      *  We want to display a question field, an answer+submit field, and a list of players.
      */
     return (
-        props.currentUser //&& props.currentGame
+        props.currentUser && props.currentGameId //&& props.currentGame
         ?
         <>
+            {checkInit}
             {console.log('Rerendered: ', props.currentGameId, players)}
             {/* Player List */}
             {console.log('Players in return line 148', players)}
@@ -147,7 +162,7 @@ function GameComponent(props: IGameProps) {
             
         </>
         :
-        <Redirect to="/login"/>
+        <Redirect to="/join-game"/>
     )
 }
 
