@@ -243,31 +243,16 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
-                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
-
-                    </tbody>
-                </Table >
-                <Table  striped bordered hover variant="dark">
-                    <thead>
-                    <tr>
-                          <td><h3>Favorites</h3></td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
-                    </tr>
-                        <tr>
-                          <td>Collection Title</td>
-                          <td>Collection Category</td>
-                          <td>Collection Description</td>
-                          <td>Author</td>
+                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */} 
+                     <tr>
+                          <td><h5>*Favorites*</h5></td>
+                          <td>+</td>
+                          <td>+</td>
+                          <td>+</td>
                           <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {/* god loop */}
-                    {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */}
-                    {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
+                    </tr>
+                   
+                        {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
                            return  <tr key={i} >
                                              <td>{C?.title} </td>
                                              <td>{C?.category}</td>
@@ -277,8 +262,10 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
+
                     </tbody>
                 </Table >
+               
 
                 <table>
                     <tbody>
