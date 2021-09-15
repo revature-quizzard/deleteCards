@@ -326,11 +326,15 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                  See the "{currentCollection?.title}" Preview here! 
                                 </Card.Text>
                                 <Button variant="success" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
-                                <br />
-                                 <ul>
-                                   {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{ return <li key={i}>{q?.question}</li> })}
-                                 </ul> 
+                              
+                                   
+                                 
                             </Card.Body>
+                             <br></br>
+                                <ListGroup>
+                                    <ListGroup.Item><h6>Questions</h6></ListGroup.Item>
+                                    {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{ return <ListGroup.Item key={i}>{q?.question}</ListGroup.Item>})}
+                                </ListGroup>
                             </Card>
                             </td>
                         </tr>
