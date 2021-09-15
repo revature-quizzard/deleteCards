@@ -27,7 +27,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
     
 
     function updateMaxPlayers(e: any) {
-      setMaxPlayers(e.currentTarget.value);
+      setMaxPlayers(parseInt(e.currentTarget.value));
   }
 
   function updateMatchTimer(e: any , eventKey : Number) {
@@ -94,7 +94,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
               <ListGroup.Item variant="light"> Name : {name}</ListGroup.Item>
             </ListGroup>
        
-            <p>More Settings Comming Soon....</p>
+            <p>More Settings Coming Soon....</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}> Cancel</Button>
