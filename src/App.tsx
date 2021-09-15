@@ -17,13 +17,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { Collections } from './dtos/collection';
 import { GameState } from './dtos/game-state';
+import { createTheme, ThemeProvider } from '@material-ui/core';
 
-
-
-
-
-
-
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#5f2568'
+    }
+  }
+})
 
 function App() {
 
@@ -36,6 +38,7 @@ function App() {
 
   return (
     <>
+    <ThemeProvider theme = {theme}>
       <Router>
         <NavbarComponent currentUser={authUser} setCurrentUser={setAuthUser}/>
         <Switch>
@@ -50,7 +53,8 @@ function App() {
             <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/> } />
             <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame}/>} />
         </Switch>
-      </Router>
+       </Router>
+      </ThemeProvider>
     </>
   );
 }

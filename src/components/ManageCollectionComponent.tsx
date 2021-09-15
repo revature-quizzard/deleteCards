@@ -6,7 +6,7 @@ import EditCollectionModal from "./collection-modals/EditCollectionModal";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
-import {getSavedCollections} from "../remote/user-service";
+import {getFavorites, getSavedCollections, unfavorite} from "../remote/user-service";
 import { Redirect , Link } from "react-router-dom";
 
 interface IManageProps {
@@ -16,6 +16,7 @@ interface IManageProps {
 
 function ManageCollectionComponent(props: IManageProps) {
     let [collections , setCollections] = useState([] as Collections[]);
+    let [favorites , setFavorites] = useState([] as Collections[]);
     let [errorMessage, setErrorMessage] = useState('');
     let [hasCollections, setHasCollections] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
@@ -25,14 +26,15 @@ function ManageCollectionComponent(props: IManageProps) {
 
     useEffect(() => {
         if(!hasCollections) {
-            getCollection();
+            fillCollections();
+            fillFavorites();
+            setHasCollections(true);
         }
     })
 
-    async function getCollection() {    
+    async function fillCollections() {    
         try {   
             if(props.currentUser) {
-                setHasCollections(true);
                 //@ts-ignore
                 let user_id = props.currentUser.id;
                 let temp = await getSavedCollections( user_id, props.currentUser.token );
@@ -49,6 +51,19 @@ function ManageCollectionComponent(props: IManageProps) {
 
             
     }
+
+    async function fillFavorites() {    
+        try {   
+            if(props.currentUser) {
+                let user_id = props.currentUser.id;
+                let favorited : Collections[] | undefined = await getFavorites(props.currentUser.id, props.currentUser.token)
+                setFavorites(favorited as Collections[]);
+            }
+        } catch (e: any) {
+            setErrorMessage(e.message); 
+        }   
+    }
+
 
     function edit(collection : Collections | undefined) {
         if(!collection) {
@@ -119,6 +134,20 @@ function ManageCollectionComponent(props: IManageProps) {
         return undefined;
     }
 
+    function unfavoriteCollection(collection : Collections | undefined) {
+        if(collection) {
+            try{
+                unfavorite(props.currentUser?.id as string, collection.id, props.currentUser?.token as string)
+                let temp : Collections[] = favorites.filter((c : Collections) => {
+                    return !(c.id === collection.id)
+                })
+                setFavorites(temp);
+            } catch (e : any) {
+                setErrorMessage(e);
+            }
+        }
+    }
+
     function getComponent() {
         if(showDelete) {
             return <DeleteCollectionModal current_user={props.currentUser} collection={currentCollection} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
@@ -137,9 +166,11 @@ function ManageCollectionComponent(props: IManageProps) {
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
-                          <td>Collection Title</td>
-                          <td>Collection Category</td>
-                          <td>Collection Description</td>
+                          <td>Title</td>
+                          <td>Category</td>
+                          <td>Description</td>
+                          <td>Author</td>
+                          <td>Question Count</td>
                           <td>Manage</td>
                         </tr>
                     </thead>
@@ -150,6 +181,8 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.title} </td>
                                     <td>{C?.category}</td>
                                     <td>{C?.description}</td>
+                                    <td>{C?.author.username}</td>
+                                    <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
                                     <Button variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
@@ -162,6 +195,37 @@ function ManageCollectionComponent(props: IManageProps) {
                 </Table>
 
                 <Button variant="secondary" onClick={create}>Create New Collection</Button>
+
+                <br></br>
+                <h1>{props.currentUser.username}'s Favorites</h1>
+                <Table  striped bordered hover variant="dark">
+                    <thead>
+                        <tr>
+                          <td>Title</td>
+                          <td>Category</td>
+                          <td>Description</td>
+                          <td>Author</td>
+                          <td>Question Count</td>
+                          <td>Manage</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {favorites?.map((C : Collections | undefined, i) =>{
+                           
+                        return  <tr key={i}>
+                                    <td>{C?.title} </td>
+                                    <td>{C?.category}</td>
+                                    <td>{C?.description}</td>
+                                    <td>{C?.author.username}</td>
+                                    <td>{C?.questionList.length}</td>
+                                    <td>
+                                    <Button variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
+                                    </td>
+                                </tr> 
+                    })}
+                    {getComponent()}
+                    </tbody>
+                </Table>
                 
         </>
         :
