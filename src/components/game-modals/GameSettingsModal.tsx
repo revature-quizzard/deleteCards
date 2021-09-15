@@ -17,17 +17,18 @@ interface IGameSettingsModal {
 }
 
 function GameSettingsModal(props: IGameSettingsModal) {
-  let [matchTimer , setMatchTimer] = useState(Number);
-  let [maxPlayers , setMaxPlayers] = useState(Number);
+  let [matchTimer , setMatchTimer] = useState(30);
+  let [maxPlayers , setMaxPlayers] = useState(0);
   let [category , setCategory] = useState('Category');
   let [name , setName] = useState('');
-    const handleClose = () => {
+    
+  const handleClose = () => {
       props.setShow(false);
-    }
+  }
     
 
-    function updateMaxPlayers(e: any) {
-      setMaxPlayers(e.currentTarget.value);
+  function updateMaxPlayers(e: any) {
+      setMaxPlayers(parseInt(e.currentTarget.value));
   }
 
   function updateMatchTimer(e: any , eventKey : Number) {
@@ -62,6 +63,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
       
         
         let collection : Collections | undefined = props.selectedCollection;
+        console.log('Settings before set: ', props.currentGameSettings);
         props.setCurrentGameSettings({maxPlayers   , matchTimer , collection  , category  , name });
         
       }
@@ -94,7 +96,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
               <ListGroup.Item variant="light"> Name : {name}</ListGroup.Item>
             </ListGroup>
        
-            <p>More Settings Comming Soon....</p>
+            <p>More Settings Coming Soon....</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}> Cancel</Button>

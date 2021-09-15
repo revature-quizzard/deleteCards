@@ -60,6 +60,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     console.log('Returned players array', playersArr);
                     // @ts-ignore
                     let temp = doc.doc['_document']['data']['value']['mapValue']['fields'];
+                    console.log('temp: ', temp);
                     if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.start_time || !temp.end_time) {
                         console.log("INVALID COLLECTION IN FIREBASE", temp);
                         return;
