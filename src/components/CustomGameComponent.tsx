@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Principal} from "../dtos/principal";
 import {GameSettings} from "../dtos/game-settings";
-import {getSavedCollections} from "../remote/user-service";
+import {getFavorites, getSavedCollections} from "../remote/user-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
 import { Redirect , Link } from "react-router-dom";
 import { Collections } from "../dtos/collection";
@@ -23,8 +23,10 @@ let targetsFavoriteCollections :  [] | undefined;
 let targetCollectionQuestionsList :  [] | undefined;
 let globalKey : Number | undefined;
 let collectionVisible : boolean = false;
+let favCollectionVisible : boolean = false;
 let collectionQLVisible : boolean = false;
 let showCollectionText = "Show Collections";
+let showFavCollectionText = "Show Favorites"
 let showQuestionListText ="Preview";
 
 interface IGameCustomCollectionProps {
@@ -123,6 +125,60 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
       
     }
 
+    function selectFavoriteCollection(e: any , key: any)
+    {
+        if(targetsFavoriteCollections)
+        {
+              targetCollectionQuestionsList = [];
+              showQuestionListText = "Preview";
+              setCurrentCollection(targetsFavoriteCollections[key]);
+              props.setSelectedCollection(currentCollection);
+                let maxPlayers: Number = 2;
+                let matchTimer : Number = 30;
+                let collection : Collections = currentCollection as Collections;
+                let category : string | undefined = currentCollection?.category;
+                let name: string = 'new collection';
+              props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+             
+              console.log("key : " , key ,  " value : " , targetsFavoriteCollections[key]);
+        }
+      
+    }
+
+    async function getFavoriteCollections(){
+        
+        try {
+                if(favCollectionVisible === false && props.currentUser)
+                {
+                    showFavCollectionText = "Hide Favorites" ;
+                    //@ts-ignore
+                    let user_id = props.currentUser.id;
+                    targetsFavoriteCollections = await getFavorites( user_id, props.currentUser.token );  
+                    
+                    
+                    props.setCurrentCollection(targetsFavoriteCollections);
+                    
+                } else if (favCollectionVisible === true && props.currentUser)  {
+
+                    showFavCollectionText = "Show Favorites" ;
+                    targetsFavoriteCollections = undefined;
+                    props.setCurrentCollection(targetsFavoriteCollections);
+                    
+                    
+                }else {
+
+                    setErrorMessage('signed in You must be');
+                }
+
+                favCollectionVisible = !favCollectionVisible;
+                console.log("Collections Visiblity : " + favCollectionVisible);
+                
+
+           }catch (e: any) {
+            setErrorMessage(e.message); 
+             }  
+    }
+
     async function getCollection() {
         
         try {
@@ -188,16 +244,24 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
+
                     </tbody>
                 </Table >
                 <Table  striped bordered hover variant="dark">
                     <thead>
+                    <tr>
+                          <td><h3>Favorites</h3></td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td>-</td>
+                    </tr>
                         <tr>
                           <td>Collection Title</td>
                           <td>Collection Category</td>
                           <td>Collection Description</td>
                           <td>Author</td>
-                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
+                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,7 +273,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.category}</td>
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
-                                             <td> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                             <td> <Button variant="success" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
@@ -257,8 +321,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                      <Link to="/game" className="btn btn-success" onClick={sendGameSettings} >Start Game</Link>
                                      :
 
-                                     <Alert variant="danger">
-                                     <Alert.Heading>Oh snap! You got forgot to pick a Collection!</Alert.Heading>
+                                     <Alert variant="warning">
+                                     <Alert.Heading>Cant Play Without Collection</Alert.Heading>
                                    </Alert>
                                      
                                 }
