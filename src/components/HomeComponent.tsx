@@ -9,7 +9,7 @@ interface IHomeProps {
 const linkStyle = {
     backgroundColor: '#5f2568',
     border: '#5f2568',
-    color: "lime",
+    color: "gold",
   };
 
 const useStyles = makeStyles({
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
     },
      welcome: {
         color: ' #FFD93D',
-        marginLeft: "15rem",
+        alignContent: "center",
     }
 });
 
@@ -43,16 +43,14 @@ function HomeComponent(props: IHomeProps) {
             <br/><br/>
             <Link to="/manage-collections" style = {linkStyle} className="w-100 btn btn-primary">Manage Collection</Link>
             <br/><br/>
-            <Link to="/" style = {linkStyle} className="w-100 btn btn-primary">Create Game</Link>
-            <br/><br/>
-            <Link to="/custom-game" style = {linkStyle} className="w-100 btn btn-primary">Custom Game (Testing)</Link>
+            <Link to="/custom-game" style = {linkStyle} className="w-100 btn btn-primary">Create Game</Link>
             <br/><br/>
             <Link to="/discover" style = {linkStyle} className="w-100 btn btn-primary">Discover</Link>
             <br/><br/>
             </div>
         </>
         :
-        <Redirect to="/login"/>
+        <Redirect to="/splash"/>
     )
 }
 

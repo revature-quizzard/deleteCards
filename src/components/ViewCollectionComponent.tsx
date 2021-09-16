@@ -19,6 +19,11 @@ interface IViewProps {
     collection: Collections | undefined;
     setCollection: (nextCollection: Collections | undefined) => void
 }
+const buttonStyle = {
+    backgroundColor: 'black',
+    border: 'black',
+    color: "gold",
+  }
 
 function ViewCollectionComponent(props: IViewProps) {
     let [questions , setQuestions] = useState([] as Question[]);
@@ -144,15 +149,15 @@ function ViewCollectionComponent(props: IViewProps) {
         props.currentUser
         ?
         <>
-            <h1>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
-            <h6>Category: {props.collection?.category}</h6>
-            <h6>Description: {props.collection?.description}</h6>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
+            <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Category: {props.collection?.category}</h6>
+            <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Description: {props.collection?.description}</h6>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
                           <td>Question</td>
-                          <td>Category</td>
                           <td>Answer</td>
+                          <td>Difficulty</td>
                           <td>Manage</td>
                         </tr>
                     </thead>
@@ -161,19 +166,19 @@ function ViewCollectionComponent(props: IViewProps) {
                            
                         return  <tr key={i}>
                                     <td>{Q?.question} </td>
-                                    <td>{Q?.category}</td>
                                     <td>{Q?.answer}</td>
+                                    <td>{Q?.value}</td>
                                     
                                     <td>
-                                    <Button variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
-                                    <Button variant="secondary" onClick={() => remove(Q)}>Delete</Button> {  }
+                                    <Button style = {buttonStyle} variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
+                                    <Button  style = {buttonStyle}variant="secondary" onClick={() => remove(Q)}>Delete</Button> {  }
                                     </td>
                                 </tr> 
                     })}
                     {getComponent()}
                     </tbody>
                 </Table>
-                <Button variant="secondary" onClick={create}>Create New Question</Button>
+                <Button style = {buttonStyle} variant="secondary" onClick={create}>Create New Question</Button>
         </>
         :
         <Redirect to="/login"/>

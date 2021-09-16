@@ -1,33 +1,71 @@
 import {useState} from "react";
 import {Principal} from "../dtos/principal";
 import {GameSettings} from "../dtos/game-settings";
-import {getSavedCollections} from "../remote/user-service";
+import {getFavorites, getSavedCollections} from "../remote/user-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
-import { Redirect , Link } from "react-router-dom";
+import { Redirect , Link, useHistory } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
-import { Card, ListGroup } from "react-bootstrap";
-import GameSettingsModal from "./collection-modals/GameSettingsModal";
+import { Alert, Card, ListGroup } from "react-bootstrap";
+import GameSettingsModal from "./game-modals/GameSettingsModal";
 import { Question } from "../dtos/question";
-import { stringify } from "querystring";
+import * as firestore from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import app from '../util/Firebase';
+import { getRandQuestion } from "../remote/question-service";
+import { GameState } from "../dtos/game-state";
+import { makeStyles } from "@material-ui/core";
 
+
+const db = firestore.getFirestore(app);
 
 let targetsCollections :  [] | undefined;
-let targetCollectionQuestionsList :  [] | undefined;
+let targetsFavoriteCollections :  [] | undefined;
+let targetCollectionQuestionsList :  Question[] | undefined;
 let globalKey : Number | undefined;
 let collectionVisible : boolean = false;
+let favCollectionVisible : boolean = false;
 let collectionQLVisible : boolean = false;
 let showCollectionText = "Show Collections";
+let showFavCollectionText = "Show Favorites"
 let showQuestionListText ="Preview";
+
+const styles = {
+    backgroundImage: "url(/splash.jpg)",
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    width: '100vw',
+    height: '125vh'
+};
+
+const useStyles = makeStyles({
+    link: {
+        backgroundColor: 'black',
+        border: 'black',
+        color: "gold",
+    },
+
+    Button: {
+        backgroundColor: 'black',
+        border: 'black',
+        color: "gold",
+    }
+})
 
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
-    currentCollection:  [] | undefined,
+    currentGameId: string,
+    setCurrentGameId: ((gameId: string) => void),
+    selectedCollection: Collections | undefined,
+    setSelectedCollection: (nextCollection: Collections | undefined) => void
+    currentCollections:  [] | undefined,
     setCurrentCollection: (nextCollection:  [] | undefined) => void,
     currentGameSettings_:  GameSettings | undefined,
     setCurrentGameSettings_: (nextCollection: GameSettings | undefined) => void
 }
+
 
 function CustomGameComponent(props: IGameCustomCollectionProps) {
     let [collectionTitle , setCollectionTitle] = useState('');
@@ -37,6 +75,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
     let [showSettings, setShowSettings] = useState(false);
     let [currentCollection, setCurrentCollection] = useState(undefined as Collections | undefined);
 
+    let history = useHistory();
 
     function displayModal() {
         setShowSettings(true);
@@ -45,77 +84,156 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
 
     function getModal() {
         if(showSettings) {
-            return <GameSettingsModal  current_user={props.currentUser} currentGameSettings={props.currentGameSettings_} setCurrentGameSettings={props.setCurrentGameSettings_} show={showSettings} setShow={setShowSettings} />;
+            props.setSelectedCollection(currentCollection);
+            return <GameSettingsModal  current_user={props.currentUser} selectedCollection={props.selectedCollection} currentGameSettings={props.currentGameSettings_} setCurrentGameSettings={props.setCurrentGameSettings_} show={showSettings} setShow={setShowSettings} />;
         }
     }
 
+    // Translate game settings into a Game State and store in Firestore db
+    async function sendGameSettings()
+    {
+        const gamesRef = firestore.collection(db , "games");
+        console.log('Current Game Settings:', props.currentGameSettings_);
+        if (!props.currentGameSettings_) {
+            console.log('Current Game Settings:', props.currentGameSettings_);
+            return;
+        } else console.log('Props are truthy!');
+        let newGame = {
+            name: props.currentGameSettings_.name,
+            capacity: props.currentGameSettings_.maxPlayers,
+            match_state: 0,
+            question_index: 0,
+            question_timer: props.currentGameSettings_.matchTimer,
+            start_time: new firestore.Timestamp(1,1),
+            end_time: new firestore.Timestamp(1,1),
+            host: props.currentUser?.username,
+            collection: props.currentGameSettings_.collection,
+            trigger: true
+        };          
 
-    function displayQuestions(e : any , key: any) {
+        let gameDocRef = await firestore.addDoc(gamesRef , newGame);
+        console.log('Setting game Id to: ', gameDocRef.id);
+        props.setCurrentGameId(gameDocRef.id);
+        let playersRef = firestore.collection(gamesRef, `${gameDocRef.id}/players`);
+        let newPlayer = {
+            answered: false,
+            name: props.currentUser?.username,
+            points : 0,
+            answered_at: new firestore.Timestamp(1,1)
+        }
+        let playerDoc = await firestore.addDoc(playersRef, newPlayer);
+        history.push('/game');
+    }
 
-       
 
-       if(collectionVisible && targetsCollections)
-       {
-           
-           setCurrentCollection(targetsCollections[key]);
-       
-           console.log("key :  " , key ,  " value : " , targetsCollections[key]);
-           // return early if there are no questions in list
-           if(currentCollection?.questionList.length === 0 )
-           { 
-               collectionQLVisible = false;
-               
-               return;
-           }
+    function displayQuestions(e : any) { 
+        
+       console.log("pressed");
+         
 
-           if(collectionQLVisible === false)
-           {
-                targetCollectionQuestionsList = currentCollection?.questionList;
+           if(collectionQLVisible === false){
+
+                   console.log(" on");
                 collectionQLVisible = true;
                 showQuestionListText = "Preview";
-               
-           }else if(collectionQLVisible === true && currentCollection){
-                setCurrentCollection(undefined);
-             //  currentCollection.questionList = [];
-                targetCollectionQuestionsList = currentCollection?.questionList;   
-                collectionQLVisible = false;
-                showQuestionListText = "Hide";
-
+                targetCollectionQuestionsList = currentCollection?.questionList;
+                props.setSelectedCollection(currentCollection);
+           
            }else{
-            console.log("Questions Visiblity : " + collectionQLVisible);
+            console.log(" off ");
+            if(currentCollection)
+             currentCollection.questionList = [];
+
+                collectionQLVisible = false;
+                showQuestionListText = "-";  
+             
+                
+                targetCollectionQuestionsList = currentCollection?.questionList;
+                 props.setSelectedCollection(currentCollection);
+               
            }
 
-        
-            
-        }
-        else
-        {
-            setCurrentCollection(undefined);
+                
              //  currentCollection.questionList = [];
-                targetCollectionQuestionsList = currentCollection?.questionList; 
-            collectionQLVisible = false;
+             
+             
+           }
             
-        } 
-        
-        
-    }
+  
+    
 
     function selectCollection(e: any , key: any)
     {
-        if(collectionVisible && targetsCollections)
+        if(targetsCollections)
         {
-              
-              setCurrentCollection(targetsCollections[key]);
-                let maxPlayers: Number = 2;
-                let matchTimer : Number = 60;
-                let collection : Collections = currentCollection as Collections;
-                let category : string | undefined = currentCollection?.category;
-                let name: string = 'name';
-              props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
-              
-              console.log("key : " , key ,  " value : " , targetsCollections[key]);
+            targetCollectionQuestionsList = [];
+            showQuestionListText = "Preview";
+            setCurrentCollection(targetsCollections[key]);
+            props.setSelectedCollection(currentCollection);
+            let maxPlayers: Number = 4;
+            let matchTimer : Number = 30;
+            let collection : Collections = targetsCollections[key] as Collections;
+            let category : string | undefined = currentCollection?.category;
+            let name: string = 'new collection';
+            props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+            
+            console.log("key : " , key ,  " value : " , targetsCollections[key]);
         }
       
+    }
+
+    function selectFavoriteCollection(e: any , key: any)
+    {
+        if(targetsFavoriteCollections)
+        {
+            targetCollectionQuestionsList = [];
+            showQuestionListText = "Preview";
+            setCurrentCollection(targetsFavoriteCollections[key]);
+            props.setSelectedCollection(currentCollection);
+            let maxPlayers: Number = 4;
+            let matchTimer : Number = 15;
+            let collection : Collections = targetsFavoriteCollections[key] as Collections;
+            let category : string | undefined = currentCollection?.category;
+            let name: string = 'new collection';
+            props.setCurrentGameSettings_({maxPlayers   , matchTimer , collection  , category  , name });
+            
+            console.log("key : " , key ,  " value : " , targetsFavoriteCollections[key]);
+        }
+      
+    }
+
+    async function getFavoriteCollections(){
+        
+        try {
+                if(favCollectionVisible === false && props.currentUser)
+                {
+                    showFavCollectionText = "Hide Favorites" ;
+                    //@ts-ignore
+                    let user_id = props.currentUser.id;
+                    targetsFavoriteCollections = await getFavorites( user_id, props.currentUser.token );  
+                    
+                    
+                    props.setCurrentCollection(targetsFavoriteCollections);
+                    
+                } else if (favCollectionVisible === true && props.currentUser)  {
+
+                    showFavCollectionText = "Show Favorites" ;
+                    targetsFavoriteCollections = undefined;
+                    props.setCurrentCollection(targetsFavoriteCollections);
+                    
+                    
+                }else {
+
+                    setErrorMessage('signed in You must be');
+                }
+
+                favCollectionVisible = !favCollectionVisible;
+                console.log("Collections Visiblity : " + favCollectionVisible);
+                
+
+           }catch (e: any) {
+            setErrorMessage(e.message); 
+             }  
     }
 
     async function getCollection() {
@@ -126,15 +244,17 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     showCollectionText = "Hide Collections" ;
                     //@ts-ignore
                     let user_id = props.currentUser.id;
-                     targetsCollections = await getSavedCollections( user_id, props.currentUser.token );  
+                    targetsCollections = await getSavedCollections( user_id, props.currentUser.token );  
+                    
                     
                     props.setCurrentCollection(targetsCollections);
                     
                 } else if (collectionVisible === true && props.currentUser)  {
 
                     showCollectionText = "Show Collections" ;
-                    props.setCurrentCollection(undefined);
                     targetsCollections = undefined;
+                    props.setCurrentCollection(targetsCollections);
+                    
                     
                 }else {
 
@@ -148,6 +268,29 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
            }catch (e: any) {
             setErrorMessage(e.message); 
              }  
+    }
+
+    async function generateRandom() {
+        let collection : Collections = {
+            id: '-1',
+            key_: -1,
+            title: 'Random Collection',
+            description: 'Randomly generated from jservice.io API',
+            category: 'Random',
+            author: {
+                id: '',
+                username: '',
+                token: ''
+            },
+            questionList: [] as Question[]
+        }
+
+        for(let i = 0; i < 10; i++) {
+            let question = await getRandQuestion(collection.id);
+            collection.questionList.push(question)
+        }
+        console.log(collection)
+        setCurrentCollection(collection)
     }
     
     
@@ -165,7 +308,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>Collection Category</td>
                           <td>Collection Description</td>
                           <td>Author</td>
-                          <td>Questions</td>
+                          <td>Size</td>
                           <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
                         </tr>
                     </thead>
@@ -178,76 +321,111 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.category}</td>
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
-                                             {/* mini loop cell*/}
-                                             {/* ////////////////////////////////////////////////////////////////// */}
-                                            
-                                             <td>
-                                                <p>"{C?.title}" (Preview?)</p>
-                                                <ul>
-                                                    {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{return <li key={i}>{q?.question}</li> })}
-                                                </ul> 
-                                             </td> 
-                                              {/* ////////////////////////////////////////////////////////////////// */}
-                                             <td><Button variant="secondary" onClick={(e) => displayQuestions( e , i)}> {showQuestionListText.toString()}</Button> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                             <td>{C?.questionList.length.toString()}</td>
+                                             <td> <Button variant="light" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                            </tr> 
+                                      })}
+                     {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */} 
+                     
+                     <tr>
+                          <td><h5>*Favorites*</h5></td>
+                          <td>+</td>
+                          <td>+</td>
+                          <td>+</td>
+                          <td>Size</td>
+                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
+                    </tr>
+                   
+                        {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
+                           return  <tr key={i} >
+                                             <td>{C?.title} </td>
+                                             <td>{C?.category}</td>
+                                             <td>{C?.description}</td>
+                                             <td>{C?.author.username.toString()}</td>
+                                             <td>{C?.questionList.length.toString()}</td>
+                                             <td> <Button variant="light" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
+
                     </tbody>
                 </Table >
+               
+               
+
+                <Button variant="light" onClick={generateRandom} > Create Random Collection</Button>
 
                 <table>
                     <tbody>
                         <tr>
                             <td>
-                            <Card style={{ width: '18rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white" >
                             <Card.Body>
                                 <Card.Title>Game Manager</Card.Title>
                                 
-                                <Button variant="success" onClick={displayModal}>Game Settings</Button>
+                                
                                 <Card.Text>
-                                    <br />
-                                <ListGroup  >
-                                    <ListGroup.Item  ><h6>Summary</h6>Collection : "{props.currentGameSettings_?.collection?.title}"</ListGroup.Item>
-                                    <ListGroup.Item  >Match time : {props.currentGameSettings_?.matchTimer} (seconds)</ListGroup.Item>
-                                    <ListGroup.Item  >Category : {currentCollection?.category}</ListGroup.Item>
-                                    <ListGroup.Item  >Max Players : {props.currentGameSettings_?.maxPlayers}</ListGroup.Item>
-                                    <ListGroup.Item  > Name : {props.currentGameSettings_?.name}</ListGroup.Item>
-                                </ListGroup>
+                                  Set up your game
                                 </Card.Text>
-                                    
+                                <Button variant="light" onClick={displayModal}>Game Settings</Button>
                                 {getModal()}
                             </Card.Body>
                             </Card> 
                             
                             </td>
                             <td>
-                            <Card style={{ width: '20rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white">
+                           
                             <Card.Body>
                                 <Card.Title>Game Initiator</Card.Title>
+
                                 <Card.Text>
-                                Setup som pregame settings here
+                                <br />
+                                <ListGroup  >
+                                    <ListGroup.Item ><h6>Summary</h6></ListGroup.Item>
+                                    <ListGroup.Item variant="light">  Collection : "{currentCollection?.title}"</ListGroup.Item>
+                                    <ListGroup.Item variant="light">Match time : {props.currentGameSettings_?.matchTimer} (seconds)</ListGroup.Item>
+                                    <ListGroup.Item variant="light">Category : {currentCollection?.category}</ListGroup.Item>
+                                    <ListGroup.Item variant="light">Max Players : {props.currentGameSettings_?.maxPlayers}</ListGroup.Item>
+                                    <ListGroup.Item variant="light"> Name : {props.currentGameSettings_?.name}</ListGroup.Item>
+                                </ListGroup>
+                               
                                 </Card.Text>
-                                <Link to="/" className="btn btn-primary">Start Game</Link>
+                                {
+                                     currentCollection?.category ? 
+                                     <Button className="btn btn-success"variant="success outline-dark"   onClick={sendGameSettings} >Start Game</Button>
+                                     :
+
+                                     <Alert variant="warning">
+                                     <Alert.Heading>Cant Play Without Collection</Alert.Heading>
+                                   </Alert>
+                                     
+                                }
+                                
                             </Card.Body>
                          
                             </Card>
                             </td>
                             <td>
-                            <Card style={{ width: '18rem' }}>
+                            <Card style={{ width: '22rem' }} className="bg-dark text-white">
                             <Card.Body>
                                 <Card.Title>Game Inspect</Card.Title>
                                 <Card.Text>
-                                Setup som pregame settings here
+                                 See the "{currentCollection?.title}" Preview here! 
                                 </Card.Text>
-                                <Button variant="primary">Confirm</Button>
+                                <Button variant="light" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
                             </Card.Body>
+                             <br></br>
+                                <ListGroup >
+                                    <ListGroup.Item ><h6>Questions</h6></ListGroup.Item>
+                                    {targetCollectionQuestionsList?.map((q : Question | undefined , i) =>{ return <ListGroup.Item key={i} variant="light">{q?.question}</ListGroup.Item>})}
+                                </ListGroup>
                             </Card>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }

@@ -12,6 +12,12 @@ interface IDiscoverProps {
     setCurrCollection: (nextCollection: Collections | undefined) => void
 }
 
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "lime",
+  }
+
 function DiscoverCollectionsComponent(props: IDiscoverProps) {
     let [collections , setCollections] = useState([] as Collections[]);
     let [errorMessage, setErrorMessage] = useState('');
@@ -105,7 +111,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                                     <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
+                                    <Button style = {buttonStyle} variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
                                     </td>
                                 </tr> 
                     })}

@@ -43,7 +43,7 @@ export function NavbarComponent(props: INavbarProps){
                                             </ListItemText>
                                             <ListItemText inset>
                                                 <Typography color="inherit" variant="h6" onClick={logout}>
-                                                    <Link to="/" id="logout">Logout</Link>
+                                                    <Link className={classes.link} to="/" id="logout">Logout</Link>
                                                 </Typography>
                                             </ListItemText>
                                         </>
