@@ -76,7 +76,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
               <Modal.Title>Settings</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${"Match Time"} ${matchTimer} ${"(seconds)"} `}>
+            <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${"Time Per Question"} ${matchTimer} ${"(seconds)"} `}>
             <Dropdown.Item eventKey="1"  onClick={(e) => updateMatchTimer(e , 1)}>:15</Dropdown.Item>
             <Dropdown.Item eventKey="2"  onClick={(e) => updateMatchTimer(e , 2)}>:30</Dropdown.Item>
             <Dropdown.Item eventKey="3"  onClick={(e) => updateMatchTimer(e , 3)}>:45</Dropdown.Item>
