@@ -9,7 +9,7 @@ interface IHomeProps {
 const linkStyle = {
     backgroundColor: '#5f2568',
     border: '#5f2568',
-    color: "lime",
+    color: "gold",
   };
 
 const useStyles = makeStyles({
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
     },
      welcome: {
         color: ' #FFD93D',
-        marginLeft: "15rem",
+        alignContent: "center",
     }
 });
 
@@ -50,7 +50,7 @@ function HomeComponent(props: IHomeProps) {
             </div>
         </>
         :
-        <Redirect to="/login"/>
+        <Redirect to="/splash"/>
     )
 }
 

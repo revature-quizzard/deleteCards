@@ -25,7 +25,7 @@ const buttonStyle = {
 }
 
 function CreateQuestionModal(props: IQuestionModal) {
-    let [question , setQuestion] = useState({question:"", collection_id: props.current_collection?.id, answer:"", category:"", value:""} as Question | undefined);
+    let [question , setQuestion] = useState({question:"", collection_id: props.current_collection?.id, answer:"", category: props.current_collection?.category, value:""} as Question | undefined);
     let [errorMessage, setErrorMessage] = useState('');
 
     const handleClose = () => {

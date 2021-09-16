@@ -20,9 +20,9 @@ interface IEditCollectionProps {
 }
 
 const buttonStyle = {
-  backgroundColor: '#5f2568',
-  border: '#5f2568',
-  color: "lime",
+  backgroundColor: 'black',
+  border: 'black',
+  color: "gold",
 }
 
 function EditQuestionModal(props: IEditCollectionProps) {
@@ -90,12 +90,12 @@ function EditQuestionModal(props: IEditCollectionProps) {
               <Modal.Title>Edit</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <input id="question-input" type="text" defaultValue={props.question?.question} onChange={updateQuestion} placeholder="Question"/>
+                <input style = {{width:"420px"}} id="question-input" type="textarea" defaultValue={props.question?.question} onChange={updateQuestion} placeholder="Question"/>
                 <br/><br/>
                 <input id="answer-input" type="text" defaultValue={props.question?.answer} onChange={updateAnswer} placeholder="Title"/>
                 <br/><br/>
                 <p>Difficulty:</p>
-              <DropdownButton as={ButtonGroup} style = {buttonStyle} key={1} id={`dropdown-variants-primary`} variant="primary" title= {props.question?.value}>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="dark" title= {props.question?.value}>
               <Dropdown.Item eventKey="1"  onClick={(e) => updateDifficulty(e , 1)}>1</Dropdown.Item>
                 <Dropdown.Item eventKey="2"  onClick={(e) => updateDifficulty(e , 2)}>2</Dropdown.Item>
                 <Dropdown.Item eventKey="3"  onClick={(e) => updateDifficulty(e , 3)}>3</Dropdown.Item>
@@ -105,10 +105,10 @@ function EditQuestionModal(props: IEditCollectionProps) {
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+              <Button style ={buttonStyle} variant="secondary" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="primary" onClick={edit}>
+              <Button style ={buttonStyle} variant="primary" onClick={edit}>
                 Save Changes
               </Button>
             </Modal.Footer>

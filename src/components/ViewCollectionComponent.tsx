@@ -20,9 +20,9 @@ interface IViewProps {
     setCollection: (nextCollection: Collections | undefined) => void
 }
 const buttonStyle = {
-    backgroundColor: '#5f2568',
-    border: '#5f2568',
-    color: "lime",
+    backgroundColor: 'black',
+    border: 'black',
+    color: "gold",
   }
 
 function ViewCollectionComponent(props: IViewProps) {
@@ -149,9 +149,9 @@ function ViewCollectionComponent(props: IViewProps) {
         props.currentUser
         ?
         <>
-            <h1>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
-            <h6>Category: {props.collection?.category}</h6>
-            <h6>Description: {props.collection?.description}</h6>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
+            <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Category: {props.collection?.category}</h6>
+            <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Description: {props.collection?.description}</h6>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
