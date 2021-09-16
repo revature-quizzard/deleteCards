@@ -7,6 +7,7 @@ import ErrorMessageComponent from "./ErrorMessageComponent";
 import { Redirect , Link, withRouter, useHistory } from "react-router-dom";
 import { Collections } from "../dtos/collection";
 import { Alert, Card, InputGroup, Table, Button, FormControl } from "react-bootstrap";
+import { makeStyles } from "@material-ui/core";
 
 import * as firestore from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
@@ -25,6 +26,28 @@ interface IJoinGameProps {
     currentGameId: string;
     setCurrentGameId: ((gameId: string) => void);
 }
+
+const useStyles = makeStyles({
+    JGameContainer: {
+        backgroundColor: "black",
+        opacity: .94,
+        justifyContent: "center",
+        marginLeft: "10rem",
+        marginTop: "5rem",
+        width: "75%",
+        height:"75%",
+        borderRadius: "8em",
+        border: "white",
+        overflowY: "scroll"
+    }
+}) 
+
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "gold",
+    marginLeft: '1em'
+  }
 
 /**
  *  We want the JoinGameComponent to:
@@ -224,7 +247,8 @@ function JoinGameComponent(props: IJoinGameProps) {
         else return undefined;
     }
     
-
+    const classes = useStyles();
+    
     /**
      *  Displays list of active games if any exist, with a join game button, otherwise displays message indicating that none exist.
      *  Displays search for direct game id and a join game button.
@@ -234,11 +258,11 @@ function JoinGameComponent(props: IJoinGameProps) {
         !props.currentUser ? <Redirect to="/login"/> :
         <>
             {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
-             <div>
-               
+             <div id = "jg-component" className={classes.JGameContainer}>
+             <br/><br/>
              <br/><br/>
                 {/* Prints all active games to the screen */}
-
+                <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -307,7 +331,8 @@ function JoinGameComponent(props: IJoinGameProps) {
                     {/* </Button> */}
                 {/* </InputGroup> */}
                 
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            
+            </div>
         </>
     )
 }

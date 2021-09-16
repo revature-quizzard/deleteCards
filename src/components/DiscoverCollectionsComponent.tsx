@@ -6,16 +6,32 @@ import { Collections } from "../dtos/collection";
 import {getAllCollections} from "../remote/collection-service";
 import { Redirect , Link } from "react-router-dom";
 import { getFavorites, favorite, unfavorite} from "../remote/user-service";
+import { makeStyles } from "@material-ui/core";
+
 
 interface IDiscoverProps {
     currentUser: Principal | undefined;
     setCurrCollection: (nextCollection: Collections | undefined) => void
 }
 
+const useStyles = makeStyles({
+    DiscoverContainer: {
+        backgroundColor: "black",
+        opacity: .94,
+        justifyContent: "center",
+        marginLeft: "10rem",
+        marginTop: "5rem",
+        width: "75%",
+        height:"75%",
+        borderRadius: "8em",
+        border: "white",
+    }
+}) 
+
 const buttonStyle = {
     backgroundColor: '#5f2568',
     border: '#5f2568',
-    color: "lime",
+    color: "gold",
   }
 
 function DiscoverCollectionsComponent(props: IDiscoverProps) {
@@ -85,11 +101,15 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
         }   
     }
 
+    const classes = useStyles();
     return (
         props.currentUser
         ?
         <>
-            <h1>Discover Collections</h1>
+        <div id = "discover-component" className={classes.DiscoverContainer}>
+            <br></br>
+            <br></br>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Discover Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -117,6 +137,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                     })}
                     </tbody>
                 </Table>
+        </div>
         </>
         :
         <Redirect to="/login"/>

@@ -1,5 +1,5 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel, ListGroup } from "react-bootstrap";
+import { Alert, Button, Card, Carousel, Table, ListGroup } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -17,7 +17,6 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import app from '../util/Firebase';
-
 
 const db = firestore.getFirestore(app);
 
@@ -381,18 +380,26 @@ function PlayersComponent(props: any) {
   const players : Player[] = props.players;
 
   return (
-    <ListGroup id="players-component">
-    <ListGroup.Item variant="dark"><h6>Players</h6></ListGroup.Item>
-    {players.map(function(player, i) {
       
-      return <ListGroup.Item variant="light" key={i}>
-            
-            {/* @ts-ignore */}
-            {player.name.stringValue}
-      </ListGroup.Item>
-    })}
-  </ListGroup>
-  )}
-
+      <Table  striped bordered hover variant="dark" id="players-component">
+                    <thead>
+                        <tr>
+                          <td><h5 color="yellow">Players</h5></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {players.map(function(player, i) {
+                            return <tr key={i}>
+                                <td>
+                                  {/* @ts-ignore */}
+                                  {player.name.stringValue}
+                                </td>
+                            </tr>
+                          })}
+                    </tbody>
+       </Table>
+     
+  )
+}
 
 export default GameComponent;

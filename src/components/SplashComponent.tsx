@@ -13,20 +13,35 @@ const styles = {
     height: '125vh'
 };
 
+const linkStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "gold",
+  };
+
+  const locationStyle ={
+  justifyContent: "center",
+        marginLeft: "50rem",
+        marginTop: "45rem",
+    }
+
 const useStyles = makeStyles({
     link: {
         backgroundColor: 'black',
         border: 'black',
         color: "gold",
     }
+
 })
 function SplashComponent(props: ISplashProps){
     const classes = useStyles();
 return (
     <>
-    <div>
-    <Link to="/register" id="register" className={classes.link}>Register</Link>
-    <Link to="/login" id="login" className={classes.link}>Login</Link>
+    <div style={locationStyle}>
+    <Link to="/register" style ={linkStyle} id="register" className="w-25 btn btn-primary">Register</Link>
+    <br></br>
+    <br></br>
+    <Link to="/login" style ={linkStyle} id="login" className="w-25 btn btn-primary">Login</Link>
     </div>
     </>
 )

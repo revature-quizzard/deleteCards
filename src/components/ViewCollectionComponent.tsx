@@ -6,12 +6,11 @@ import {useState, useEffect} from "react";
 import {getCollection} from "../remote/collection-service";
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
+import { FormControl, Input, InputLabel, makeStyles, Typography} from "@material-ui/core";
 
 import DeleteQuestionModal from "./question-modals/DeleteQuestionModal";
 import CreateQuestionModal from "./question-modals/CreateQuestionModal";
 import EditQuestionModal from "./question-modals/EditQuestionModal";
-
-
 
 
 interface IViewProps {
@@ -19,10 +18,25 @@ interface IViewProps {
     collection: Collections | undefined;
     setCollection: (nextCollection: Collections | undefined) => void
 }
+const useStyles = makeStyles({
+    ManageContainer: {
+        backgroundColor: "black",
+        opacity: .94,
+        justifyContent: "center",
+        marginLeft: "10rem",
+        marginTop: "5rem",
+        width: "75%",
+        height:"75%",
+        borderRadius: "8em",
+        border: "white",
+    }
+}) 
+
 const buttonStyle = {
-    backgroundColor: 'black',
-    border: 'black',
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
     color: "gold",
+    marginLeft: '1em'
   }
 
 function ViewCollectionComponent(props: IViewProps) {
@@ -144,11 +158,14 @@ function ViewCollectionComponent(props: IViewProps) {
         }
     }
 
-
+    const classes = useStyles();
     return (
         props.currentUser
         ?
         <>
+            <div id = "manage-component" className={classes.ManageContainer} >
+            <br></br>
+            <br></br>  
             <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
             <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Category: {props.collection?.category}</h6>
             <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Description: {props.collection?.description}</h6>
@@ -179,6 +196,7 @@ function ViewCollectionComponent(props: IViewProps) {
                     </tbody>
                 </Table>
                 <Button style = {buttonStyle} variant="secondary" onClick={create}>Create New Question</Button>
+            </div>
         </>
         :
         <Redirect to="/login"/>
