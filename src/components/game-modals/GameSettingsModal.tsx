@@ -34,15 +34,17 @@ function GameSettingsModal(props: IGameSettingsModal) {
 
     if(eventKey === 1)
     {
-      setMatchTimer(30);
+      setMatchTimer(15);
     }else if(eventKey === 2)
     {
-      setMatchTimer(45);
+      setMatchTimer(30);
     }else if(eventKey === 3)
     {
-      setMatchTimer(60);
-    }else
+      setMatchTimer(45);
+    }else if( eventKey === 4)
     {
+      setMatchTimer(60);
+    }else{
       setMatchTimer(75);
     }
     console.log(matchTimer );
@@ -75,10 +77,11 @@ function GameSettingsModal(props: IGameSettingsModal) {
             </Modal.Header>
             <Modal.Body>
             <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${"Match Time"} ${matchTimer} ${"(seconds)"} `}>
-            <Dropdown.Item eventKey="1"  onClick={(e) => updateMatchTimer(e , 1)}>:30</Dropdown.Item>
-            <Dropdown.Item eventKey="2"  onClick={(e) => updateMatchTimer(e , 2)}>:45</Dropdown.Item>
-            <Dropdown.Item eventKey="3"  onClick={(e) => updateMatchTimer(e , 3)}>:60</Dropdown.Item>
-            <Dropdown.Item eventKey="4"  onClick={(e) => updateMatchTimer(e , 4)}>:75</Dropdown.Item>
+            <Dropdown.Item eventKey="1"  onClick={(e) => updateMatchTimer(e , 1)}>:15</Dropdown.Item>
+            <Dropdown.Item eventKey="2"  onClick={(e) => updateMatchTimer(e , 2)}>:30</Dropdown.Item>
+            <Dropdown.Item eventKey="3"  onClick={(e) => updateMatchTimer(e , 3)}>:45</Dropdown.Item>
+            <Dropdown.Item eventKey="4"  onClick={(e) => updateMatchTimer(e , 4)}>:60</Dropdown.Item>
+            <Dropdown.Item eventKey="5"  onClick={(e) => updateMatchTimer(e , 5)}>:75</Dropdown.Item>
             </DropdownButton>
             <br/><br/>
             <input id="collection-name-input" type="text" onChange={updateMaxPlayers} placeholder="Max Players (20 Max)"/>
