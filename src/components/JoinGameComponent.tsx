@@ -38,6 +38,7 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
+        overflowY: "scroll"
     }
 }) 
 
@@ -258,10 +259,10 @@ function JoinGameComponent(props: IJoinGameProps) {
         <>
             {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
              <div id = "jg-component" className={classes.JGameContainer}>
-               
+             <br/><br/>
              <br/><br/>
                 {/* Prints all active games to the screen */}
-
+                <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
