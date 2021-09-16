@@ -8,12 +8,34 @@ import Button from 'react-bootstrap/Button'
 import { Collections } from "../dtos/collection";
 import {getFavorites, getSavedCollections, unfavorite} from "../remote/user-service";
 import { Redirect , Link } from "react-router-dom";
+import { colors } from "@material-ui/core";
+import { FormControl, Input, InputLabel, makeStyles, Typography} from "@material-ui/core";
+
 
 interface IManageProps {
     currentUser: Principal | undefined;
     setCurrCollection: (nextCollection: Collections | undefined) => void
 }
+const useStyles = makeStyles({
+    ManageContainer: {
+        backgroundColor: "black",
+        opacity: .94,
+        justifyContent: "center",
+        marginLeft: "10rem",
+        marginTop: "5rem",
+        width: "75%",
+        height:"75%",
+        borderRadius: "8em",
+        border: "white",
+    }
+}) 
 
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "gold",
+    marginLeft: '1em'
+}
 function ManageCollectionComponent(props: IManageProps) {
     let [collections , setCollections] = useState([] as Collections[]);
     let [favorites , setFavorites] = useState([] as Collections[]);
@@ -157,12 +179,15 @@ function ManageCollectionComponent(props: IManageProps) {
             return <EditCollectionModal current_user={props.currentUser}  collection={currentCollection} show={showEdit} setShow={setShowEdit} updateUI={editUI}/>;
         }
     }
-
+    const classes = useStyles();
     return (
         props.currentUser
         ?
         <>
-            <h1>{props.currentUser.username}'s Collections</h1>
+            <div id = "manage-component" className={classes.ManageContainer}>
+            <br></br>
+            <br></br>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}> {props.currentUser.username}'s Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -184,9 +209,9 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
-                                    <Button variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
-                                    <Link to="/view-collection" className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
+                                    <Button style ={buttonStyle}variant="secondary" onClick={() => edit(C)}>Edit</Button> {  }
+                                    <Button style ={buttonStyle} variant="secondary" onClick={() => remove(C)}>Delete</Button> {  }
+                                    <Link to="/view-collection" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}
@@ -194,10 +219,10 @@ function ManageCollectionComponent(props: IManageProps) {
                     </tbody>
                 </Table>
 
-                <Button variant="secondary" onClick={create}>Create New Collection</Button>
+                <Button style ={buttonStyle} variant="secondary" onClick={create}>Create New Collection</Button>
 
                 <br></br>
-                <h1>{props.currentUser.username}'s Favorites</h1>
+                <h1 style = {{color: '#FFD93D', marginLeft: '1em'}}>{props.currentUser.username}'s Favorites</h1>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -219,14 +244,14 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.author.username}</td>
                                     <td>{C?.questionList.length}</td>
                                     <td>
-                                    <Button variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
+                                    <Button style= {buttonStyle} variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
                                     </td>
                                 </tr> 
                     })}
                     {getComponent()}
                     </tbody>
                 </Table>
-                
+                </div>      
         </>
         :
         <Redirect to="/login"/>

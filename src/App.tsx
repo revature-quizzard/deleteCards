@@ -6,6 +6,7 @@ import {BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import {NavbarComponent} from './components/NavbarComponent';
 import LoginComponent from "./components/LoginComponent";
 import HomeComponent from "./components/HomeComponent";
+import SplashComponent from "./components/SplashComponent";
 import RegisterComponent from "./components/RegisterComponent"
 import CustomGameComponent from './components/CustomGameComponent';
 import ManageCollectionComponent from './components/ManageCollectionComponent';
@@ -27,6 +28,15 @@ const theme = createTheme({
   }
 })
 
+const styles = {
+      backgroundImage: "url(/splash.jpg)",
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      width: '100vw',
+      height: '125vh'
+};
+
 function App() {
 
   const [authUser, setAuthUser] = useState(undefined as Principal | undefined)
@@ -39,12 +49,14 @@ function App() {
 
   return (
     <>
+    <div style ={styles}>
     <ThemeProvider theme = {theme}>
       <Router>
         <NavbarComponent currentUser={authUser} setCurrentUser={setAuthUser}/>
         <Switch>
             <Route exact path="/" render={() => <HomeComponent currentUser={authUser} /> } />
             <Route path="/home" render={() => <HomeComponent currentUser={authUser} /> } />
+            <Route path="/splash" render={() => <SplashComponent /> } />
             <Route path="/login" render={() => <LoginComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId} selectedCollection={selectedCollection} setSelectedCollection={setSelectCollection} currentCollections={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings}/> } />
@@ -56,6 +68,7 @@ function App() {
         </Switch>
        </Router>
       </ThemeProvider>
+      </div>
     </>
   );
 }
