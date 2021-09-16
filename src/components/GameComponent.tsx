@@ -1,5 +1,5 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel, ListGroup, Table } from "react-bootstrap";
+import { Alert, Button, Card, Carousel, ListGroup } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -9,7 +9,7 @@ import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import { classicNameResolver } from "typescript";
 import { Player } from "../dtos/player";
 import { Collections } from "../dtos/collection";
-// import Timer from "../util/timer";
+import Timer from "../util/timer";
 import '../GameComponent.css'
 
 import * as firestore from 'firebase/firestore';
@@ -84,40 +84,33 @@ function GameComponent(props: IGameProps) {
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
 
-    useEffect(() => {
-      console.log('GAME CHANGED, SPECIAL USEEFFECT GO:', game)
-
-    }, [game])
+    let answer = '';
 
     useEffect(() => {
-      console.log("USE EFFECT")
+      
       if(props.currentGameId) {
         setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
       } else {
         return;
       }
-      console.log(props.currentGameId)
-      const retrieveCollection = () => {
-          firestore.onSnapshot(gameDocRef, async snapshot => {
-            console.log('GAME CALLBACK');
-              // console.log('gameDocSnapshot: ', snapshot);
+      //@ts-ignore
+      let unsub;
+      const onUpdate = () => {
+          unsub = firestore.onSnapshot(gamesRef, async snapshot => {
+              console.log('ON UPDATE');
               let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
-              // console.log('Game taken from snapshot:', temp);
-
               //@ts-ignore
               temp = temp['_document']['data']['value']['mapValue']['fields'];
-
-              // console.log('Temp now equal: ', temp);
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
               //@ts-ignore
               let playersDocArr = await getPlayers(props.currentGameId, playersRef);
               let playersArr : Player[] = [];
+              //@ts-ignore
               playersDocArr.forEach(player => {
                 // console.log('Player:', player);
                 playersArr.push(player);
               })
-              // console.log('Player array before set:', ...playersArr);
 
               let newGame : GameState = {
                 id: props.currentGameId as string,
@@ -142,25 +135,17 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
+            console.log(newGame)
+            setGame(newGame);
 
-            console.log('NEW GAME: ', newGame);
-            // console.log('MATCH STATE', newGame.match_state);
-
-            //@ts-ignore
-            let test = (newGame) => {
-              console.log("IN SETTER", newGame)
-              return newGame
-            }
-            // setGame(undefined);
-            setGame(test(newGame));
-            // console.log('HAHAHA JACK U R SO FUNNY HAHA HEHE')
-            // setTrigger(!trigger);
-            // setPlayers(playersArr);
-            // console.log(players);
           })
-        // console.log('GAME=', game);
       }
-      retrieveCollection()
+      onUpdate()
+
+      return () => {
+          //@ts-ignore
+          unsub();
+      }
     }, [])
 
     // Get players from collections
@@ -185,34 +170,102 @@ function GameComponent(props: IGameProps) {
       }
     }
 
-    function startGame() {
+    /**  
+     *  Start Game sends an update to Firebase, which trigger our snapshot listener in useEffect
+     *  Inside of the snapshot listener, we set our game state to 2, and update our game state accordingly
+     */
+    async function startGame() {
       console.log("The game is starting right now!");
-      // let test = {
-      //   ...game,
-      //   name: 'ssssssususus'
-      // }
-      //@ts-ignore
-      // setGame(test);
-      firestore.updateDoc(gameDocRef, 'match_state', 2);
-      //@ts-ignore
-      setGame(prevState => {
-        console.log('GAME INSIDE SETGAME', game);
-        //@ts-ignore
-        let temp = prevState;
-        //@ts-ignore
-        temp.match_state = 2;
-        return temp
-      })
+      await firestore.updateDoc(gameDocRef, 'match_state', 2);
       setTrigger(trigger => !trigger);
     }
 
+    /**
+     *  Calls when timer runs out of time
+     */
     function onTimeout() {
-      // console.log('The timer has run out');
-      // if (game?.match_state == 2)
-      //   firestore.updateDoc(gameDocRef, 'match_state', 1);
-      // else if (game?.match_state == 1)
-      // firestore.updateDoc(gameDocRef, 'match_state', 2);
-      // setTrigger(trigger => !trigger);
+      console.log('The timer has run out');
+      // When timer runs out of time, game just finished a question
+      if (game?.match_state == 2) {
+        firestore.updateDoc(gameDocRef, 'match_state', 1);
+        clearAnswers();
+      }
+
+      // When timer runs out of time, game just finished break/answer reveal
+      else if (game?.match_state == 1) {    
+        //@ts-ignore   
+        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
+        //@ts-ignore
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1)
+          firestore.updateDoc(gameDocRef, 'match_state', 3);
+        else {
+          firestore.updateDoc(gameDocRef, 'match_state', 2)
+          //@ts-ignore
+          let currentIndex : number = parseInt(game.question_index);
+          let nextIndex : number = currentIndex + 1;
+          firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
+        }
+      }
+      setTrigger(trigger => !trigger);
+    }
+
+    async function submit(e: any) {
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      //@ts-ignore
+      let playersDocArr = await firestore.getDocs(playersRef)
+      playersDocArr.forEach(player => {
+        //@ts-ignore
+        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
+          // firestore.updateDoc(player)
+          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+          firestore.updateDoc(playerRef, 'answered', true);          
+          
+          console.log("submission:", answer)
+          // TODO Validate answer better
+          //@ts-ignore
+          if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
+            // If answer is correct, add points to user
+            //@ts-ignore
+            let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
+
+            console.log('current points: ', currentPoints);
+            //@ts-ignore
+            let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
+            console.log('value: ', value);
+
+            currentPoints += value;
+            console.log('current points: ', currentPoints);
+            //@ts-ignore
+            firestore.updateDoc(playerRef, 'points',  currentPoints);
+          }
+        }
+      })
+
+    }
+
+    /**
+     *  This function sets all 'answered' fields to be false after each question
+     */
+    async function clearAnswers() {
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      //@ts-ignore
+      let playersDocArr = await firestore.getDocs(playersRef)
+      playersDocArr.forEach(player => {
+        //@ts-ignore
+        if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
+          // firestore.updateDoc(player)
+          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+          firestore.updateDoc(playerRef, 'answered', false);
+        }
+      })
+    }
+
+    /**
+     *  TODO: Fill out later
+     */
+    function validateAnswer(submittedAnswer: string, correctAnswer: string) {
+      // Trim strings and compare
+      return true;
     }
 
     /**
@@ -238,14 +291,13 @@ function GameComponent(props: IGameProps) {
               <PlayersComponent key={true} players={game?.players} />
 
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
-              {/* {
-                (game.match_state == 1 || game.match_state == 2) ?
-                  // <Timer initialMinute={0} initialSeconds={8} onTimeout={onTimeout} />
-                  : <></>
-              } */}
               {
-                
-                
+                (game.match_state == 1 || game.match_state == 2) ?
+                  <Timer initialMinute={0} initialSeconds={3} onTimeout={onTimeout} />
+                  : <></>
+              }
+
+              {                
                 (game.match_state == 2) ?
                 <>
 
@@ -253,13 +305,41 @@ function GameComponent(props: IGameProps) {
                 <Container className={classes.questionAnswer}>
                     <Container id="div-for-question" className={classes.question}>
                     <h1>
-
-                      </h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
+                    </h1>
+                    <h2>
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
+                    </h2>
                     
                     </Container>
                     <Container id="input-container" className={classes.input}>
-                        <CssTextField id="answer-input" type="text"/>
-                        <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
+                        <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
+                        <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
+                    </Container>
+                </Container>
+                </>
+                : <></>
+              }
+
+              { 
+                
+                (game.match_state == 1) ?
+                <>
+
+                {/* Question Answer */}
+                <Container className={classes.questionAnswer}>
+                    <Container id="div-for-question" className={classes.question}>
+                    <h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}
+                      </h1>
+                    
                     </Container>
                 </Container>
                 </>
@@ -301,20 +381,18 @@ function PlayersComponent(props: any) {
   const players : Player[] = props.players;
 
   return (
-    
     <ListGroup id="players-component">
     <ListGroup.Item variant="dark"><h6>Players</h6></ListGroup.Item>
     {players.map(function(player, i) {
       
-      return <ListGroup.Item variant="dark" key={i}>
+      return <ListGroup.Item variant="light" key={i}>
             
             {/* @ts-ignore */}
             {player.name.stringValue}
       </ListGroup.Item>
     })}
   </ListGroup>
-   
-     
   )}
+
 
 export default GameComponent;
