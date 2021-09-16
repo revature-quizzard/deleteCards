@@ -236,6 +236,10 @@ function GameComponent(props: IGameProps) {
       }
     }
 
+    /**  
+     *  Start Game sends an update to Firebase, which trigger our snapshot listener in useEffect
+     *  Inside of the snapshot listener, we set our game state to 2, and update our game state accordingly
+     */
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
@@ -243,12 +247,12 @@ function GameComponent(props: IGameProps) {
     }
 
     function onTimeout() {
-      // console.log('The timer has run out');
-      // if (game?.match_state == 2)
-      //   firestore.updateDoc(gameDocRef, 'match_state', 1);
-      // else if (game?.match_state == 1)
-      // firestore.updateDoc(gameDocRef, 'match_state', 2);
-      // setTrigger(trigger => !trigger);
+      console.log('The timer has run out');
+      if (game?.match_state == 2)
+        firestore.updateDoc(gameDocRef, 'match_state', 1);
+      else if (game?.match_state == 1)
+        firestore.updateDoc(gameDocRef, 'match_state', 2);
+      setTrigger(trigger => !trigger);
     }
 
     /**
@@ -274,11 +278,11 @@ function GameComponent(props: IGameProps) {
               <PlayersComponent key={true} players={game?.players} />
 
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
-              {/* {
+              {
                 (game.match_state == 1 || game.match_state == 2) ?
-                  // <Timer initialMinute={0} initialSeconds={8} onTimeout={onTimeout} />
+                  <Timer initialMinute={0} initialSeconds={8} onTimeout={onTimeout} />
                   : <></>
-              } */}
+              }
               {
                 
                 
