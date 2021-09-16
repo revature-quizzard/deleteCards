@@ -84,74 +84,6 @@ function GameComponent(props: IGameProps) {
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
 
-    // useEffect(() => {
-    //   if(props.currentGameId) {
-    //     setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
-    //   } else {
-    //     return;
-    //   }
-    //   console.log(props.currentGameId)
-    //   const retrieveCollection = () => {
-    //       firestore.onSnapshot(gameDocRef, async snapshot => {
-    //           let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
-
-    //           //@ts-ignore
-    //           temp = temp['_document']['data']['value']['mapValue']['fields'];
-
-    //           let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
-    //           //@ts-ignore
-    //           let playersDocArr = await getPlayers(props.currentGameId, playersRef);
-    //           let playersArr : Player[] = [];
-    //           //@ts-ignore
-    //           playersDocArr.forEach(player => {
-    //             // console.log('Player:', player);
-    //             playersArr.push(player);
-    //           })
-    //           console.log('Player array before set:', ...playersArr);
-
-    //           let newGame : GameState = {
-    //             id: props.currentGameId as string,
-    //             //@ts-ignore
-    //             name: temp.name.stringValue,
-    //             //@ts-ignore
-    //             capacity: temp.capacity.integerValue,
-    //             //@ts-ignore
-    //             match_state: temp.match_state.integerValue,
-    //             //@ts-ignore
-    //             question_index: temp.question_index.integerValue,
-    //             //@ts-ignore
-    //             question_timer: temp.question_timer.integerValue,
-    //             //@ts-ignore
-    //             start_time: temp.start_time.timestampValue,
-    //             //@ts-ignore
-    //             end_time: temp.end_time.timestampValue,
-    //             //@ts-ignore
-    //             host: temp.host.stringValue,
-    //             //@ts-ignore
-    //             players: playersArr,
-    //             //@ts-ignore
-    //             collection: temp.collection.mapValue.fields
-    //         }
-
-    //         console.log('NEW GAME: ', newGame);
-    //         console.log('MATCH STATE', newGame.match_state);
-
-    //         //@ts-ignore
-    //         let test = (newGame) => {
-    //           console.log("IN SETTER", newGame)
-    //           return newGame
-    //         }
-    //         setGame(test(newGame));
-    //         console.log('HAHAHA JACK U R SO FUNNY HAHA HEHE')
-    //         // setTrigger(!trigger);
-    //         // setPlayers(playersArr);
-    //         // console.log(players);
-    //       })
-    //     // console.log('GAME=', game);
-    //   }
-    //   retrieveCollection()
-    // }, [])
-
     useEffect(() => {
       
       if(props.currentGameId) {
@@ -250,9 +182,25 @@ function GameComponent(props: IGameProps) {
       console.log('The timer has run out');
       if (game?.match_state == 2)
         firestore.updateDoc(gameDocRef, 'match_state', 1);
-      else if (game?.match_state == 1)
-        firestore.updateDoc(gameDocRef, 'match_state', 2);
+      else if (game?.match_state == 1) {    
+        //@ts-ignore   
+        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
+        //@ts-ignore
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1)
+          firestore.updateDoc(gameDocRef, 'match_state', 3);
+        else {
+          firestore.updateDoc(gameDocRef, 'match_state', 2)
+          //@ts-ignore
+          let currentIndex : number = parseInt(game.question_index);
+          let nextIndex : number = currentIndex + 1;
+          firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
+        }
+      }
       setTrigger(trigger => !trigger);
+    }
+
+    function answer() {
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
     }
 
     /**
@@ -280,12 +228,11 @@ function GameComponent(props: IGameProps) {
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
               {
                 (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={8} onTimeout={onTimeout} />
+                  <Timer initialMinute={0} initialSeconds={3} onTimeout={onTimeout} />
                   : <></>
               }
-              {
-                
-                
+
+              {                
                 (game.match_state == 2) ?
                 <>
 
@@ -293,13 +240,41 @@ function GameComponent(props: IGameProps) {
                 <Container className={classes.questionAnswer}>
                     <Container id="div-for-question" className={classes.question}>
                     <h1>
-
-                      </h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
+                    </h1>
+                    <h2>
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
+                    </h2>
                     
                     </Container>
                     <Container id="input-container" className={classes.input}>
                         <CssTextField id="answer-input" type="text"/>
                         <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
+                    </Container>
+                </Container>
+                </>
+                : <></>
+              }
+
+              { 
+                
+                (game.match_state == 1) ?
+                <>
+
+                {/* Question Answer */}
+                <Container className={classes.questionAnswer}>
+                    <Container id="div-for-question" className={classes.question}>
+                    <h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}
+                      </h1>
+                    
                     </Container>
                 </Container>
                 </>

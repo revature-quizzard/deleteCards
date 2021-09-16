@@ -24,7 +24,7 @@ const Timer = (props: ITimerProps) => {
                 if (minutes === 0) {
                     if (matchState === 2) {
                         props.onTimeout();
-                        setSeconds(5);
+                        setSeconds(2);
                         setMatchState(1);
                     } else if (matchState === 1) {
                         props.onTimeout();
