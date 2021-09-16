@@ -85,33 +85,30 @@ function GameComponent(props: IGameProps) {
     let [trigger, setTrigger] = useState(false);
 
     useEffect(() => {
-      // console.log("HERE")
+      
       if(props.currentGameId) {
         setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
       } else {
         return;
       }
-      console.log(props.currentGameId)
-      const retrieveCollection = () => {
-          firestore.onSnapshot(gameDocRef, async snapshot => {
-              console.log('gameDocSnapshot: ', snapshot);
+      //@ts-ignore
+      let unsub;
+      const onUpdate = () => {
+          unsub = firestore.onSnapshot(gamesRef, async snapshot => {
+              console.log('ON UPDATE');
               let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
-              console.log('Game taken from snapshot:', temp);
-
               //@ts-ignore
               temp = temp['_document']['data']['value']['mapValue']['fields'];
-
-              console.log('Temp now equal: ', temp);
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
               //@ts-ignore
               let playersDocArr = await getPlayers(props.currentGameId, playersRef);
               let playersArr : Player[] = [];
+              //@ts-ignore
               playersDocArr.forEach(player => {
                 // console.log('Player:', player);
                 playersArr.push(player);
               })
-              console.log('Player array before set:', ...playersArr);
 
               let newGame : GameState = {
                 id: props.currentGameId as string,
@@ -136,16 +133,17 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
-
-            console.log('NEW GAME: ', newGame);
-
+            console.log(newGame)
             setGame(newGame);
-            // setPlayers(playersArr);
-            // console.log(players);
+
           })
-        
       }
-      retrieveCollection()
+      onUpdate()
+
+      return () => {
+          //@ts-ignore
+          unsub();
+      }
     }, [])
 
     // Get players from collections
@@ -170,16 +168,39 @@ function GameComponent(props: IGameProps) {
       }
     }
 
+    /**  
+     *  Start Game sends an update to Firebase, which trigger our snapshot listener in useEffect
+     *  Inside of the snapshot listener, we set our game state to 2, and update our game state accordingly
+     */
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
-      setTrigger(!trigger);
+      setTrigger(trigger => !trigger);
     }
 
     function onTimeout() {
       console.log('The timer has run out');
-      firestore.updateDoc(gameDocRef, 'match_state', 1);
-      setTrigger(!trigger);
+      if (game?.match_state == 2)
+        firestore.updateDoc(gameDocRef, 'match_state', 1);
+      else if (game?.match_state == 1) {    
+        //@ts-ignore   
+        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
+        //@ts-ignore
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1)
+          firestore.updateDoc(gameDocRef, 'match_state', 3);
+        else {
+          firestore.updateDoc(gameDocRef, 'match_state', 2)
+          //@ts-ignore
+          let currentIndex : number = parseInt(game.question_index);
+          let nextIndex : number = currentIndex + 1;
+          firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
+        }
+      }
+      setTrigger(trigger => !trigger);
+    }
+
+    function answer() {
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
     }
 
     /**
@@ -198,7 +219,8 @@ function GameComponent(props: IGameProps) {
             {(game) ?
               <>
               {checkInit}
-              {console.log('Rerendered: ', props.currentGameId,game.match_state)}              
+              {console.log('GAME RERENDER: ', game)}
+              {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
               {/* Player List */}
               {console.log('Players AND game in return line 187', game?.players, game)}
               <PlayersComponent key={true} players={game?.players} />
@@ -206,12 +228,11 @@ function GameComponent(props: IGameProps) {
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
               {
                 (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
+                  <Timer initialMinute={0} initialSeconds={3} onTimeout={onTimeout} />
                   : <></>
               }
-              {
-                
-                
+
+              {                
                 (game.match_state == 2) ?
                 <>
 
@@ -219,13 +240,41 @@ function GameComponent(props: IGameProps) {
                 <Container className={classes.questionAnswer}>
                     <Container id="div-for-question" className={classes.question}>
                     <h1>
-
-                      </h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
+                    </h1>
+                    <h2>
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
+                    </h2>
                     
                     </Container>
                     <Container id="input-container" className={classes.input}>
                         <CssTextField id="answer-input" type="text"/>
                         <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
+                    </Container>
+                </Container>
+                </>
+                : <></>
+              }
+
+              { 
+                
+                (game.match_state == 1) ?
+                <>
+
+                {/* Question Answer */}
+                <Container className={classes.questionAnswer}>
+                    <Container id="div-for-question" className={classes.question}>
+                    <h1>
+                      {/* @ts-ignore */}
+                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)}
+                      {/* @ts-ignore */}
+                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}
+                      </h1>
+                    
                     </Container>
                 </Container>
                 </>
@@ -251,7 +300,10 @@ function GameComponent(props: IGameProps) {
             
         </>
         :
+        <>
+        {console.log('REDIRECTING TO JOIN')}
         <Redirect to="/join-game"/>
+        </>
     )
 }
 

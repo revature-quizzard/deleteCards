@@ -45,20 +45,24 @@ function JoinGameComponent(props: IJoinGameProps) {
     let [gameId, setGameId] = useState('');
 
     let history = useHistory();
+    // let [unsub, setUnsub] = useState((undefined as firestore.Unsubscribe | undefined))
 
 
     // game id = FsvUzbk9Ql4nhrEmrK1v
 
     useEffect(() => {
+        //@ts-ignore
+        let unsub;
         const retrieveCollection = () => {
-            firestore.onSnapshot(gamesRef, snapshot => {
+            unsub = firestore.onSnapshot(gamesRef, snapshot => {
+                console.log('JOIN CALLBACK');
                 let games = snapshot.docChanges()
                 games.forEach(async doc => {
                     // @ts-ignore
                     let _id = doc.doc.id;
                     let playersRef = firestore.collection(gamesRef, `${_id}/players`);
                     let playersArr = await getPlayers(gameId, playersRef);
-                    console.log('Returned players array', playersArr);
+                    // console.log('Returned players array', playersArr);
                     // @ts-ignore
                     let temp = doc.doc['_document']['data']['value']['mapValue']['fields'];
                     if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.start_time || !temp.end_time) {
@@ -69,7 +73,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         id: _id,
                         name: temp.name.stringValue,
                         capacity: temp.capacity.integerValue,
-                        match_state: temp.match_state,
+                        match_state: temp.match_state.integerValue,
                         question_index: temp.question_index,
                         question_timer: temp.question_timer,
                         start_time: temp.start_time.timestampValue,
@@ -111,14 +115,21 @@ function JoinGameComponent(props: IJoinGameProps) {
                     
                 })
             })
-          
+            // setUnsub(tempunsub);
         }
         retrieveCollection()
+
+        return () => {
+            //@ts-ignore
+            unsub();
+        }
+
+        
     }, [])
 
     // Get players from collections
     async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
-        console.log('Players collection: ', await firestore.getDocs(playersRef));
+        // console.log('Players collection: ', await firestore.getDocs(playersRef));
         let game = activeGames?.find(g => {
             return g.id == gameid;
         })
@@ -141,7 +152,7 @@ function JoinGameComponent(props: IJoinGameProps) {
         // If game is valid, redirect to lobby
         if (game) {
 
-            console.log(game);
+            // console.log(game);
             let playersRef = firestore.collection(gamesRef, `${game.id}/players`);
             let players = await firestore.getDocs(playersRef);
             let inGame = false;
@@ -153,7 +164,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     //@ts-ignore
                     player = p['_document']['data']['value']['mapValue']['fields']
                 }
-                console.log(p)
+                // console.log(p)
             })
 
             let playerDoc;
@@ -184,8 +195,10 @@ function JoinGameComponent(props: IJoinGameProps) {
             //@ts-ignore
             game.players.push(player);
             props.setCurrentGame(game);
-            console.log('Setting game id to: ', game.id);
+            // console.log('Setting game id to: ', game.id);
             props.setCurrentGameId(game.id);
+            //@ts-ignore
+            // unsub();
             history.push("/game")
         }
 
@@ -247,7 +260,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             <td>{game.name}</td>
                                             {/* @ts-ignore */}
                                             <td>{game.host}</td>
-                                            {console.log('Collection: ', game.collection)}
+                                            {/* {console.log('Collection: ', game.collection)} */}
                                             {/* @ts-ignore */}
                                             <td>{game.collection.title.stringValue}</td>
                                             {/* @ts-ignore */}
@@ -300,17 +313,5 @@ function JoinGameComponent(props: IJoinGameProps) {
     )
 }
 
-function GameListComponent(props: any) {
-    console.log('Inside GameList');
-    return (
-    <tr>
-        <td>props.name</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    )
-}
 
 export default JoinGameComponent;
