@@ -94,6 +94,7 @@ function GameComponent(props: IGameProps) {
       console.log(props.currentGameId)
       const retrieveCollection = () => {
           firestore.onSnapshot(gameDocRef, async snapshot => {
+            console.log('GAME CALLBACK');
               console.log('gameDocSnapshot: ', snapshot);
               let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
               console.log('Game taken from snapshot:', temp);
@@ -138,12 +139,16 @@ function GameComponent(props: IGameProps) {
             }
 
             console.log('NEW GAME: ', newGame);
+            console.log('MATCH STATE', newGame.match_state);
 
+            // setGame(undefined);
             setGame(newGame);
+            console.log('HAHAHA JACK U R SO FUNNY HAHA HEHE')
+            // setTrigger(!trigger);
             // setPlayers(playersArr);
             // console.log(players);
           })
-        
+        // console.log('GAME=', game);
       }
       retrieveCollection()
     }, [])
@@ -173,13 +178,16 @@ function GameComponent(props: IGameProps) {
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
-      setTrigger(!trigger);
+      setTrigger(trigger => !trigger);
     }
 
     function onTimeout() {
-      console.log('The timer has run out');
-      firestore.updateDoc(gameDocRef, 'match_state', 1);
-      setTrigger(!trigger);
+      // console.log('The timer has run out');
+      // if (game?.match_state == 2)
+      //   firestore.updateDoc(gameDocRef, 'match_state', 1);
+      // else if (game?.match_state == 1)
+      // firestore.updateDoc(gameDocRef, 'match_state', 2);
+      // setTrigger(trigger => !trigger);
     }
 
     /**
@@ -198,17 +206,18 @@ function GameComponent(props: IGameProps) {
             {(game) ?
               <>
               {checkInit}
-              {console.log('Rerendered: ', props.currentGameId,game.match_state)}              
+              {console.log('GAME RERENDER: ', game)}
+              {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
               {/* Player List */}
               {console.log('Players AND game in return line 187', game?.players, game)}
               <PlayersComponent key={true} players={game?.players} />
 
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
-              {
+              {/* {
                 (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
+                  // <Timer initialMinute={0} initialSeconds={8} onTimeout={onTimeout} />
                   : <></>
-              }
+              } */}
               {
                 
                 
@@ -251,7 +260,10 @@ function GameComponent(props: IGameProps) {
             
         </>
         :
+        <>
+        {console.log('REDIRECTING TO JOIN')}
         <Redirect to="/join-game"/>
+        </>
     )
 }
 
