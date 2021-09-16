@@ -78,15 +78,14 @@ const useStyles= makeStyles({
 function GameComponent(props: IGameProps) {
 
     const classes = useStyles();
-    let [answer , setAnswer] = useState('');
-    let [players, setPlayers] = useState([] as Player[]);
-    let [collection, setCollection] = useState({} as Collections);
+    let [game, setGame] = useState(undefined as GameState | undefined);
     let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
     let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `dummy`))
     let [init, setInit] = useState(false);
+    let [trigger, setTrigger] = useState(false);
 
     useEffect(() => {
-      console.log("HERE")
+      // console.log("HERE")
       if(props.currentGameId) {
         setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
       } else {
@@ -96,19 +95,53 @@ function GameComponent(props: IGameProps) {
       const retrieveCollection = () => {
           firestore.onSnapshot(gameDocRef, async snapshot => {
               console.log('gameDocSnapshot: ', snapshot);
+              let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
+              console.log('Game taken from snapshot:', temp);
+
+              //@ts-ignore
+              temp = temp['_document']['data']['value']['mapValue']['fields'];
+
+              console.log('Temp now equal: ', temp);
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
               //@ts-ignore
               let playersDocArr = await getPlayers(props.currentGameId, playersRef);
               let playersArr : Player[] = [];
               playersDocArr.forEach(player => {
-                console.log('Player:', player);
+                // console.log('Player:', player);
                 playersArr.push(player);
               })
               console.log('Player array before set:', ...playersArr);
-              //setActiveGames(prevGames => [...prevGames, newGame])
-              setPlayers(playersArr);
-              console.log(players);
+
+              let newGame : GameState = {
+                id: props.currentGameId as string,
+                //@ts-ignore
+                name: temp.name.stringValue,
+                //@ts-ignore
+                capacity: temp.capacity.integerValue,
+                //@ts-ignore
+                match_state: temp.match_state.integerValue,
+                //@ts-ignore
+                question_index: temp.question_index.integerValue,
+                //@ts-ignore
+                question_timer: temp.question_timer.integerValue,
+                //@ts-ignore
+                start_time: temp.start_time.timestampValue,
+                //@ts-ignore
+                end_time: temp.end_time.timestampValue,
+                //@ts-ignore
+                host: temp.host.stringValue,
+                //@ts-ignore
+                players: playersArr,
+                //@ts-ignore
+                collection: temp.collection.mapValue.fields
+            }
+
+            console.log('NEW GAME: ', newGame);
+
+            setGame(newGame);
+            // setPlayers(playersArr);
+            // console.log(players);
           })
         
       }
@@ -137,32 +170,84 @@ function GameComponent(props: IGameProps) {
       }
     }
 
+    async function startGame() {
+      console.log("The game is starting right now!");
+      await firestore.updateDoc(gameDocRef, 'match_state', 2);
+      setTrigger(!trigger);
+    }
+
+    function onTimeout() {
+      console.log('The timer has run out');
+      firestore.updateDoc(gameDocRef, 'match_state', 1);
+      setTrigger(!trigger);
+    }
+
     /**
      *  We want to display a question field, an answer+submit field, and a list of players.
+     *  Game States:
+     *    - 0: Waiting to start
+     *    - 1: Started, no questions
+     *    - 2: Started, questions
+     *    - 3: Ended
      */
     return (
-        props.currentUser && props.currentGameId //&& props.currentGame
+        props.currentUser && props.currentGameId//&& props.currentGame
         ?
         <>
-            {checkInit}
-            {console.log('Rerendered: ', props.currentGameId, players)}
-            {/* If game state changes to $, start timer, set game state to $ when timer ends */}
-            <Timer key={0} initialMinute={0} initialSeconds={40} />
-            {/* Player List */}
-            {console.log('Players in return line 148', players)}
-            <PlayersComponent key={1} players={players} />
+            
+            {(game) ?
+              <>
+              {checkInit}
+              {console.log('Rerendered: ', props.currentGameId,game.match_state)}              
+              {/* Player List */}
+              {console.log('Players AND game in return line 187', game?.players, game)}
+              <PlayersComponent key={true} players={game?.players} />
 
-            {/* Question and Answer */}
-            <Container className={classes.questionAnswer}>
-                <Container id="div-for-question" className={classes.question}>
-                <p>What the capital of uranus?</p>
+              {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
+              {
+                (game.match_state == 1 || game.match_state == 2) ?
+                  <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
+                  : <></>
+              }
+              {
                 
+                
+                (game.match_state == 2) ?
+                <>
+
+                {/* Question and Answer */}
+                <Container className={classes.questionAnswer}>
+                    <Container id="div-for-question" className={classes.question}>
+                    <h1>
+
+                      </h1>
+                    
+                    </Container>
+                    <Container id="input-container" className={classes.input}>
+                        <CssTextField id="answer-input" type="text"/>
+                        <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
+                    </Container>
                 </Container>
-                <Container id="input-container" className={classes.input}>
-                    <CssTextField id="answer-input" type="text"/>
-                    <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
-                </Container>
-            </Container>
+                </>
+                : <></>
+              }
+
+              {/* Host Capabilities */}
+              {(props.currentUser.username === game?.host && game.match_state == 0)
+              ?
+                <>
+                  <Button onClick={startGame}>
+                    Start Game!
+                  </Button>
+                </>
+              :
+                <>
+                
+                </>
+              }
+              </>
+
+            : <></>}
             
         </>
         :

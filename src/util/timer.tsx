@@ -3,10 +3,16 @@ import { useState, useEffect } from 'react';
 
 // Source: https://stackoverflow.com/questions/40885923/countdown-timer-in-react
 
-const Timer = (props:any) => {
-    const {initialMinute = 0,initialSeconds = 0} = props;
-    const [ minutes, setMinutes ] = useState(initialMinute);
-    const [seconds, setSeconds ] =  useState(initialSeconds);
+interface ITimerProps {
+    initialMinute : number;
+    initialSeconds : number;
+    onTimeout : (() => void);
+  }
+
+const Timer = (props: ITimerProps) => {
+    // const {initialMinute = 0,initialSeconds = 0, onTimeout} = props;
+    const [ minutes, setMinutes ] = useState(props.initialMinute);
+    const [seconds, setSeconds ] =  useState(props.initialSeconds);
     useEffect(()=>{
     let myInterval = setInterval(() => {
             if (seconds > 0) {
@@ -15,6 +21,7 @@ const Timer = (props:any) => {
             if (seconds === 0) {
                 if (minutes === 0) {
                     clearInterval(myInterval)
+                    props.onTimeout()
                 } else {
                     setMinutes(minutes - 1);
                     setSeconds(59);
