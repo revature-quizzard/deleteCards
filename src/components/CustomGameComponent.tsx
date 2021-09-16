@@ -15,6 +15,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import app from '../util/Firebase';
 import { getRandQuestion } from "../remote/question-service";
 import { GameState } from "../dtos/game-state";
+import { makeStyles } from "@material-ui/core";
 
 
 const db = firestore.getFirestore(app);
@@ -29,6 +30,29 @@ let collectionQLVisible : boolean = false;
 let showCollectionText = "Show Collections";
 let showFavCollectionText = "Show Favorites"
 let showQuestionListText ="Preview";
+
+const styles = {
+    backgroundImage: "url(/splash.jpg)",
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    width: '100vw',
+    height: '125vh'
+};
+
+const useStyles = makeStyles({
+    link: {
+        backgroundColor: 'black',
+        border: 'black',
+        color: "gold",
+    },
+
+    Button: {
+        backgroundColor: 'black',
+        border: 'black',
+        color: "gold",
+    }
+})
 
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
@@ -146,7 +170,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             showQuestionListText = "Preview";
             setCurrentCollection(targetsCollections[key]);
             props.setSelectedCollection(currentCollection);
-            let maxPlayers: Number = 2;
+            let maxPlayers: Number = 4;
             let matchTimer : Number = 30;
             let collection : Collections = targetsCollections[key] as Collections;
             let category : string | undefined = currentCollection?.category;
@@ -166,8 +190,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             showQuestionListText = "Preview";
             setCurrentCollection(targetsFavoriteCollections[key]);
             props.setSelectedCollection(currentCollection);
-            let maxPlayers: Number = 2;
-            let matchTimer : Number = 30;
+            let maxPlayers: Number = 4;
+            let matchTimer : Number = 15;
             let collection : Collections = targetsFavoriteCollections[key] as Collections;
             let category : string | undefined = currentCollection?.category;
             let name: string = 'new collection';
@@ -327,6 +351,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                     </tbody>
                 </Table >
                
+               
 
                 
                 <Button variant="light" onClick={generateRandom} > Create Random Collection</Button>
@@ -369,7 +394,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 </Card.Text>
                                 {
                                      currentCollection?.category ? 
-                                     <Button className="btn btn-light" onClick={sendGameSettings} >Start Game</Button>
+                                     <Button className="btn btn-success"variant="success outline-dark"   onClick={sendGameSettings} >Start Game</Button>
                                      :
 
                                      <Alert variant="warning">

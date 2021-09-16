@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 
-import {Navbar, Container, Nav } from 'react-bootstrap';
 import {AppBar, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
 import { Principal } from "../dtos/principal";
 
@@ -43,7 +42,7 @@ export function NavbarComponent(props: INavbarProps){
                                             </ListItemText>
                                             <ListItemText inset>
                                                 <Typography color="inherit" variant="h6" onClick={logout}>
-                                                    <Link className={classes.link} to="/" id="logout">Logout</Link>
+                                                    <Link to="/" id="logout">Logout</Link>
                                                 </Typography>
                                             </ListItemText>
                                         </>

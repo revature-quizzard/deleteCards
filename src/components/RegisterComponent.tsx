@@ -28,6 +28,10 @@ const useStyles = makeStyles({
         marginLeft: "10em"
     },
 }) 
+    const buttonStyle ={
+        color: "gold",
+        marginLeft: "10rem"
+    }
 
 function RegisterComponent(props: IRegisterProps) {
 
@@ -85,11 +89,13 @@ function RegisterComponent(props: IRegisterProps) {
         props.currentUser ? <Redirect to="/"/> :
         <>
             <div id="register-form" className= {classes.RegisterContainer}>
-            <br></br>
-            <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
             <Typography style= {{color: "gold"}} align="center" variant="h4">Register for a new account!</Typography>
             <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style= {{color: "white"}} htmlFor="firstName" >First Name</InputLabel>
+                    <h5 style= {{color: "gold"}}>First Name</h5> 
                     <Input
                         onChange={handleChange}
                         id="firstName"
@@ -101,7 +107,7 @@ function RegisterComponent(props: IRegisterProps) {
                 </FormControl>
 
                 <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style= {{color: "white"}} htmlFor="lastName">Last Name</InputLabel>
+                    <h5 style= {{color: "gold"}}>Last Name</h5> 
                     <Input
                         onChange={handleChange}
                         id="lastName"
@@ -113,8 +119,8 @@ function RegisterComponent(props: IRegisterProps) {
                 </FormControl>
 
                 <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style= {{color: "white"}} htmlFor="email">Email Address</InputLabel>
-                    <Input
+                <h5 style= {{color: "gold"}}>Email</h5>                  
+                   <Input
                         onChange={handleChange}
                         id="email"
                         name="email"
@@ -126,7 +132,7 @@ function RegisterComponent(props: IRegisterProps) {
 
 
                 <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style= {{color: "white"}} htmlFor="username">Username</InputLabel>
+                <h5 style= {{color: "gold"}}>Username</h5>
                     <Input
                         onChange={handleChange}
                         id="username"
@@ -138,7 +144,7 @@ function RegisterComponent(props: IRegisterProps) {
                 </FormControl>
 
                 <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style ={{color: "white"}} htmlFor="password">Password</InputLabel>
+                <h5 style= {{color: "gold"}}>Password</h5>                     
                     <Input
                         onChange={handleChange}
                         id="password"
@@ -149,8 +155,8 @@ function RegisterComponent(props: IRegisterProps) {
                     />
                 </FormControl>
                 <FormControl margin="normal"  className={classes.Form}>
-                    <InputLabel style= {{color: "white"}} htmlFor="confirmPassword">Confirm Password</InputLabel>
-                    <Input
+                <h5 style= {{color: "gold"}}>Verify Password</h5>                    
+                     <Input
                         onChange={handleChange}
                         id="confirmPassword"
                         name="confirmPassword"
@@ -164,6 +170,7 @@ function RegisterComponent(props: IRegisterProps) {
 
                 <Button
                     id="register-button"
+                    style={buttonStyle}
                     onClick={register}
                     variant="contained"
                     color="primary"

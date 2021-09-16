@@ -1,5 +1,5 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel, Table } from "react-bootstrap";
+import { Alert, Button, Card, Carousel, Table, ListGroup } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -17,7 +17,6 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import app from '../util/Firebase';
-
 
 const db = firestore.getFirestore(app);
 
@@ -83,6 +82,8 @@ function GameComponent(props: IGameProps) {
     let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `dummy`))
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
+
+    let answer = '';
 
     useEffect(() => {
       
@@ -178,10 +179,18 @@ function GameComponent(props: IGameProps) {
       setTrigger(trigger => !trigger);
     }
 
+    /**
+     *  Calls when timer runs out of time
+     */
     function onTimeout() {
       console.log('The timer has run out');
-      if (game?.match_state == 2)
+      // When timer runs out of time, game just finished a question
+      if (game?.match_state == 2) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
+        clearAnswers();
+      }
+
+      // When timer runs out of time, game just finished break/answer reveal
       else if (game?.match_state == 1) {    
         //@ts-ignore   
         console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
@@ -199,8 +208,63 @@ function GameComponent(props: IGameProps) {
       setTrigger(trigger => !trigger);
     }
 
-    function answer() {
+    async function submit(e: any) {
       let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      //@ts-ignore
+      let playersDocArr = await firestore.getDocs(playersRef)
+      playersDocArr.forEach(player => {
+        //@ts-ignore
+        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
+          // firestore.updateDoc(player)
+          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+          firestore.updateDoc(playerRef, 'answered', true);          
+          
+          console.log("submission:", answer)
+          // TODO Validate answer better
+          //@ts-ignore
+          if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
+            // If answer is correct, add points to user
+            //@ts-ignore
+            let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
+
+            console.log('current points: ', currentPoints);
+            //@ts-ignore
+            let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
+            console.log('value: ', value);
+
+            currentPoints += value;
+            console.log('current points: ', currentPoints);
+            //@ts-ignore
+            firestore.updateDoc(playerRef, 'points',  currentPoints);
+          }
+        }
+      })
+
+    }
+
+    /**
+     *  This function sets all 'answered' fields to be false after each question
+     */
+    async function clearAnswers() {
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      //@ts-ignore
+      let playersDocArr = await firestore.getDocs(playersRef)
+      playersDocArr.forEach(player => {
+        //@ts-ignore
+        if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
+          // firestore.updateDoc(player)
+          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+          firestore.updateDoc(playerRef, 'answered', false);
+        }
+      })
+    }
+
+    /**
+     *  TODO: Fill out later
+     */
+    function validateAnswer(submittedAnswer: string, correctAnswer: string) {
+      // Trim strings and compare
+      return true;
     }
 
     /**
@@ -252,8 +316,8 @@ function GameComponent(props: IGameProps) {
                     
                     </Container>
                     <Container id="input-container" className={classes.input}>
-                        <CssTextField id="answer-input" type="text"/>
-                        <Button className="btn btn-primary" id="submit-answer" title="enter">Answer</Button>
+                        <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
+                        <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
                     </Container>
                 </Container>
                 </>
