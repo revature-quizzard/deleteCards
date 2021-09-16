@@ -11,7 +11,7 @@ interface INavbarProps {
 const useStyles = makeStyles({
     link: {
         textDecoration: "none",
-        color: "white"
+        color: "gold"
     }
 })
 
@@ -30,7 +30,7 @@ export function NavbarComponent(props: INavbarProps){
                     <Typography variant="h5" color="inherit">
                         <List component="nav">
                             <ListItem component="div">
-                                <Typography color="inherit" variant="h5">Navbar</Typography>
+                                <Typography color="inherit" variant="h5">JASH</Typography>
                                 {
                                     props.currentUser
                                         ?
@@ -42,7 +42,7 @@ export function NavbarComponent(props: INavbarProps){
                                             </ListItemText>
                                             <ListItemText inset>
                                                 <Typography color="inherit" variant="h6" onClick={logout}>
-                                                    <Link to="/" id="logout">Logout</Link>
+                                                    <Link to="/" id="logout" className={classes.link}>Logout</Link>
                                                 </Typography>
                                             </ListItemText>
                                         </>
