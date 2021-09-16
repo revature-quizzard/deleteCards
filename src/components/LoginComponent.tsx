@@ -18,6 +18,9 @@ const useStyles = makeStyles({
         marginTop: "10rem",
         padding: 20,
         width: "25%"
+    },
+    Input: {
+        color: "white"
     }
 });
 
@@ -54,27 +57,29 @@ function LoginComponent(props: ILoginProps) {
         <>
             <div id="login-component" className={classes.loginContainer}>
 
-            <Typography align="center" variant="h4">Please Log In to Your Account</Typography>
+            <Typography style= {{color: "gold"}} align="center" variant="h4">Please Log In to Your Account</Typography>
 
             <FormControl margin="normal" fullWidth>
-                <InputLabel htmlFor="username">Username</InputLabel>
+                <InputLabel style={{color: "white"}} htmlFor="username">Username</InputLabel>
                 <Input
                     onChange={handleChange}
                     id="username"
                     name="username"
                     type="text"
                     placeholder="Enter your username"
+                    style ={{backgroundColor: "white"}}
                 />
             </FormControl>
 
             <FormControl margin="normal" fullWidth>
-                <InputLabel htmlFor="password">Password</InputLabel>
+                <InputLabel className={classes.Input} htmlFor="password">Password</InputLabel>
                 <Input
                     onChange={handleChange}
                     id="password"
                     name="password"
                     type="password"
                     placeholder="Enter your password"
+                    style ={{backgroundColor: "white"}}
                 />
             </FormControl>
 
