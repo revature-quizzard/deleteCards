@@ -102,8 +102,7 @@ function EditQuestionModal(props: IEditCollectionProps) {
                 <Dropdown.Item eventKey="4"  onClick={(e) => updateDifficulty(e , 4)}>4</Dropdown.Item>
               </DropdownButton>
                 <br/><br/>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </Modal.Body>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </Modal.Body>
             <Modal.Footer>
               <Button style ={buttonStyle} variant="secondary" onClick={handleClose}>
                 Close

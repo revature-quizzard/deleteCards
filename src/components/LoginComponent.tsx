@@ -89,7 +89,7 @@ function LoginComponent(props: ILoginProps) {
 
             <br/><br/>
 
-            { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
+            { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }
             </div>
         </>
     )

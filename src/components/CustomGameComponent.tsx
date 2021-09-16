@@ -298,7 +298,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
                                              <td>{C?.questionList.length.toString()}</td>
-                                             <td> <Button variant="success" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                             <td> <Button variant="light" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */} 
@@ -309,7 +309,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>+</td>
                           <td>+</td>
                           <td>Size</td>
-                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
+                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
                     </tr>
                    
                         {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
@@ -319,7 +319,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
                                              <td>{C?.questionList.length.toString()}</td>
-                                             <td> <Button variant="success" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
+                                             <td> <Button variant="light" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
@@ -328,7 +328,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                 </Table >
                
 
-                <Button variant="primary" onClick={generateRandom} > Create Random Collection</Button>
+                <Button variant="light" onClick={generateRandom} > Create Random Collection</Button>
 
                 <table>
                     <tbody>
@@ -342,7 +342,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                   Set up your game
                                 </Card.Text>
-                                <Button variant="success" onClick={displayModal}>Game Settings</Button>
+                                <Button variant="light" onClick={displayModal}>Game Settings</Button>
                                 {getModal()}
                             </Card.Body>
                             </Card> 
@@ -368,7 +368,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 </Card.Text>
                                 {
                                      currentCollection?.category ? 
-                                     <Button className="btn btn-success" onClick={sendGameSettings} >Start Game</Button>
+                                     <Button className="btn btn-light" onClick={sendGameSettings} >Start Game</Button>
                                      :
 
                                      <Alert variant="warning">
@@ -388,7 +388,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                  See the "{currentCollection?.title}" Preview here! 
                                 </Card.Text>
-                                <Button variant="success" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
+                                <Button variant="light" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
                             </Card.Body>
                              <br></br>
                                 <ListGroup >
@@ -400,8 +400,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                         </tr>
                     </tbody>
                 </table>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }

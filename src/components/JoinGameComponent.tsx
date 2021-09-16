@@ -307,8 +307,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     {/* </Button> */}
                 {/* </InputGroup> */}
                 
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }

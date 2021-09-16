@@ -143,8 +143,7 @@ function RegisterComponent(props: IRegisterProps) {
                     size="medium">Register</Button>
 
                 <br/><br/>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }
