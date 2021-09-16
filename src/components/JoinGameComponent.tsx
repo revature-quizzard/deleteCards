@@ -152,7 +152,7 @@ function JoinGameComponent(props: IJoinGameProps) {
         // If game is valid, redirect to lobby
         if (game) {
 
-            console.log(game);
+            // console.log(game);
             let playersRef = firestore.collection(gamesRef, `${game.id}/players`);
             let players = await firestore.getDocs(playersRef);
             let inGame = false;
@@ -164,7 +164,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     //@ts-ignore
                     player = p['_document']['data']['value']['mapValue']['fields']
                 }
-                console.log(p)
+                // console.log(p)
             })
 
             let playerDoc;
@@ -260,7 +260,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             <td>{game.name}</td>
                                             {/* @ts-ignore */}
                                             <td>{game.host}</td>
-                                            {console.log('Collection: ', game.collection)}
+                                            {/* {console.log('Collection: ', game.collection)} */}
                                             {/* @ts-ignore */}
                                             <td>{game.collection.title.stringValue}</td>
                                             {/* @ts-ignore */}
@@ -313,17 +313,5 @@ function JoinGameComponent(props: IJoinGameProps) {
     )
 }
 
-function GameListComponent(props: any) {
-    console.log('Inside GameList');
-    return (
-    <tr>
-        <td>props.name</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    )
-}
 
 export default JoinGameComponent;
