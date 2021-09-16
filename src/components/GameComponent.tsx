@@ -1,5 +1,5 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel } from "react-bootstrap";
+import { Alert, Button, Card, Carousel, ListGroup } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -316,26 +316,20 @@ function PlayersComponent(props: any) {
   const players : Player[] = props.players;
 
   return (
-    <Container id="players-component">
-      <Card>
-        <CardContent>
-          <Typography>
-            Players
-          </Typography>
-        </CardContent>
-      </Card>
+    <ListGroup  >
+      <ListGroup.Item ><h6>Players</h6></ListGroup.Item>
       {players.map(function(player, i) {
-        return <Card key={i}>
-          <CardContent>
+        return <ListGroup.Item variant="light" key={i}>
             <Typography>
               {/* @ts-ignore */}
               {player.name.stringValue}
             </Typography>
-          </CardContent>
-        </Card>
+        </ListGroup.Item>
       })}
-    </Container>
+    </ListGroup>
+        
+  
   )
-}
+    }
 
 export default GameComponent;
