@@ -8,6 +8,8 @@ import { makeStyles, withStyles } from "@material-ui/styles";
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import { classicNameResolver } from "typescript";
 import { Player } from "../dtos/player";
+import { Collections } from "../dtos/collection";
+import Timer from "../util/timer";
 import '../GameComponent.css'
 
 import * as firestore from 'firebase/firestore';
@@ -15,7 +17,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import app from '../util/Firebase';
-import { Collections } from "../dtos/collection";
+
 
 const db = firestore.getFirestore(app);
 
@@ -129,6 +131,8 @@ function GameComponent(props: IGameProps) {
         ?
         <>
             {console.log('Rerendered: ', props.currentGameId, players)}
+            {/* If game state changes to $, start timer, set game state to $ when timer ends */}
+            <Timer key={0} initialMinute={0} initialSeconds={40} />
             {/* Player List */}
             {console.log('Players in return line 148', players)}
             <PlayersComponent key={1} players={players} />
