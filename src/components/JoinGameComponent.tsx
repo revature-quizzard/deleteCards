@@ -74,8 +74,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                         question_timer: temp.question_timer,
                         start_time: temp.start_time.timestampValue,
                         end_time: temp.end_time.timestampValue,
+                        host: temp.host.stringValue,
                         players: playersArr,
-                        collection: temp.collection
+                        collection: temp.collection.mapValue.fields
                     }
                     console.log(newGame);
                     let gameIndex = 0;
@@ -133,29 +134,6 @@ function JoinGameComponent(props: IJoinGameProps) {
         return playerarr;
     }
     
-    // This function is used for testing to spoof existence of active games
-    function generateGames() {
-        console.log('Generating games...')
-
-        let test_game : GameState = {
-            id: '1',
-            name: 'Test Game',
-            capacity: 10,
-            match_state: 0,
-            question_index: 0,
-            question_timer: 10,
-            start_time: new firestore.Timestamp(1, 1),
-            end_time: new firestore.Timestamp(1, 1),
-            players: [],
-            collection: new Collections('1', 1, 'test', 'test', 'test', new Principal('1', 'test', '1'))
-        }
-    
-        let test_list : GameState[] = [];
-        test_list.push(test_game);
-    
-        // setActiveGames(test_list);
-    }
-
     async function joinGame(game : GameState) {
         console.log('Redirecting user to new game...');
         setErrorMessage('');
@@ -251,9 +229,10 @@ function JoinGameComponent(props: IJoinGameProps) {
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
-                            <td>Game ID</td>
                             <td>Name</td>
-                            <td>Start Time</td>
+                            <td>Host</td>
+                            <td>Collection Name</td>
+                            <td>Category</td>
                             <td>Capacity</td>
                             <td></td>
                         </tr>
@@ -265,11 +244,14 @@ function JoinGameComponent(props: IJoinGameProps) {
                         
                         return  <tr key={i} >
                                             {/* @ts-ignore */}
-                                            <td>{game.id}</td>
-                                            {/* @ts-ignore */}
                                             <td>{game.name}</td>
                                             {/* @ts-ignore */}
-                                            <td>{game.start_time}</td>
+                                            <td>{game.host}</td>
+                                            {console.log('Collection: ', game.collection)}
+                                            {/* @ts-ignore */}
+                                            <td>{game.collection.title.stringValue}</td>
+                                            {/* @ts-ignore */}
+                                            <td>{game.collection.category.stringValue}</td>
                                             {/* @ts-ignore */}
                                             <td>{game.players.length + '/' + game.capacity}</td>
                                             <td>
@@ -299,7 +281,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         </>
                 }
 
-                <InputGroup className="mb-3">
+                {/* <InputGroup className="mb-3">
                     <FormControl
                     placeholder="Enter Game ID"
                     aria-label="Enter Game ID"
@@ -308,11 +290,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                     onChange={e => setGameId(e.target.value)}
                     />
                     {/* <Button className="btn btn-primary" id="direct-join-game" onClick={joinGame}> */}
-                    Join Game
+                    {/* Join Game */}
                     {/* </Button> */}
-                </InputGroup>
-
-                <Button variant="secondary" onClick={() => generateGames()}>Generate Games</Button>
+                {/* </InputGroup> */}
                 
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
             </div>

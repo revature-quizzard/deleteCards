@@ -82,6 +82,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             question_timer: props.currentGameSettings_.matchTimer,
             start_time: new firestore.Timestamp(1,1),
             end_time: new firestore.Timestamp(1,1),
+            host: props.currentUser?.username,
             collection: props.currentGameSettings_.collection,
             trigger: true
         };          
