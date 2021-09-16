@@ -399,8 +399,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                         </tr>
                     </tbody>
                 </table>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }

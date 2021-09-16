@@ -295,8 +295,7 @@ function JoinGameComponent(props: IJoinGameProps) {
 
                 <Button variant="secondary" onClick={() => generateGames()}>Generate Games</Button>
                 
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage}/> : <></> }
-            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
         </>
     )
 }
