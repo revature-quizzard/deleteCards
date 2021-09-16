@@ -9,7 +9,7 @@ import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import { classicNameResolver } from "typescript";
 import { Player } from "../dtos/player";
 import { Collections } from "../dtos/collection";
-// import Timer from "../util/timer";
+import Timer from "../util/timer";
 import '../GameComponent.css'
 
 import * as firestore from 'firebase/firestore';
@@ -84,40 +84,99 @@ function GameComponent(props: IGameProps) {
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
 
-    useEffect(() => {
-      console.log('GAME CHANGED, SPECIAL USEEFFECT GO:', game)
+    // useEffect(() => {
+    //   if(props.currentGameId) {
+    //     setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
+    //   } else {
+    //     return;
+    //   }
+    //   console.log(props.currentGameId)
+    //   const retrieveCollection = () => {
+    //       firestore.onSnapshot(gameDocRef, async snapshot => {
+    //           let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
 
-    }, [game])
+    //           //@ts-ignore
+    //           temp = temp['_document']['data']['value']['mapValue']['fields'];
+
+    //           let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+    //           //@ts-ignore
+    //           let playersDocArr = await getPlayers(props.currentGameId, playersRef);
+    //           let playersArr : Player[] = [];
+    //           //@ts-ignore
+    //           playersDocArr.forEach(player => {
+    //             // console.log('Player:', player);
+    //             playersArr.push(player);
+    //           })
+    //           console.log('Player array before set:', ...playersArr);
+
+    //           let newGame : GameState = {
+    //             id: props.currentGameId as string,
+    //             //@ts-ignore
+    //             name: temp.name.stringValue,
+    //             //@ts-ignore
+    //             capacity: temp.capacity.integerValue,
+    //             //@ts-ignore
+    //             match_state: temp.match_state.integerValue,
+    //             //@ts-ignore
+    //             question_index: temp.question_index.integerValue,
+    //             //@ts-ignore
+    //             question_timer: temp.question_timer.integerValue,
+    //             //@ts-ignore
+    //             start_time: temp.start_time.timestampValue,
+    //             //@ts-ignore
+    //             end_time: temp.end_time.timestampValue,
+    //             //@ts-ignore
+    //             host: temp.host.stringValue,
+    //             //@ts-ignore
+    //             players: playersArr,
+    //             //@ts-ignore
+    //             collection: temp.collection.mapValue.fields
+    //         }
+
+    //         console.log('NEW GAME: ', newGame);
+    //         console.log('MATCH STATE', newGame.match_state);
+
+    //         //@ts-ignore
+    //         let test = (newGame) => {
+    //           console.log("IN SETTER", newGame)
+    //           return newGame
+    //         }
+    //         setGame(test(newGame));
+    //         console.log('HAHAHA JACK U R SO FUNNY HAHA HEHE')
+    //         // setTrigger(!trigger);
+    //         // setPlayers(playersArr);
+    //         // console.log(players);
+    //       })
+    //     // console.log('GAME=', game);
+    //   }
+    //   retrieveCollection()
+    // }, [])
 
     useEffect(() => {
-      console.log("USE EFFECT")
+      
       if(props.currentGameId) {
         setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
       } else {
         return;
       }
-      console.log(props.currentGameId)
-      const retrieveCollection = () => {
-          firestore.onSnapshot(gameDocRef, async snapshot => {
-            console.log('GAME CALLBACK');
-              // console.log('gameDocSnapshot: ', snapshot);
+      //@ts-ignore
+      let unsub;
+      const onUpdate = () => {
+          unsub = firestore.onSnapshot(gamesRef, async snapshot => {
+              console.log('ON UPDATE');
               let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
-              // console.log('Game taken from snapshot:', temp);
-
               //@ts-ignore
               temp = temp['_document']['data']['value']['mapValue']['fields'];
-
-              // console.log('Temp now equal: ', temp);
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
               //@ts-ignore
               let playersDocArr = await getPlayers(props.currentGameId, playersRef);
               let playersArr : Player[] = [];
+              //@ts-ignore
               playersDocArr.forEach(player => {
                 // console.log('Player:', player);
                 playersArr.push(player);
               })
-              // console.log('Player array before set:', ...playersArr);
 
               let newGame : GameState = {
                 id: props.currentGameId as string,
@@ -142,25 +201,17 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
+            console.log(newGame)
+            setGame(newGame);
 
-            console.log('NEW GAME: ', newGame);
-            // console.log('MATCH STATE', newGame.match_state);
-
-            //@ts-ignore
-            let test = (newGame) => {
-              console.log("IN SETTER", newGame)
-              return newGame
-            }
-            // setGame(undefined);
-            setGame(test(newGame));
-            // console.log('HAHAHA JACK U R SO FUNNY HAHA HEHE')
-            // setTrigger(!trigger);
-            // setPlayers(playersArr);
-            // console.log(players);
           })
-        // console.log('GAME=', game);
       }
-      retrieveCollection()
+      onUpdate()
+
+      return () => {
+          //@ts-ignore
+          unsub();
+      }
     }, [])
 
     // Get players from collections
@@ -185,24 +236,9 @@ function GameComponent(props: IGameProps) {
       }
     }
 
-    function startGame() {
+    async function startGame() {
       console.log("The game is starting right now!");
-      // let test = {
-      //   ...game,
-      //   name: 'ssssssususus'
-      // }
-      //@ts-ignore
-      // setGame(test);
-      firestore.updateDoc(gameDocRef, 'match_state', 2);
-      //@ts-ignore
-      setGame(prevState => {
-        console.log('GAME INSIDE SETGAME', game);
-        //@ts-ignore
-        let temp = prevState;
-        //@ts-ignore
-        temp.match_state = 2;
-        return temp
-      })
+      await firestore.updateDoc(gameDocRef, 'match_state', 2);
       setTrigger(trigger => !trigger);
     }
 
