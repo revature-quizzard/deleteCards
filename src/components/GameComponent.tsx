@@ -302,11 +302,11 @@ function PlayersComponent(props: any) {
 
   return (
     
-    <ListGroup   id="players-component">
-    <ListGroup.Item variant="light"><h6>Players</h6></ListGroup.Item>
+    <ListGroup id="players-component">
+    <ListGroup.Item variant="dark"><h6>Players</h6></ListGroup.Item>
     {players.map(function(player, i) {
       
-      return <ListGroup.Item variant="light" key={i}>
+      return <ListGroup.Item variant="dark" key={i}>
             
             {/* @ts-ignore */}
             {player.name.stringValue}
