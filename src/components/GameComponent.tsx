@@ -1,5 +1,5 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel } from "react-bootstrap";
+import { Alert, Button, Card, Carousel, Table } from "react-bootstrap";
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -301,25 +301,25 @@ function PlayersComponent(props: any) {
   const players : Player[] = props.players;
 
   return (
-    <Container id="players-component">
-      <Card>
-        <CardContent>
-          <Typography>
-            Players
-          </Typography>
-        </CardContent>
-      </Card>
-      {players.map(function(player, i) {
-        return <Card key={i}>
-          <CardContent>
-            <Typography>
-              {/* @ts-ignore */}
-              {player.name.stringValue}
-            </Typography>
-          </CardContent>
-        </Card>
-      })}
-    </Container>
+      
+      <Table  striped bordered hover variant="dark" id="players-component">
+                    <thead>
+                        <tr>
+                          <td><h5 color="yellow">Players</h5></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {players.map(function(player, i) {
+                            return <tr key={i}>
+                                <td>
+                                  {/* @ts-ignore */}
+                                  {player.name.stringValue}
+                                </td>
+                            </tr>
+                          })}
+                    </tbody>
+       </Table>
+     
   )
 }
 
