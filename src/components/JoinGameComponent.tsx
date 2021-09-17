@@ -123,10 +123,43 @@ function JoinGameComponent(props: IJoinGameProps) {
                         case 'modified':
                             console.log('A game was modified');
                             gameIndex = activeGames.findIndex(game => game.id == _id);
-                            setActiveGames(prevGames => [
-                                ...prevGames.slice(0,gameIndex),
-                                newGame
-                            ])
+                            // Game is only game in list
+                            if (updateRef.current.length == 1) {
+                                setActiveGames([newGame]);
+                            }
+
+                            // game1, game2, game3
+                            // slice = game2, game3
+
+                            // Game is at beginning of list
+                            else if (gameIndex == 0) {
+                                setActiveGames(prevGames => [
+                                    newGame,
+                                    ...prevGames.slice(gameIndex+1)
+                                ])
+                            }
+
+
+                            // game 1, game 2, game 3
+                            // slice 1 = game1, slice 2 = game 3
+                            // setActiveGames(slice1, slice2)
+
+                            // Game is in middle of list
+                            else if (gameIndex < updateRef.current.length - 1 ) {
+                                setActiveGames(prevGames => [
+                                    ...prevGames.slice(0,gameIndex),
+                                    newGame,
+                                    ...prevGames.slice(gameIndex+1)
+                                ])
+                            }
+
+                            // Game is at end of list
+                            else if (gameIndex == updateRef.current.length - 1) {
+                                setActiveGames(prevGames => [
+                                    ...prevGames.slice(0,gameIndex),
+                                    newGame
+                                ])
+                            }
                             console.log('activeGames:', activeGames);
                             break;
                         // Handle existing game being deleted
@@ -163,7 +196,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                             // Game is in middle of list
                             else if (gameIndex < updateRef.current.length - 1 ) {
                                 setActiveGames(prevGames => [
-                                    ...prevGames.slice(0,gameIndex-1),
+                                    ...prevGames.slice(0,gameIndex),
                                     ...prevGames.slice(gameIndex+1)
                                 ])
                             }
