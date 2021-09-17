@@ -92,8 +92,8 @@ function GameComponent(props: IGameProps) {
       } else {
         return;
       }
-      //@ts-ignore
-      let unsub;
+  
+      let unsub : firestore.Unsubscribe = null as unknown as firestore.Unsubscribe;
       const onUpdate = () => {
           unsub = firestore.onSnapshot(gamesRef, async snapshot => {
               console.log('ON UPDATE');
@@ -142,7 +142,6 @@ function GameComponent(props: IGameProps) {
       onUpdate()
 
       return () => {
-          //@ts-ignore
           unsub();
       }
     }, [])
