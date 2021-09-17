@@ -15,6 +15,7 @@ const linkStyle = {
 const useStyles = makeStyles({
     HomeContainer: {
         backgroundColor: "black",
+        opacity: .94,
         justifyContent: "center",
         marginLeft: "10rem",
         marginTop: "5rem",

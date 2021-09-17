@@ -31,29 +31,6 @@ let showCollectionText = "Show Collections";
 let showFavCollectionText = "Show Favorites"
 let showQuestionListText ="Preview";
 
-const styles = {
-    backgroundImage: "url(/splash.jpg)",
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    width: '100vw',
-    height: '125vh'
-};
-
-const useStyles = makeStyles({
-    link: {
-        backgroundColor: 'black',
-        border: 'black',
-        color: "gold",
-    },
-
-    Button: {
-        backgroundColor: 'black',
-        border: 'black',
-        color: "gold",
-    }
-})
-
 interface IGameCustomCollectionProps {
     currentUser: Principal | undefined,
     currentGameId: string,
@@ -65,6 +42,19 @@ interface IGameCustomCollectionProps {
     currentGameSettings_:  GameSettings | undefined,
     setCurrentGameSettings_: (nextCollection: GameSettings | undefined) => void
 }
+const useStyles = makeStyles({
+    CreateContainer: {
+        backgroundColor: "black",
+        opacity: .94,
+        justifyContent: "center",
+        marginLeft: "10rem",
+        marginTop: "5rem",
+        width: "75%",
+        height:"75%",
+        borderRadius: "8em",
+        border: "white",
+    }
+})
 
 
 function CustomGameComponent(props: IGameCustomCollectionProps) {
@@ -293,12 +283,15 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
         setCurrentCollection(collection)
     }
     
-    
+    const classes = useStyles();
     return(
         !props.currentUser ? <Redirect to="/login"/> :
         <>
         
-             <div>
+             <div id="custom-component" className={classes.CreateContainer}>
+                 <br></br>
+                 <br></br>
+                 <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Create Game</h1>
                 {/* prints all user collections to the screen */}
 
                 <Table  striped bordered hover variant="dark">
@@ -353,6 +346,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                
                
 
+                
                 <Button variant="light" onClick={generateRandom} > Create Random Collection</Button>
 
                 <table>
@@ -425,7 +419,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                         </tr>
                     </tbody>
                 </table>
-                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </div>
+                { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            
+                </div>
         </>
     )
 }

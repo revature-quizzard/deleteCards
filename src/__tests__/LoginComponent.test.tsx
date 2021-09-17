@@ -5,6 +5,7 @@ import ErrorMessageComponent from '../components/ErrorMessageComponent';
 
 // Jest Mocks
 import {authenticate} from '../remote/auth-service';
+import { Principal } from '../dtos/principal';
 jest.mock('../remote/auth-service');
 
 // Jest's describe function creates a test suite for grouping any number of test cases (optional)
@@ -84,61 +85,68 @@ describe('LoginComponent Test Suite', () => {
         const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
 
         let loginButtonWrapper = wrapper.find('#login-button').at(0);
-
+        
         console.log(loginButtonWrapper.debug());
-
+        
         loginButtonWrapper.simulate('click');
-
+        
         let expectedErrorComponent = <ErrorMessageComponent errorMessage={'You must provide a username and a password!'}/>;
         
         expect(wrapper.contains(expectedErrorComponent)).toBe(true);
     });
-
+    
     it('Clicking login button with valid form field values attempts to login', () => {
         // Mock up the props
         let mockUser = undefined;
         let mockSetUserFn = jest.fn();
-
+        
         const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn}/>);
-
+        
         let usernameInput = wrapper.find('input[name="username"]');
         let passwordInput =  wrapper.find('input[name="password"]');
         let loginButtonWrapper = wrapper.find('button');
-
+        
         usernameInput.simulate('change', {target: {name: 'username', value: 'test-username'}});
         passwordInput.simulate('change', {target: {name: 'password', value: 'test-password'}});
         loginButtonWrapper.simulate('click');
-
+        
         expect(authenticate).toBeCalledTimes(1);
-
+        
         
     });
-
+    
     // Does not currently work, need to figure out how to mock return of authenticate function
     it('Clicking login button with incorrect credentials displays error message', () => {
         // Mock up the props
         let mockUser = undefined;
         let mockSetUserFn = jest.fn();
-
+        
+        
+        (authenticate as jest.Mock).mockReturnValueOnce(Promise.resolve({
+            "statusCode": 500,
+            "message": "Invalid credentials provided!",
+            "timestamp": "2021-09-16T22:43:14.633"
+        }))
+        
         // We need to use Enzyme's mount function so that child components are rendered
         const wrapper = mount(<LoginComponent currentUser={mockUser} setCurrentUser={mockSetUserFn} />);
-
+        
         let usernameInput = wrapper.find('input[name="username"]');
         let passwordInput =  wrapper.find('input[name="password"]');
         let loginButtonWrapper = wrapper.find('button');
-
+        
         usernameInput.simulate('change', {target: {name: 'username', value: 'test-username'}});
         passwordInput.simulate('change', {target: {name: 'password', value: 'test-password'}});
         loginButtonWrapper.simulate('click');
         
-
+        
         expect(authenticate).toBeCalledTimes(1);
-        // authenticate.mockReturnValueOnce();
-
+        
+        
         let expectedErrorComponent = <ErrorMessageComponent errorMessage={'Invalid credentials provided!'}/>;
         
         expect(wrapper.contains(expectedErrorComponent)).toBe(true);
     })
-
-
+    
+    
 })

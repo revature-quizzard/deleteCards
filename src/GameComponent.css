@@ -3,3 +3,11 @@
     background-color: black;
     float: left;
 }
+
+#usertrue {
+    color: limegreen;
+}
+
+#userfalse {
+    color: beige;
+}

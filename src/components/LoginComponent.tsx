@@ -13,13 +13,22 @@ interface ILoginProps {
 
 const useStyles = makeStyles({
     loginContainer: {
+        backgroundColor: "black",
+        opacity: .94,
         justifyContent: "center",
         marginLeft: "25rem",
         marginTop: "10rem",
         padding: 20,
         width: "25%"
+    },
+    Input: {
+        color: "white"
     }
 });
+
+const labelStyle = {
+    color: "white"
+}
 
 function LoginComponent(props: ILoginProps) {
     const classes = useStyles();
@@ -54,27 +63,29 @@ function LoginComponent(props: ILoginProps) {
         <>
             <div id="login-component" className={classes.loginContainer}>
 
-            <Typography align="center" variant="h4">Please Log In to Your Account</Typography>
+            <Typography style= {{color: "gold"}} align="center" variant="h4">Please Log In to Your Account</Typography>
 
             <FormControl margin="normal" fullWidth>
-                <InputLabel htmlFor="username">Username</InputLabel>
+            <h5 style= {{color: "gold"}}>Username</h5>                  
                 <Input
                     onChange={handleChange}
                     id="username"
                     name="username"
                     type="text"
                     placeholder="Enter your username"
+                    style ={{backgroundColor: "white"}}
                 />
             </FormControl>
 
             <FormControl margin="normal" fullWidth>
-                <InputLabel htmlFor="password">Password</InputLabel>
+            <h5 style= {{color: "gold"}}>Password</h5>                  
                 <Input
                     onChange={handleChange}
                     id="password"
                     name="password"
                     type="password"
                     placeholder="Enter your password"
+                    style ={{backgroundColor: "white"}}
                 />
             </FormControl>
 
