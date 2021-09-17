@@ -3,7 +3,7 @@ import { Principal } from "../dtos/principal";
 
 import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "react-bootstrap";
 
-import { Redirect , Link, useLocation } from "react-router-dom";
+import { Redirect , Link, useHistory } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
@@ -98,6 +98,7 @@ function GameComponent(props: IGameProps) {
 
     // let answered = false;
     let answer = '';
+    let unsub : firestore.Unsubscribe = null as unknown as firestore.Unsubscribe;
 
     useEffect(() => {
       
@@ -106,14 +107,25 @@ function GameComponent(props: IGameProps) {
       } else {
         return;
       }
-  
-      let unsub : firestore.Unsubscribe = null as unknown as firestore.Unsubscribe;
+
+      if(game?.match_state === 3) {
+        unsub();
+        return;
+      };  
+      
       const onUpdate = () => {
-          unsub = firestore.onSnapshot(gamesRef, async snapshot => {
+          unsub = firestore.onSnapshot(firestore.doc(gamesRef, `${props.currentGameId}`), async snapshot => {
+              // if (!snapshot.exists()) {
+              //   history
+              // }
+              if(game?.match_state === 3) {
+                unsub();
+                return;
+              };
               console.log('ON UPDATE');
-              let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
+              // let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
               //@ts-ignore
-              temp = temp['_document']['data']['value']['mapValue']['fields'];
+              let temp = snapshot['_document']['data']['value']['mapValue']['fields'];
 
               let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
               //@ts-ignore
@@ -295,6 +307,10 @@ function GameComponent(props: IGameProps) {
           
       })
     }
+    
+    function closeGame() {
+
+    }
 
     /**
      *  TODO: Fill out later
@@ -441,6 +457,9 @@ function GameComponent(props: IGameProps) {
                 (game.match_state == 3) ?
                 <>
                   <LeaderboardComponent key={3} players={game?.players} />
+                  {
+                  <Button className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
+                  }
                 </> 
                 : <> </>
               }
