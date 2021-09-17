@@ -194,6 +194,7 @@ function GameComponent(props: IGameProps) {
       if (game?.match_state == 2) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
         clearAnswers();
+        setTrigger(trigger => !trigger);
       }
 
       // When timer runs out of time, game just finished break/answer reveal
@@ -210,8 +211,9 @@ function GameComponent(props: IGameProps) {
           let nextIndex : number = currentIndex + 1;
           firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
         }
+        
+        setTrigger(trigger => !trigger);
       }
-      setTrigger(trigger => !trigger);
     }
 
     async function submit(e: any) {
@@ -235,7 +237,7 @@ function GameComponent(props: IGameProps) {
               setTrigger(!trigger);
             }
           }    
-          
+          console.log("BEFORE VALIDATE")
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
             // If answer is correct, add points to user
@@ -246,6 +248,7 @@ function GameComponent(props: IGameProps) {
 
             currentPoints += value;
             //@ts-ignore
+            console.log("CURR POINTS", currentPoints)
             firestore.updateDoc(playerRef, 'points',  currentPoints);
           }
         }
