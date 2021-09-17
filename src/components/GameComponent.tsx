@@ -134,7 +134,7 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
-            console.log(newGame)
+            console.log("GAME", newGame)
             setGame(newGame);
 
           })
@@ -154,8 +154,15 @@ function GameComponent(props: IGameProps) {
         //@ts-ignore
         let playerarr = [];
         gameplayers.forEach(player => {
-            //@ts-ignore
-            playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
+          //@ts-ignore
+          let fields = player['_document']['data']['value']['mapValue']['fields']
+          let playerStructure = {
+            name: fields.name.stringValue,
+            answered: fields.answered.booleanValue,
+            answered_at: fields.answered_at.timestampValue,
+            points : fields.points.integerValue
+          }
+          playerarr.push(playerStructure)
         })
 
         //@ts-ignore
@@ -208,31 +215,36 @@ function GameComponent(props: IGameProps) {
     }
 
     async function submit(e: any) {
-      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      let playersRef = firestore.collection(gameDocRef, `/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(player => {
         //@ts-ignore
         if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
           // firestore.updateDoc(player)
-          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
-          firestore.updateDoc(playerRef, 'answered', true);          
+          let playerRef = firestore.doc(gameDocRef, `/players/${player.id}`)
+          //this update doesn't trigger callback
+          firestore.updateDoc(playerRef, 'answered', true);
+          //Set answered locally
+          if(game) {
+            let player = game.players.find((p) => p.name === props.currentUser?.username);
+            console.log(player)
+            if(player) {
+              player.answered = true;
+              //force rerender
+              setTrigger(!trigger);
+            }
+          }    
           
-          console.log("submission:", answer)
-          // TODO Validate answer better
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
             // If answer is correct, add points to user
             //@ts-ignore
             let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
-
-            console.log('current points: ', currentPoints);
             //@ts-ignore
             let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
-            console.log('value: ', value);
 
             currentPoints += value;
-            console.log('current points: ', currentPoints);
             //@ts-ignore
             firestore.updateDoc(playerRef, 'points',  currentPoints);
           }
@@ -250,12 +262,21 @@ function GameComponent(props: IGameProps) {
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(player => {
         //@ts-ignore
-        if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
-          // firestore.updateDoc(player)
+        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
           let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
           firestore.updateDoc(playerRef, 'answered', false);
         }
       })
+
+      if(game) {
+        let player = game.players.find((p) => p.name === props.currentUser?.username);
+        console.log(player)
+        if(player) {
+          player.answered = false;
+          //force rerender
+          setTrigger(!trigger);
+        }
+      } 
     }
 
     /**
@@ -264,7 +285,6 @@ function GameComponent(props: IGameProps) {
     function validateAnswer(submittedAnswer: string, correctAnswer: string) {
       // Trim strings and compare
       let correct = submittedAnswer.toLowerCase().replace(/\s+/g, '') === correctAnswer.toLowerCase().replace(/\s+/g, '');
-      console.log(correct)
       return correct
     }
 
@@ -283,47 +303,58 @@ function GameComponent(props: IGameProps) {
             
             {(game) ?
               <>
-              {checkInit}
-              {console.log('GAME RERENDER: ', game)}
-              {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
-              {/* Player List */}
-              {console.log('Players AND game in return line 187', game?.players, game)}
-              <PlayersComponent key={true} players={game?.players} />
+                {checkInit}
+                {console.log('GAME RERENDER: ', game)}
+                {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
+                {/* Player List */}
+                {console.log('Players AND game in return line 187', game?.players, game)}
+                <PlayersComponent key={true} players={game?.players} />
 
-              {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
-              {
-                (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
+                {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
+                {
+                  (game.match_state == 1 || game.match_state == 2) ?
+                    <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
                   : <></>
-              }
+                }
 
-              {                
-                (game.match_state == 2) ?
-                <>
+                {                
+                  (game.match_state == 2) ?
+                  <>
+                    {/* Question and Answer */}
+                    <Container className={classes.questionAnswer}>
+                      <Container id="div-for-question" className={classes.question}>
+                      <h1>
+                        {/* @ts-ignore */}
+                        {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
+                        {/* @ts-ignore */}
+                        {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
+                      </h1>
+                      <h2>
+                        {/* @ts-ignore */}
+                        {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
+                      </h2>
+                      {console.log(!game.players.find((p) => p.name === props.currentUser?.username)?.answered)}
+                      {console.log("ANSWERED", game.players.find(p => p.name === props.currentUser?.username), game.players.find((p) => p.name === props.currentUser?.username)?.answered)}
+                      {
+                        (!game.players.find((p) => p.name === props.currentUser?.username)?.answered) ?
 
-                {/* Question and Answer */}
-                <Container className={classes.questionAnswer}>
-                    <Container id="div-for-question" className={classes.question}>
-                    <h1>
-                      {/* @ts-ignore */}
-                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
-                    </h1>
-                    <h2>
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
-                    </h2>
-                    
+                        <>
+                          <Container>
+                            <Container id="input-container" className={classes.input}>
+                              <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
+                              <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
+                            </Container>
+                          </Container>
+                        </>
+                        :
+                        <>
+                        </>
+                      }
+                      </Container>
                     </Container>
-                    <Container id="input-container" className={classes.input}>
-                        <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
-                        <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
-                    </Container>
-                </Container>
-                </>
-                : <></>
-              }
+                  </>
+                  : <></>
+                }
 
               { 
                 
@@ -393,7 +424,7 @@ function PlayersComponent(props: any) {
                             return <tr key={i}>
                                 <td>
                                   {/* @ts-ignore */}
-                                  {player.name.stringValue}
+                                  {player.name}
                                 </td>
                             </tr>
                           })}
