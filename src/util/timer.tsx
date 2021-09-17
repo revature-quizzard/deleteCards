@@ -30,7 +30,7 @@ const Timer = (props: ITimerProps) => {
                         props.onTimeout();
                         setMinutes(props.initialMinute);
                         setSeconds(props.initialSeconds);
-                        setMatchState(props.initialSeconds);                   
+                        setMatchState(2);                   
                     } else clearInterval(myInterval)
 
                 } else {

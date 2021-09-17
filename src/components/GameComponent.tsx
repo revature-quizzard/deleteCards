@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
-import { classicNameResolver } from "typescript";
+import { classicNameResolver, isPropertySignature } from "typescript";
 import { Player } from "../dtos/player";
 import { Collections } from "../dtos/collection";
 import Timer from "../util/timer";
@@ -120,7 +120,7 @@ function GameComponent(props: IGameProps) {
                 // console.log('Player:', player);
                 playersArr.push(player);
                 //@ts-ignore
-                if (player.name.stringValue == props.currentUser?.username) setCurrentPlayer(player);
+                if (player.name == props.currentUser?.username) setCurrentPlayer(player);
                 else console.log('ABORT: NOT THE SAME PLAYER:', player)
               })
 
@@ -232,13 +232,13 @@ function GameComponent(props: IGameProps) {
     }
 
     async function submit(e: any) {
+      console.log("SUBMITTED")
       let playersRef = firestore.collection(gameDocRef, `/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(async player => {
         //@ts-ignore
-        if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
-          // firestore.updateDoc(player)
+        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
           let playerRef = firestore.doc(gameDocRef, `/players/${player.id}`)
           // Set current timestamp to firestore (potentially used for scoring later)
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
@@ -251,7 +251,6 @@ function GameComponent(props: IGameProps) {
           //@ts-ignore
           await firestore.updateDoc(temp, 'trigger', !gameDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
           setTrigger(!trigger);
-
 
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
@@ -318,7 +317,7 @@ function GameComponent(props: IGameProps) {
                 {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
                 {/* Player List */}
                 {console.log('Players AND game in return line 187', game?.players, game)}
-                <PlayersComponent key={1} players={game?.players} />
+                <PlayersComponent key={1} players={game?.players} user={props.currentUser} />
 
                 {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
                 {
@@ -441,12 +440,12 @@ function PlayersComponent(props: any) {
                             return <tr key={i}>
                                 {/* DYNAMIC ID: Id will be usertrue if current user, otherwise userfalse */}
                                 {/* @ts-ignore */}
-                                <td id={"user" + (player.name.stringValue == props.user.username)}>
+                                <td id={"user" + (player.name == props.user.username)}>
                                   {/* @ts-ignore */}
 
-                                  {console.log("user" + (player.name.stringValue == props.user.username), player.name, props.user.username)}
+                                  {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points.integerValue} points
+                                  {player.name} | {player.points} points
                                 </td>
                             </tr>
                           })}
@@ -464,7 +463,7 @@ function PlayersComponent(props: any) {
 function LeaderboardComponent(props: any) {
   // Sort the players in descending order of points
   // @ts-ignore
-  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points.integerValue > b.points.integerValue ? -1 : 1);
+  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points > b.points ? -1 : 1);
   console.log('Sorted players array at end of game:', players)
 
   return (
@@ -473,7 +472,7 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name.stringValue} | {player.points.integerValue} points
+                                  {player.name} | {player.points} points
                                 </h1>
                             </Card>
                           })}
