@@ -203,7 +203,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: false,
                     name: props.currentUser?.username,
                     points : 0,
-                    answered_at: new firestore.Timestamp(1,1)
+                    answered_at: new firestore.Timestamp(1,1),
+                    answered_correctly: false,
+                    placing: 0
                 }
                 playerDoc = await firestore.addDoc(playersRef, newPlayer);
                 let newPlayerTemp = await firestore.getDoc(playerDoc);
@@ -212,6 +214,8 @@ function JoinGameComponent(props: IJoinGameProps) {
                     name: newPlayer.name,
                     points: newPlayer.points,
                     answered_at: newPlayer.answered_at,
+                    answered_correctly: newPlayer.answered_correctly,
+                    placing: newPlayer.placing,
                     id: newPlayerTemp.id
                 }
             }

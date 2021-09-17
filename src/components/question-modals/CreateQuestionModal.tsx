@@ -72,13 +72,13 @@ function CreateQuestionModal(props: IQuestionModal) {
       let temp = question;
       if(temp) {
         if(key === 1)
-        temp.value = "1";
+        temp.value = "100";
         else if(key === 2)
-        temp.value = "2";
+        temp.value = "200";
         else if(key === 3)
-        temp.value = "3";
+        temp.value = "500";
         else if(key === 4)
-        temp.value = "4";
+        temp.value = "1000";
       }
           setQuestion(temp);
       }
