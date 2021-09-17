@@ -263,7 +263,9 @@ function GameComponent(props: IGameProps) {
      */
     function validateAnswer(submittedAnswer: string, correctAnswer: string) {
       // Trim strings and compare
-      return true;
+      let correct = submittedAnswer.toLowerCase().replace(/\s+/g, '') === correctAnswer.toLowerCase().replace(/\s+/g, '');
+      console.log(correct)
+      return correct
     }
 
     /**
@@ -291,7 +293,7 @@ function GameComponent(props: IGameProps) {
               {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
               {
                 (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={3} onTimeout={onTimeout} />
+                  <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
                   : <></>
               }
 
