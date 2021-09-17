@@ -1,26 +1,30 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel, Table, ListGroup } from "react-bootstrap";
+
+
+import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "react-bootstrap";
+
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
-import { classicNameResolver } from "typescript";
+import { classicNameResolver, isPropertySignature } from "typescript";
 import { Player } from "../dtos/player";
 import { Collections } from "../dtos/collection";
 import Timer from "../util/timer";
 import '../GameComponent.css'
-
+import Badge from 'react-bootstrap/Badge'
 import * as firestore from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Placeholder from 'react-bootstrap/Placeholder'
 
 import app from '../util/Firebase';
 
 const db = firestore.getFirestore(app);
 
-
+let gameProgPercentage : Number = 0;
 
 interface IGameProps {
   currentUser: Principal | undefined;
@@ -52,13 +56,13 @@ const CssTextField = withStyles({
 
 const useStyles= makeStyles({
     question : {
-        backgroundColor : 'black',
+        backgroundColor : '#282c34',
         justifyContent : 'center',
         color : 'white',
-        width : '35rem',
+        width: '40rem',
         height : '20rem',
         border : '1em black',
-        borderRadius : '2em' 
+        borderRadius : '.1em' 
     },
     questionAnswer : {
         // backgroundColor : 'limegreen',
@@ -120,7 +124,7 @@ function GameComponent(props: IGameProps) {
                 // console.log('Player:', player);
                 playersArr.push(player);
                 //@ts-ignore
-                if (player.name.stringValue == props.currentUser?.username) setCurrentPlayer(player);
+                if (player.name == props.currentUser?.username) setCurrentPlayer(player);
                 else console.log('ABORT: NOT THE SAME PLAYER:', player)
               })
 
@@ -147,7 +151,7 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
-            console.log(newGame)
+            console.log("GAME", newGame)
             setGame(newGame);
 
           })
@@ -167,8 +171,15 @@ function GameComponent(props: IGameProps) {
         //@ts-ignore
         let playerarr = [];
         gameplayers.forEach(player => {
-            //@ts-ignore
-            playerarr.push(player['_document']['data']['value']['mapValue']['fields'])
+          //@ts-ignore
+          let fields = player['_document']['data']['value']['mapValue']['fields']
+          let playerStructure = {
+            name: fields.name.stringValue,
+            answered: fields.answered.booleanValue,
+            answered_at: fields.answered_at.timestampValue,
+            points : fields.points.integerValue
+          }
+          playerarr.push(playerStructure)
         })
 
         //@ts-ignore
@@ -202,13 +213,15 @@ function GameComponent(props: IGameProps) {
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
         clearAnswers();
-      } 
-      // else if (game?.match_state == 2) setAnswered(false);
+        setTrigger(trigger => !trigger);
+      }
 
       // When timer runs out of time, game just finished break/answer reveal
       else if (game?.match_state == 1) {    
+       
         //@ts-ignore   
-        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
+        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue);
+        
         //@ts-ignore
         if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host)
           firestore.updateDoc(gameDocRef, 'match_state', 3);
@@ -218,68 +231,47 @@ function GameComponent(props: IGameProps) {
           let currentIndex : number = parseInt(game.question_index);
           let nextIndex : number = currentIndex + 1;
           firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
-          
-        } 
+          setTrigger(!trigger)
+
+          gameProgPercentage = game.question_index as number; 
+        }
+
       }
-      setAnswered(false);
-      setTrigger(trigger => !trigger);
     }
 
     async function submit(e: any) {
-      // Prevent button spam
-      //@ts-ignore
-      if (answered) {
-        console.log('YOU HAVE ALREADY ANSWERED YOU SNEAKY BITCH')
-        return;
-      } else console.log('PLAYER HAS NOT YET ANSWERED: ', currentPlayer);
-
-      setAnswered(true);
-
-      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+      console.log("SUBMITTED")
+      let playersRef = firestore.collection(gameDocRef, `/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(async player => {
         //@ts-ignore
         if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
-          // firestore.updateDoc(player)
-          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
-      
-          await console.log('NOW:', firestore.Timestamp.now());
+          let playerRef = firestore.doc(gameDocRef, `/players/${player.id}`)
           // Set current timestamp to firestore (potentially used for scoring later)
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
-
-          // Set answered state to true to take away button privileges!
-          await firestore.updateDoc(playerRef, 'answered', true);
-          console.log("submission:", answer)
+          //this update doesn't trigger callback
+          firestore.updateDoc(playerRef, 'answered', true);
 
           // Use this functionality to trigger snapshot listener, as a change to players subcollection does not trigger it
           let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
           let gameDoc = await firestore.getDoc(temp);
-          console.log('GAME DOC',gameDoc)
           //@ts-ignore
           await firestore.updateDoc(temp, 'trigger', !gameDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
           setTrigger(!trigger);
 
-          // TODO Validate answer better
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
             // If answer is correct, add points to user
             //@ts-ignore
             let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
-
-            console.log('current points: ', currentPoints);
             //@ts-ignore
             let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
-            // Sometimes jService values are blank?
-            if (value == NaN || value == null) value = 100;
-            console.log('value: ', value);
 
             // Add value of question to total number of points and update Firebase
             currentPoints += value;
-            console.log('current points: ', currentPoints);
-            //@ts-ignore
-            firestore.updateDoc(playerRef, 'points',  currentPoints);
 
+            firestore.updateDoc(playerRef, 'points',  currentPoints);
                
           }
         }
@@ -292,19 +284,15 @@ function GameComponent(props: IGameProps) {
      *  Only the host will call this method.
      */
     async function clearAnswers() {
-      console.log('CALLING CLEARANSWERS')
       let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(async player => {
         //@ts-ignore
-        // if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
-          // firestore.updateDoc(player)
+
         let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
         await firestore.updateDoc(playerRef, 'answered', false);
-        console.log('SETTING ', player, ' TO ANSWERED = FALSE')
           
-        // }
       })
     }
 
@@ -313,7 +301,8 @@ function GameComponent(props: IGameProps) {
      */
     function validateAnswer(submittedAnswer: string, correctAnswer: string) {
       // Trim strings and compare
-      return true;
+      let correct = submittedAnswer.toLowerCase().replace(/\s+/g, '') === correctAnswer.toLowerCase().replace(/\s+/g, '');
+      return correct
     }
 
     /**
@@ -331,19 +320,17 @@ function GameComponent(props: IGameProps) {
             
             {(game) ?
               <>
-              {checkInit}
-              {console.log('GAME RERENDER: ', game)}
-              {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
-              {/* Player List */}
-              {
-                (game.match_state == 3) ? <> </> :
-                <PlayersComponent key={1} players={game?.players} user={props.currentUser}/>
-              }
+                {checkInit}
+                {console.log('GAME RERENDER: ', game)}
+                {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
+                {/* Player List */}
+                {console.log('Players AND game in return line 187', game?.players, game)}
+                <PlayersComponent key={1} players={game?.players} user={props.currentUser} />
 
-              {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
-              {
-                (game.match_state == 1 || game.match_state == 2) ?
-                  <Timer initialMinute={0} initialSeconds={6} onTimeout={onTimeout} />
+                {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
+                {
+                  (game.match_state == 1 || game.match_state == 2) ?
+                    <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
                   : <></>
               }
 
@@ -352,32 +339,46 @@ function GameComponent(props: IGameProps) {
                 <>
 
                 {/* Question and Answer */}
-                <Container className={classes.questionAnswer}>
-                    <Container id="div-for-question" className={classes.question}>
-                    <h1>
-                      {/* @ts-ignore */}
-                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
-                    </h1>
-                    <h2>
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
-                    </h2>
-                    
-                    </Container>
-                    <Container id="input-container" className={classes.input}>
-                        <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
-                        {
-                          // If player has not answered, display button, otherwise, do not show
-                          // @ts-ignore
-                          (!currentPlayer?.answered.booleanValue) ? <>
-                          <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
-                          </>
-                          : <> </>
-                        }
-                    </Container>
-                </Container>
+
+                <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
+
+                <Card.Header as="h5" >
+                  Welcome To *JASH*
+                  <Card.Title> 
+                  <br></br>
+                     {/* @ts-ignore */}
+                  <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  {/* @ts-ignore */}
+                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+                </Card.Title>
+                </Card.Header>
+                            <Card.Body >
+                              <Card.Body id="div-for-question"  style={{ backgroundColor:'black' , color : 'grey'}}>
+                                  <br></br>
+                                  <br></br>
+                                   <h3>
+                                     {/* @ts-ignore */}
+                                  {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}? <Badge bg="success">{game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue} Points!</Badge>
+                                  </h3> 
+                                  <br></br>
+                                 <br></br>
+                                </Card.Body>  
+                                <Card.Footer>
+                                {(!game.players.find((p) => p.name === props.currentUser?.username)?.answered) ?
+                                  <>
+                                    <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
+                                    <Button className="btn btn-primary"  title="enter" onClick={submit}>Answer</Button>
+                                  </>
+                                :
+                                  <>
+                                  </>
+                                }
+                                </Card.Footer>
+                            </Card.Body>
+                      </Card> 
+
+
+
                 </>
                 : <></>
               }
@@ -386,19 +387,39 @@ function GameComponent(props: IGameProps) {
                 
                 (game.match_state == 1) ?
                 <>
+          <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
 
-                {/* Question Answer */}
-                <Container className={classes.questionAnswer}>
-                    <Container id="div-for-question" className={classes.question}>
-                    <h1>
-                      {/* @ts-ignore */}
-                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)}
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}
-                      </h1>
-                    
-                    </Container>
-                </Container>
+          <Card.Header as="h5" >
+            Welcome To *JASH*
+            <Card.Title> 
+            <br></br>
+              {/* @ts-ignore */}
+            <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+            {/* @ts-ignore */}
+          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+          </Card.Title>
+          </Card.Header>
+                      <Card.Body >
+                        <Card.Body id="div-for-question"  style={{ backgroundColor:'black' , color : 'grey'}}>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                          <br></br>
+                            <h3 >
+                              {/* @ts-ignore */}
+                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Correct!</Badge>
+                            </h3> 
+                        
+                            <br></br>
+                          <br></br>
+                          <br></br>
+                          <br></br>
+                          </Card.Body>  
+                          <Card.Footer>
+                          
+                          </Card.Footer>
+                      </Card.Body>
+                </Card>
                 </>
                 : <></>
               }
@@ -458,11 +479,12 @@ function PlayersComponent(props: any) {
                             return <tr key={i}>
                                 {/* DYNAMIC ID: Id will be usertrue if current user, otherwise userfalse */}
                                 {/* @ts-ignore */}
-                                <td id={"user" + (player.name.stringValue == props.user.username)}>
+                                <td id={"user" + (player.name == props.user.username)}>
                                   {/* @ts-ignore */}
-                                  {console.log("user" + (player.name.stringValue == props.user.username), player.name, props.user.username)}
+
+                                  {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name.stringValue} | {player.points.integerValue} points
+                                  {player.name} | {player.points} points
                                 </td>
                             </tr>
                           })}
@@ -472,6 +494,7 @@ function PlayersComponent(props: any) {
   )
 }
 
+
 /**
  *  The LeaderboardComponent displays at the end of the game (match_state 3) and gives a short summary of the game.
  *  ie. Players are displayed in descending order of points to show placings.
@@ -480,7 +503,7 @@ function PlayersComponent(props: any) {
 function LeaderboardComponent(props: any) {
   // Sort the players in descending order of points
   // @ts-ignore
-  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points.integerValue > b.points.integerValue ? -1 : 1);
+  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points > b.points ? -1 : 1);
   console.log('Sorted players array at end of game:', players)
 
   return (
@@ -489,7 +512,7 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name.stringValue} | {player.points.integerValue} points
+                                  {player.name} | {player.points} points
                                 </h1>
                             </Card>
                           })}
