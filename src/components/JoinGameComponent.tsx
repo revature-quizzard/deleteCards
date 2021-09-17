@@ -34,11 +34,18 @@ const useStyles = makeStyles({
         justifyContent: "center",
         marginLeft: "10rem",
         marginTop: "5rem",
+        paddingTop:'5em',
+        paddingBottom:'5em',
         width: "75%",
         height:"75%",
         borderRadius: "8em",
         border: "white",
-        overflowY: "scroll"
+        overflow: "hidden",
+
+    },
+    TableStyle: {
+        overflowY: "scroll",
+          
     }
 }) 
 
@@ -341,10 +348,9 @@ function JoinGameComponent(props: IJoinGameProps) {
         <>
             {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
              <div id = "jg-component" className={classes.JGameContainer}>
-             <br/><br/>
-             <br/><br/>
                 {/* Prints all active games to the screen */}
                 <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
+                <div className={classes.TableStyle}>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -387,6 +393,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     </tbody>
                     
                 </Table>
+                </div>
                 {
                     (!activeGames)
                     ?

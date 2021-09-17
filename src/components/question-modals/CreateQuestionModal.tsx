@@ -90,7 +90,7 @@ function CreateQuestionModal(props: IQuestionModal) {
               <Modal.Title>Create New Question</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <input id="question-input" type="text" onChange={updateQuestion} placeholder="Question"/>
+              <input style = {{width:"420px"}} id="question-input" type="text" onChange={updateQuestion} placeholder="Question"/>
               <br/><br/>
               <input id="answer-input" type="text" onChange={updateAnswer} placeholder="Answer"/>
               <br/><br/>
