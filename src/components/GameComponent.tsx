@@ -1,5 +1,8 @@
 import { Principal } from "../dtos/principal";
-import { Alert, Button, Card, Carousel, Table, ListGroup } from "react-bootstrap";
+
+
+import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "react-bootstrap";
+
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
@@ -11,16 +14,17 @@ import { Player } from "../dtos/player";
 import { Collections } from "../dtos/collection";
 import Timer from "../util/timer";
 import '../GameComponent.css'
-
+import Badge from 'react-bootstrap/Badge'
 import * as firestore from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Placeholder from 'react-bootstrap/Placeholder'
 
 import app from '../util/Firebase';
 
 const db = firestore.getFirestore(app);
 
-
+let gameProgPercentage : Number = 0;
 
 interface IGameProps {
   currentUser: Principal | undefined;
@@ -52,13 +56,13 @@ const CssTextField = withStyles({
 
 const useStyles= makeStyles({
     question : {
-        backgroundColor : 'black',
+        backgroundColor : '#282c34',
         justifyContent : 'center',
         color : 'white',
-        width : '35rem',
+        width: '40rem',
         height : '20rem',
         border : '1em black',
-        borderRadius : '2em' 
+        borderRadius : '.1em' 
     },
     questionAnswer : {
         // backgroundColor : 'limegreen',
@@ -214,8 +218,10 @@ function GameComponent(props: IGameProps) {
 
       // When timer runs out of time, game just finished break/answer reveal
       else if (game?.match_state == 1) {    
+       
         //@ts-ignore   
-        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
+        console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue);
+        
         //@ts-ignore
         if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host)
           firestore.updateDoc(gameDocRef, 'match_state', 3);
@@ -225,9 +231,11 @@ function GameComponent(props: IGameProps) {
           let currentIndex : number = parseInt(game.question_index);
           let nextIndex : number = currentIndex + 1;
           firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
+          setTrigger(!trigger)
+
+          gameProgPercentage = game.question_index as number; 
         }
-        
-        setTrigger(trigger => !trigger);
+
       }
     }
 
@@ -324,63 +332,94 @@ function GameComponent(props: IGameProps) {
                   (game.match_state == 1 || game.match_state == 2) ?
                     <Timer initialMinute={0} initialSeconds={game.question_timer} onTimeout={onTimeout} />
                   : <></>
-                }
+              }
 
-                {                
-                  (game.match_state == 2) ?
-                  <>
-                    {/* Question and Answer */}
-                    <Container className={classes.questionAnswer}>
-                      <Container id="div-for-question" className={classes.question}>
-                      <h1>
-                        {/* @ts-ignore */}
-                        {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue)}
-                        {/* @ts-ignore */}
-                        {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}
-                      </h1>
-                      <h2>
-                        {/* @ts-ignore */}
-                        {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
-                      </h2>
-                      </Container>
-                    </Container>
-                      
-                      {
-                        (!game.players.find((p) => p.name === props.currentUser?.username)?.answered) ?
+              {                
+                (game.match_state == 2) ?
+                <>
 
-                        <>
-                          <Container>
-                            <Container id="input-container" className={classes.input}>
-                              <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
-                              <Button className="btn btn-primary" id="submit-answer" title="enter" onClick={submit}>Answer</Button>
-                            </Container>
-                          </Container>
-                        </>
-                        :
-                        <>
-                        </>
-                      }
-                  </>
-                  : <></>
-                }
+                {/* Question and Answer */}
+
+                <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
+
+                <Card.Header as="h5" >
+                  Welcome To *JASH*
+                  <Card.Title> 
+                  <br></br>
+                     {/* @ts-ignore */}
+                  <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  {/* @ts-ignore */}
+                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+                </Card.Title>
+                </Card.Header>
+                            <Card.Body >
+                              <Card.Body id="div-for-question"  style={{ backgroundColor:'black' , color : 'grey'}}>
+                                  <br></br>
+                                  <br></br>
+                                   <h3>
+                                     {/* @ts-ignore */}
+                                  {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue}? <Badge bg="success">{game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue} Points!</Badge>
+                                  </h3> 
+                                  <br></br>
+                                 <br></br>
+                                </Card.Body>  
+                                <Card.Footer>
+                                {(!game.players.find((p) => p.name === props.currentUser?.username)?.answered) ?
+                                  <>
+                                    <CssTextField id="answer-input" type="text" onChange={(e) => {answer=e.target.value}} />
+                                    <Button className="btn btn-primary"  title="enter" onClick={submit}>Answer</Button>
+                                  </>
+                                :
+                                  <>
+                                  </>
+                                }
+                                </Card.Footer>
+                            </Card.Body>
+                      </Card> 
+
+
+
+                </>
+                : <></>
+              }
 
               { 
                 
                 (game.match_state == 1) ?
                 <>
+          <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
 
-                {/* Question Answer */}
-                <Container className={classes.questionAnswer}>
-                    <Container id="div-for-question" className={classes.question}>
-                    <h1>
-                      {/* @ts-ignore */}
-                      {console.log(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)}
-                      {/* @ts-ignore */}
-                      {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}
-                      </h1>
-                    
-                    </Container>
-                </Container>
+          <Card.Header as="h5" >
+            Welcome To *JASH*
+            <Card.Title> 
+            <br></br>
+              {/* @ts-ignore */}
+            <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+            {/* @ts-ignore */}
+          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+          </Card.Title>
+          </Card.Header>
+                      <Card.Body >
+                        <Card.Body id="div-for-question"  style={{ backgroundColor:'black' , color : 'grey'}}>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                          <br></br>
+                            <h3 >
+                              {/* @ts-ignore */}
+                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Correct!</Badge>
+                            </h3> 
+                        
+                            <br></br>
+                          <br></br>
+                          <br></br>
+                          <br></br>
+                          </Card.Body>  
+                          <Card.Footer>
+                          
+                          </Card.Footer>
+                      </Card.Body>
+                </Card>
                 </>
                 : <></>
               }
@@ -454,6 +493,7 @@ function PlayersComponent(props: any) {
      
   )
 }
+
 
 /**
  *  The LeaderboardComponent displays at the end of the game (match_state 3) and gives a short summary of the game.
