@@ -74,15 +74,25 @@ const useStyles= makeStyles({
 
 })
 
+/**
+ *  The bread and butter of our application.
+ *  
+ *  We only want host to maintain match_state/question_index etc.
+ * 
+ */
+
 function GameComponent(props: IGameProps) {
 
     const classes = useStyles();
     let [game, setGame] = useState(undefined as GameState | undefined);
     let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
     let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `dummy`))
+    let [currentPlayer, setCurrentPlayer] = useState(undefined as Player | undefined);
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
+    let [answered, setAnswered] = useState(false);
 
+    // let answered = false;
     let answer = '';
 
     useEffect(() => {
@@ -109,6 +119,9 @@ function GameComponent(props: IGameProps) {
               playersDocArr.forEach(player => {
                 // console.log('Player:', player);
                 playersArr.push(player);
+                //@ts-ignore
+                if (player.name.stringValue == props.currentUser?.username) setCurrentPlayer(player);
+                else console.log('ABORT: NOT THE SAME PLAYER:', player)
               })
 
               let newGame : GameState = {
@@ -187,11 +200,13 @@ function GameComponent(props: IGameProps) {
 
     /**
      *  Calls when timer runs out of time
+     *  Regular players and host will be calling this function, we want to
+     *  make sure that only the host is updating match_state and question_index
      */
     function onTimeout() {
       console.log('The timer has run out');
       // When timer runs out of time, game just finished a question
-      if (game?.match_state == 2) {
+      if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
         clearAnswers();
         setTrigger(trigger => !trigger);
@@ -202,9 +217,9 @@ function GameComponent(props: IGameProps) {
         //@ts-ignore   
         console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue) 
         //@ts-ignore
-        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1)
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host)
           firestore.updateDoc(gameDocRef, 'match_state', 3);
-        else {
+        else if (props.currentUser?.username == game.host) {
           firestore.updateDoc(gameDocRef, 'match_state', 2)
           //@ts-ignore
           let currentIndex : number = parseInt(game.question_index);
@@ -220,24 +235,24 @@ function GameComponent(props: IGameProps) {
       let playersRef = firestore.collection(gameDocRef, `/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
-      playersDocArr.forEach(player => {
+      playersDocArr.forEach(async player => {
         //@ts-ignore
-        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
+        if (player['_document']['data']['value']['mapValue']['fields'].name == props.currentUser?.username) {
           // firestore.updateDoc(player)
           let playerRef = firestore.doc(gameDocRef, `/players/${player.id}`)
+          // Set current timestamp to firestore (potentially used for scoring later)
+          await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
           //this update doesn't trigger callback
           firestore.updateDoc(playerRef, 'answered', true);
-          //Set answered locally
-          if(game) {
-            let player = game.players.find((p) => p.name === props.currentUser?.username);
-            console.log(player)
-            if(player) {
-              player.answered = true;
-              //force rerender
-              setTrigger(!trigger);
-            }
-          }    
-          console.log("BEFORE VALIDATE")
+
+          // Use this functionality to trigger snapshot listener, as a change to players subcollection does not trigger it
+          let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
+          let gameDoc = await firestore.getDoc(temp);
+          //@ts-ignore
+          await firestore.updateDoc(temp, 'trigger', !gameDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+          setTrigger(!trigger);
+
+
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
             // If answer is correct, add points to user
@@ -246,10 +261,11 @@ function GameComponent(props: IGameProps) {
             //@ts-ignore
             let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
 
+            // Add value of question to total number of points and update Firebase
             currentPoints += value;
-            //@ts-ignore
-            console.log("CURR POINTS", currentPoints)
+
             firestore.updateDoc(playerRef, 'points',  currentPoints);
+               
           }
         }
       })
@@ -257,29 +273,20 @@ function GameComponent(props: IGameProps) {
     }
 
     /**
-     *  This function sets all 'answered' fields to be false after each question
+     *  This function sets all 'answered' fields to be false after each question.
+     *  Only the host will call this method.
      */
     async function clearAnswers() {
       let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
       //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
-      playersDocArr.forEach(player => {
+      playersDocArr.forEach(async player => {
         //@ts-ignore
-        if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
-          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
-          firestore.updateDoc(playerRef, 'answered', false);
-        }
-      })
 
-      if(game) {
-        let player = game.players.find((p) => p.name === props.currentUser?.username);
-        console.log(player)
-        if(player) {
-          player.answered = false;
-          //force rerender
-          setTrigger(!trigger);
-        }
-      } 
+        let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+        await firestore.updateDoc(playerRef, 'answered', false);
+          
+      })
     }
 
     /**
@@ -311,7 +318,7 @@ function GameComponent(props: IGameProps) {
                 {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
                 {/* Player List */}
                 {console.log('Players AND game in return line 187', game?.players, game)}
-                <PlayersComponent key={true} players={game?.players} />
+                <PlayersComponent key={1} players={game?.players} />
 
                 {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
                 {
@@ -336,8 +343,9 @@ function GameComponent(props: IGameProps) {
                         {/* @ts-ignore */}
                         {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue}
                       </h2>
-                      {console.log(!game.players.find((p) => p.name === props.currentUser?.username)?.answered)}
-                      {console.log("ANSWERED", game.players.find(p => p.name === props.currentUser?.username), game.players.find((p) => p.name === props.currentUser?.username)?.answered)}
+                      </Container>
+                    </Container>
+                      
                       {
                         (!game.players.find((p) => p.name === props.currentUser?.username)?.answered) ?
 
@@ -353,8 +361,6 @@ function GameComponent(props: IGameProps) {
                         <>
                         </>
                       }
-                      </Container>
-                    </Container>
                   </>
                   : <></>
                 }
@@ -388,20 +394,28 @@ function GameComponent(props: IGameProps) {
                     Start Game!
                   </Button>
                 </>
-              :
+              : <> </>
+              }
+              
+
+              {/* End of Game */}
+              {
+                (game.match_state == 3) ?
                 <>
-                
-                </>
+                  <LeaderboardComponent key={3} players={game?.players} />
+                </> 
+                : <> </>
               }
               </>
 
-            : <></>}
+            : <></>
+            }
             
         </>
         :
         <>
-        {console.log('REDIRECTING TO JOIN')}
-        <Redirect to="/join-game"/>
+          {console.log('REDIRECTING TO JOIN')}
+          <Redirect to="/join-game"/>
         </>
     )
 }
@@ -425,9 +439,14 @@ function PlayersComponent(props: any) {
                     <tbody>
                     {players.map(function(player, i) {
                             return <tr key={i}>
-                                <td>
+                                {/* DYNAMIC ID: Id will be usertrue if current user, otherwise userfalse */}
+                                {/* @ts-ignore */}
+                                <td id={"user" + (player.name.stringValue == props.user.username)}>
                                   {/* @ts-ignore */}
-                                  {player.name}
+
+                                  {console.log("user" + (player.name.stringValue == props.user.username), player.name, props.user.username)}
+                                  {/* @ts-ignore */}
+                                  {player.name} | {player.points.integerValue} points
                                 </td>
                             </tr>
                           })}
@@ -435,6 +454,32 @@ function PlayersComponent(props: any) {
        </Table>
      
   )
+}
+
+/**
+ *  The LeaderboardComponent displays at the end of the game (match_state 3) and gives a short summary of the game.
+ *  ie. Players are displayed in descending order of points to show placings.
+ *  
+ */
+function LeaderboardComponent(props: any) {
+  // Sort the players in descending order of points
+  // @ts-ignore
+  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points.integerValue > b.points.integerValue ? -1 : 1);
+  console.log('Sorted players array at end of game:', players)
+
+  return (
+    <Container>
+      {players.map(function(player, i) {
+                            return <Card key={i}>
+                                <h1>
+                                  {/* @ts-ignore */}
+                                  {player.name.stringValue} | {player.points.integerValue} points
+                                </h1>
+                            </Card>
+                          })}
+    </Container>
+  )
+
 }
 
 export default GameComponent;

@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {Principal} from "../dtos/principal";
 import {Player} from "../dtos/player";
 import { GameState } from "../dtos/game-state";
@@ -66,12 +66,15 @@ function JoinGameComponent(props: IJoinGameProps) {
     let [errorMessage, setErrorMessage] = useState('');
     let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
     let [gameId, setGameId] = useState('');
+    const updateRef = useRef(activeGames);
 
     let history = useHistory();
-    // let [unsub, setUnsub] = useState((undefined as firestore.Unsubscribe | undefined))
 
-
-    // game id = FsvUzbk9Ql4nhrEmrK1v
+    // Used to keep track of activeGames state
+    // Called on each rerender
+    useEffect(() => {
+        updateRef.current = activeGames;
+    })
 
     useEffect(() => {
         //@ts-ignore
@@ -107,16 +110,19 @@ function JoinGameComponent(props: IJoinGameProps) {
                     }
                     console.log(newGame);
                     let gameIndex = 0;
+                    console.log('ACTIVE GAMES BEFORE UPDATE:', updateRef.current)
                     switch(doc.type) {
                         // Handle case of new game being created
+                        // TODO: Handle more cases
                         case 'added':
-                            console.log('A game was added');
+                            console.log('A game was added, Active Games=', updateRef.current);
                             setActiveGames(prevGames => [...prevGames, newGame])
                             break;
                         // Handle case of existing game being updated
+                        // TODO: Handle more cases
                         case 'modified':
                             console.log('A game was modified');
-                            gameIndex = activeGames.findIndex(game => game.id = _id);
+                            gameIndex = activeGames.findIndex(game => game.id == _id);
                             setActiveGames(prevGames => [
                                 ...prevGames.slice(0,gameIndex),
                                 newGame
@@ -124,17 +130,56 @@ function JoinGameComponent(props: IJoinGameProps) {
                             console.log('activeGames:', activeGames);
                             break;
                         // Handle existing game being deleted
-                        // TODO Game could be at end of array, address that
                         case 'removed':
-                            console.log('A game was removed');
-                            gameIndex = activeGames.findIndex(game => game.id = _id);
-                            setActiveGames(prevGames => [
-                                ...prevGames.slice(0,gameIndex),
-                                ...prevGames.slice(gameIndex+1)
-                            ])
+                            console.log('A game was removed, activeGames=', updateRef.current);
+                            gameIndex = updateRef.current.findIndex(game => game.id == _id);
+
+                            console.log('Delete Game ID:', _id)
+                            console.log('gameIndex', gameIndex);
+                            console.log('Game at index:', updateRef.current[gameIndex]);
+
+                            console.log('Active games before delete:', updateRef.current);
+
+                            // Game is only game in list
+                            if (updateRef.current.length == 1) {
+                                setActiveGames([]);
+                            }
+
+                            // game1, game2, game3
+                            // slice = game2, game3
+
+                            // Game is at beginning of list
+                            else if (gameIndex == 0) {
+                                setActiveGames(prevGames => [
+                                    ...prevGames.slice(gameIndex+1)
+                                ])
+                            }
+
+
+                            // game 1, game 2, game 3
+                            // slice 1 = game1, slice 2 = game 3
+                            // setActiveGames(slice1, slice2)
+
+                            // Game is in middle of list
+                            else if (gameIndex < updateRef.current.length - 1 ) {
+                                setActiveGames(prevGames => [
+                                    ...prevGames.slice(0,gameIndex-1),
+                                    ...prevGames.slice(gameIndex+1)
+                                ])
+                            }
+
+                            // Game is at end of list
+                            else if (gameIndex == updateRef.current.length - 1) {
+                                setActiveGames(prevGames => [
+                                    ...prevGames.slice(0,gameIndex)
+                                ])
+                            }
+
+                            console.log('Active games after delete:', updateRef.current)
+                            
                             break;
                     }
-                    console.log(activeGames)
+                    console.log('Active Games after modifications (probably not accurate yet)', updateRef.current)
                     
                 })
             })
@@ -196,7 +241,9 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: false,
                     name: props.currentUser?.username,
                     points : 0,
-                    answered_at: new firestore.Timestamp(1,1)
+                    answered_at: new firestore.Timestamp(1,1),
+                    answered_correctly: false,
+                    placing: 0
                 }
                 playerDoc = await firestore.addDoc(playersRef, newPlayer);
                 let newPlayerTemp = await firestore.getDoc(playerDoc);
@@ -205,6 +252,8 @@ function JoinGameComponent(props: IJoinGameProps) {
                     name: newPlayer.name,
                     points: newPlayer.points,
                     answered_at: newPlayer.answered_at,
+                    answered_correctly: newPlayer.answered_correctly,
+                    placing: newPlayer.placing,
                     id: newPlayerTemp.id
                 }
             }
@@ -275,7 +324,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         </tr>
                     </thead>                    
                     <tbody>
-                        {/* {console.log(activeGames, activeGames[0])} */}
+                        {console.log('ACTIVE GAMES BEFORE RENDER + FIRST GAME',activeGames, activeGames[0])}
                         {/* @ts-ignore */}
                     {activeGames?.map((game, i) =>{ 
                         
