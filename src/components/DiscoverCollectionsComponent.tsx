@@ -118,6 +118,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
         <div id = "discover-component" className={classes.DiscoverContainer}>
             <br></br>
             <br></br>
+            <br></br>
             <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Discover Collections</h1>
             <div className={classes.TableStyle}>
             <Table  striped bordered hover variant="dark">
