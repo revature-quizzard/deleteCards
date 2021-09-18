@@ -24,7 +24,10 @@ import app from '../util/Firebase';
 
 const db = firestore.getFirestore(app);
 
+let streak : number = 0;
+let gameLength : number = 0;
 let gameProgPercentage : Number = 0;
+let numberOfCorrectAnswers : number = 0;
 
 interface IGameProps {
   currentUser: Principal | undefined;
@@ -84,7 +87,7 @@ const useStyles= makeStyles({
  *  We only want host to maintain match_state/question_index etc.
  * 
  */
-
+ 
 function GameComponent(props: IGameProps) {
 
     const classes = useStyles();
@@ -98,6 +101,7 @@ function GameComponent(props: IGameProps) {
 
     // let answered = false;
     let answer = '';
+    
 
     useEffect(() => {
       
@@ -153,7 +157,7 @@ function GameComponent(props: IGameProps) {
             }
             console.log("GAME", newGame)
             setGame(newGame);
-
+             
           })
       }
       onUpdate()
@@ -199,6 +203,8 @@ function GameComponent(props: IGameProps) {
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
+      //@ts-ignore
+      
       setTrigger(trigger => !trigger);
     }
 
@@ -227,12 +233,15 @@ function GameComponent(props: IGameProps) {
           firestore.updateDoc(gameDocRef, 'match_state', 3);
         else if (props.currentUser?.username == game.host) {
           firestore.updateDoc(gameDocRef, 'match_state', 2)
+
           //@ts-ignore
           let currentIndex : number = parseInt(game.question_index);
           let nextIndex : number = currentIndex + 1;
           firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
           setTrigger(!trigger)
-
+           
+          //@ts-ignore
+          gameLength = game.collection.questionList.arrayValue.values.length;
           gameProgPercentage = game.question_index as number; 
         }
 
@@ -270,9 +279,12 @@ function GameComponent(props: IGameProps) {
 
             // Add value of question to total number of points and update Firebase
             currentPoints += value;
-
+            numberOfCorrectAnswers++;
+            streak++;
             firestore.updateDoc(playerRef, 'points',  currentPoints);
                
+          }else{
+              streak = 0;
           }
         }
       })
@@ -347,7 +359,7 @@ function GameComponent(props: IGameProps) {
                   <Card.Title> 
                   <br></br>
                      {/* @ts-ignore */}
-                  <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  <h4>Questions {game.question_index } out of {game.collection.questionList.arrayValue.values.length}</h4>
                   {/* @ts-ignore */}
                 <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
                 </Card.Title>
@@ -376,9 +388,6 @@ function GameComponent(props: IGameProps) {
                                 </Card.Footer>
                             </Card.Body>
                       </Card> 
-
-
-
                 </>
                 : <></>
               }
@@ -394,7 +403,7 @@ function GameComponent(props: IGameProps) {
             <Card.Title> 
             <br></br>
               {/* @ts-ignore */}
-            <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+            <h4>Question { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
             {/* @ts-ignore */}
           <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
           </Card.Title>
@@ -404,16 +413,17 @@ function GameComponent(props: IGameProps) {
                             <br></br>
                             <br></br>
                             <br></br>
-                          <br></br>
+                            <br></br>
+
                             <h3 >
                               {/* @ts-ignore */}
                             {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Correct!</Badge>
                             </h3> 
                         
                             <br></br>
-                          <br></br>
-                          <br></br>
-                          <br></br>
+                            <br></br>
+                            <br></br>
+                            <br></br>
                           </Card.Body>  
                           <Card.Footer>
                           
@@ -453,8 +463,7 @@ function GameComponent(props: IGameProps) {
         :
         <>
           {console.log('REDIRECTING TO JOIN')}
-          {/*@ts-ignore*/ }
-          { firestore.deleteDoc(game.collection)}
+       
           <Redirect to="/join-game"/>
         </>
     )
@@ -482,11 +491,11 @@ function PlayersComponent(props: any) {
                                 {/* DYNAMIC ID: Id will be usertrue if current user, otherwise userfalse */}
                                 {/* @ts-ignore */}
                                 <td id={"user" + (player.name == props.user.username)}>
+                                 
                                   {/* @ts-ignore */}
-
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points
+                                  {player.name} | {player.points} points  {streak > 1? <p>&#x1F525;</p> : <p></p>} 
                                 </td>
                             </tr>
                           })}
@@ -514,7 +523,7 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points
+                                  {player.name} | {player.points} points  { numberOfCorrectAnswers === gameLength ?  <h1>&#x1F451;</h1> : <h1>{numberOfCorrectAnswers}/{gameLength}</h1> } { i === 0 ? <h1></h1>  : <h1>&#x1F4A9;</h1>}
                                 </h1>
                             </Card>
                           })}
