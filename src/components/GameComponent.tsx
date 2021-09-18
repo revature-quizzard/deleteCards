@@ -5,7 +5,7 @@ import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "re
 
 import { Redirect , Link, useHistory } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
@@ -90,38 +90,45 @@ function GameComponent(props: IGameProps) {
     const classes = useStyles();
     let [game, setGame] = useState(undefined as GameState | undefined);
     let [gamesRef, setGamesRef] = useState(firestore.collection(db, 'games'))
+    let [gameDoc, setGameDoc] = useState(undefined as unknown as firestore.DocumentData);
     let [gameDocRef, setGameDocRef] = useState(firestore.doc(gamesRef, `dummy`))
     let [currentPlayer, setCurrentPlayer] = useState(undefined as Player | undefined);
+    let [playerID, setPlayerID] = useState(0);
     let [init, setInit] = useState(false);
     let [trigger, setTrigger] = useState(false);
     let [answered, setAnswered] = useState(false);
 
-    // let answered = false;
+    let gameUseRef = useRef(game);
+    let currentPlayerUseRef = useRef(currentPlayer);
+    let gameDocUseRef = useRef(gameDoc);
+
+    let history = useHistory();
+
     let answer = '';
-    let unsub : firestore.Unsubscribe = null as unknown as firestore.Unsubscribe;
 
     useEffect(() => {
-      
-      if(props.currentGameId) {
-        setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
-      } else {
-        return;
-      }
 
-      if(game?.match_state === 3) {
-        unsub();
-        return;
-      };  
+      async function getDocsAndRefs() {
+        let test = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`));        
+        setGameDoc(test);
+        gameDocUseRef.current = test;
+        setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
+        
+        
+      }
       
+      if(props.currentGameId) getDocsAndRefs();
+      else return;
+  
+      let unsub : firestore.Unsubscribe = null as unknown as firestore.Unsubscribe;
       const onUpdate = () => {
           unsub = firestore.onSnapshot(firestore.doc(gamesRef, `${props.currentGameId}`), async snapshot => {
-              // if (!snapshot.exists()) {
-              //   history
-              // }
-              if(game?.match_state === 3) {
-                unsub();
+              // When a game is deleted, politely escort user out of lobby
+              if (!snapshot.exists()) {
+                console.log('Game has been deleted! Rerouting to join-game!');
+                history.push('/join-game');
                 return;
-              };
+              }
               console.log('ON UPDATE');
               // let temp = await firestore.getDoc(firestore.doc(gamesRef, `${props.currentGameId}`))
               //@ts-ignore
@@ -136,8 +143,13 @@ function GameComponent(props: IGameProps) {
                 // console.log('Player:', player);
                 playersArr.push(player);
                 //@ts-ignore
-                if (player.name == props.currentUser?.username) setCurrentPlayer(player);
-                else console.log('ABORT: NOT THE SAME PLAYER:', player)
+                if (player.name == props.currentUser?.username) {
+                  // console.log('Current Player:', player)
+                  setCurrentPlayer(player);
+                  currentPlayerUseRef.current = player;  // This is what actually works for deleting player later
+                  setPlayerID(player.id);
+                }
+                // else console.log('ABORT: NOT THE SAME PLAYER:', player)
               })
 
               let newGame : GameState = {
@@ -163,21 +175,44 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 collection: temp.collection.mapValue.fields
             }
-            console.log("GAME", newGame)
+            // console.log("GAME", newGame)
             setGame(newGame);
+            gameUseRef.current = newGame;
 
           })
       }
       onUpdate()
 
+      // When component is unmounted (player leaves page), do a number of things
       return () => {
+          console.log('UNMOUNTING GAME COMPONENT');
+          console.log('Game in Return', gameUseRef.current);
+
+          // If player is last one in lobby, delete game          
+          if (gameUseRef.current?.players.length == 1) {
+            // console.log('Time to delete!');            
+            firestore.deleteDoc(firestore.doc(gamesRef, `${props.currentGameId}`));
+          } else {
+            // Delete player from game
+            let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
+            // console.log(playersRef);
+            let playerDoc = firestore.doc(playersRef, `${currentPlayerUseRef.current?.id}`)
+            firestore.deleteDoc(playerDoc);          
+
+            // Trigger update in firestore
+            let temp = firestore.doc(gamesRef, `${props.currentGameId}`);          
+            //@ts-ignore
+            firestore.updateDoc(temp, 'trigger', !gameDocUseRef.current['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+          }
+
+          // Unsubscribe from snapshot listener
           unsub();
       }
     }, [])
 
     // Get players from collections
     async function getPlayers(gameid: string, playersRef : firestore.CollectionReference<unknown>) {
-        console.log('Players collection: ', await firestore.getDocs(playersRef));
+        // console.log('Players collection: ', await firestore.getDocs(playersRef));
         
         let gameplayers = await firestore.getDocs(playersRef)
         //@ts-ignore
@@ -186,6 +221,7 @@ function GameComponent(props: IGameProps) {
           //@ts-ignore
           let fields = player['_document']['data']['value']['mapValue']['fields']
           let playerStructure = {
+            id: player.id,
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
             answered_at: fields.answered_at.timestampValue,
@@ -308,8 +344,13 @@ function GameComponent(props: IGameProps) {
       })
     }
     
+    /**
+     *  This function is used by the host to manually close the game. All players currently
+     *  in lobby will be redirected. If the game is not closed through this manner, it will be
+     *  automatically closed when the last player leaves the lobby.
+     */
     function closeGame() {
-
+      firestore.deleteDoc(firestore.doc(gamesRef, `${props.currentGameId}`));
     }
 
     /**
@@ -340,7 +381,7 @@ function GameComponent(props: IGameProps) {
                 {console.log('GAME RERENDER: ', game)}
                 {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
                 {/* Player List */}
-                {console.log('Players AND game in return line 187', game?.players, game)}
+                {/* {console.log('Players AND game in return line 187', game?.players, game)} */}
                 <PlayersComponent key={1} players={game?.players} user={props.currentUser} />
 
                 {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
@@ -440,28 +481,37 @@ function GameComponent(props: IGameProps) {
                 : <></>
               }
 
-              {/* Host Capabilities */}
-              {(props.currentUser.username === game?.host && game.match_state == 0)
-              ?
-                <>
-                  <Button onClick={startGame}>
-                    Start Game!
-                  </Button>
-                </>
-              : <> </>
-              }
               
-
               {/* End of Game */}
               {
                 (game.match_state == 3) ?
                 <>
                   <LeaderboardComponent key={3} players={game?.players} />
-                  {
-                  <Button className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
-                  }
+                  
                 </> 
                 : <> </>
+              }
+
+              {/* Host Capabilities */}
+              {/* Before the game is started, host can start the game. 
+                  When the game is finished, and idle on the leaderboard screen, host can close the game. */}
+              {(props.currentUser.username === game?.host)
+              ?
+                <>
+                  {
+                    (game.match_state == 0) ?
+                    <Button onClick={startGame}>
+                    Start Game!
+                    </Button>
+                    : <> </>
+                  }
+                  {
+                    (game.match_state == 3) ?
+                    <Button className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
+                    : <> </>
+                  }
+                </>
+              : <> </>
               }
               </>
 
@@ -471,6 +521,7 @@ function GameComponent(props: IGameProps) {
         </>
         :
         <>
+          {/* Game is undefined. Shouldn't happen, but we have a failsafe. */}
           {console.log('REDIRECTING TO JOIN')}
           <Redirect to="/join-game"/>
         </>
