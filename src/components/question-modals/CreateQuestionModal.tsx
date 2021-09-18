@@ -21,7 +21,7 @@ interface IQuestionModal {
 const buttonStyle = {
   backgroundColor: '#5f2568',
   border: '#5f2568',
-  color: "lime",
+  color: "gold",
 }
 
 function CreateQuestionModal(props: IQuestionModal) {
@@ -95,7 +95,7 @@ function CreateQuestionModal(props: IQuestionModal) {
               <input id="answer-input" type="text" onChange={updateAnswer} placeholder="Answer"/>
               <br/><br/>
               <p>Difficulty:</p>
-              <DropdownButton as={ButtonGroup} style = {buttonStyle} key={1} id={`dropdown-variants-primary`} variant="primary" title= {question?.value}>
+              <DropdownButton as={ButtonGroup} style = {buttonStyle} key={1} id={`dropdown-variants-primary`} variant="dark" title= {question?.value}>
               <Dropdown.Item eventKey="1"  onClick={(e) => updateDifficulty(e , 1)}>1</Dropdown.Item>
                 <Dropdown.Item eventKey="2"  onClick={(e) => updateDifficulty(e , 2)}>2</Dropdown.Item>
                 <Dropdown.Item eventKey="3"  onClick={(e) => updateDifficulty(e , 3)}>3</Dropdown.Item>
@@ -104,10 +104,10 @@ function CreateQuestionModal(props: IQuestionModal) {
               <br/><br/>
               { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+              <Button style={buttonStyle} variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={create}>
+              <Button style={buttonStyle} variant="primary" onClick={create}>
                 Create
               </Button>
             </Modal.Footer>
