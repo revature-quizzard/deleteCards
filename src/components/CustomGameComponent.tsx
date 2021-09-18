@@ -355,7 +355,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                 
                 <Button style={buttonStyle} variant="light" onClick={generateRandom} > Create Random Collection</Button>
 
-                <table>
+                <table style={{marginLeft: "11em"}}>
                     <tbody>
                         <tr>
                             <td>
