@@ -203,7 +203,7 @@ function GameComponent(props: IGameProps) {
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
-      //@ts-ignore
+    
       
       setTrigger(trigger => !trigger);
     }
@@ -215,6 +215,10 @@ function GameComponent(props: IGameProps) {
      */
     function onTimeout() {
       console.log('The timer has run out');
+
+             //@ts-ignore
+             gameLength = game.collection.questionList.arrayValue.values.length as number;
+   
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
@@ -241,7 +245,6 @@ function GameComponent(props: IGameProps) {
           setTrigger(!trigger)
            
           //@ts-ignore
-          gameLength = game.collection.questionList.arrayValue.values.length;
           gameProgPercentage = game.question_index as number; 
         }
 
@@ -281,6 +284,8 @@ function GameComponent(props: IGameProps) {
             currentPoints += value;
             numberOfCorrectAnswers++;
             streak++;
+            //@ts-ignore
+            
             firestore.updateDoc(playerRef, 'points',  currentPoints);
                
           }else{
@@ -417,7 +422,7 @@ function GameComponent(props: IGameProps) {
 
                             <h3 >
                               {/* @ts-ignore */}
-                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Correct!</Badge>
+                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Revealed!</Badge>
                             </h3> 
                         
                             <br></br>
@@ -495,7 +500,7 @@ function PlayersComponent(props: any) {
                                   {/* @ts-ignore */}
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points  {streak > 1? <p>&#x1F525;</p> : <p></p>} 
+                                  {player.name} | {player.points} points  {(streak > 1 && players[i].name === player.name) ? <p>&#x1F525;</p> : <p></p>} 
                                 </td>
                             </tr>
                           })}
@@ -523,7 +528,7 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points  { numberOfCorrectAnswers === gameLength ?  <h1>&#x1F451;</h1> : <h1>{numberOfCorrectAnswers}/{gameLength}</h1> } { i === 0 ? <h1></h1>  : <h1>&#x1F4A9;</h1>}
+                                  {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>
                           })}
