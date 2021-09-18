@@ -453,6 +453,8 @@ function GameComponent(props: IGameProps) {
         :
         <>
           {console.log('REDIRECTING TO JOIN')}
+          {/*@ts-ignore*/ }
+          { firestore.deleteDoc(game.collection)}
           <Redirect to="/join-game"/>
         </>
     )
