@@ -187,7 +187,7 @@ function ManageCollectionComponent(props: IManageProps) {
             <div id = "manage-component" className={classes.ManageContainer}>
             <br></br>
             <br></br>
-            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}> My Collections</h1>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>My Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
