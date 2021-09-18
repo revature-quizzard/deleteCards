@@ -179,7 +179,16 @@ function ViewCollectionComponent(props: IViewProps) {
                         </tr>
                     </thead>
                     <tbody>
-                    {questions.map((Q : Question | undefined, i) =>{
+                        {/* Sort Questions by value, then by question, alphabetically */}
+                    {questions.sort(
+                        function (a: Question, b: Question) {
+                            if (a.value == b.value) {
+                                return a.question <= b.question ? -1 : 1;
+                            }
+
+                            return a.value > b.value ? 1 : -1;
+                        })
+                        .map((Q : Question | undefined, i) =>{
                            
                         return  <tr key={i}>
                                     <td>{Q?.question} </td>
