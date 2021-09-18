@@ -19,10 +19,6 @@ interface IViewProps {
     setCollection: (nextCollection: Collections | undefined) => void
 }
 const useStyles = makeStyles({
-    Parent: {
-        position: "relative"
-
-    },
     ManageContainer: {
         backgroundColor: "black",
         opacity: .94,
@@ -33,11 +29,13 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
-        overflowY: "scroll",
+        overflowY: "hidden",
     },
     TableStyle: {
         display:'flex',
         width: '100%',  
+        maxHeight: '600px',
+        overflowY: "scroll",
     }
     
 }) 
@@ -173,7 +171,7 @@ function ViewCollectionComponent(props: IViewProps) {
         props.currentUser
         ?
         <>
-        <div className={classes.Parent}>
+        <div>
             <div id = "manage-component" className={classes.ManageContainer} >
             <br></br>
             <br></br>  
