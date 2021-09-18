@@ -79,6 +79,27 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
         }
     }
 
+    /**
+     *  Used to shuffle the question list in a collection
+     */
+    function shuffle(array: any[]) {
+        let currentIndex = array.length,  randomIndex;
+      
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+      
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+      
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+      
+        return array;
+      }
+
     // Translate game settings into a Game State and store in Firestore db
     async function sendGameSettings()
     {
@@ -88,6 +109,12 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             console.log('Current Game Settings:', props.currentGameSettings_);
             return;
         } else console.log('Props are truthy!');
+
+        // Shuffle question list in collection
+        let newCollection = props.currentGameSettings_.collection;
+        //@ts-ignore
+        newCollection?.questionList.splice(0, newCollection?.questionList.length, ...shuffle(newCollection?.questionList));
+
         let newGame = {
             name: props.currentGameSettings_.name,
             capacity: props.currentGameSettings_.maxPlayers,
@@ -97,7 +124,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             start_time: new firestore.Timestamp(1,1),
             end_time: new firestore.Timestamp(1,1),
             host: props.currentUser?.username,
-            collection: props.currentGameSettings_.collection,
+            collection: newCollection,
             trigger: true
         };          
 
