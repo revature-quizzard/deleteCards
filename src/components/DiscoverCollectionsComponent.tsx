@@ -25,7 +25,16 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
+        overflowY: "hidden",
+    },
+    TableStyle: {
+        display:'flex',
+        width: '100%',  
+        maxHeight: '600px',
+        overflowY: "scroll",
     }
+
+
 }) 
 
 const buttonStyle = {
@@ -110,6 +119,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
             <br></br>
             <br></br>
             <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Discover Collections</h1>
+            <div className={classes.TableStyle}>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -137,6 +147,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                     })}
                     </tbody>
                 </Table>
+            </div>
         </div>
         </>
         :

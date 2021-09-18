@@ -40,14 +40,16 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border:"black",
-        overflowY: "scroll",
+        overflowY: "hidden",
 
     },
     TableStyle: {
-        tableLayout: 'fixed',
-        width: '100%',
-          
+        display:'flex',
+        width: '100%',  
+        maxHeight: '600px',
+        overflowY: "scroll",
     }
+    
 }) 
 
 const buttonStyle = {
@@ -351,8 +353,8 @@ function JoinGameComponent(props: IJoinGameProps) {
              <div id = "jg-component" className={classes.JGameContainer}>
                 {/* Prints all active games to the screen */}
                 <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
-                <div >
-                <Table className={classes.TableStyle} striped bordered hover variant="dark">
+                <div className={classes.TableStyle}>
+                <Table striped bordered hover variant="dark">
                     <thead>
                         <tr>
                             <td>Name</td>
@@ -383,7 +385,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             <td>
                                                 {(game.capacity > game.players.length) ?
                                                 
-                                                <Button className="btn btn-secondary" onClick={async() => joinGame(game)}>Join Game</Button>
+                                                <Button style={buttonStyle} className="btn btn-secondary" onClick={async() => joinGame(game)}>Join Game</Button>
                                                 : <></>
                                                 }
                                             </td>
