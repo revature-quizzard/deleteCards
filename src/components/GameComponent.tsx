@@ -3,7 +3,7 @@ import { Principal } from "../dtos/principal";
 
 import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "react-bootstrap";
 
-import { Redirect , Link, useLocation } from "react-router-dom";
+import { Redirect , Link, useHistory } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
 import { useState, useEffect } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
@@ -96,6 +96,8 @@ function GameComponent(props: IGameProps) {
     let [trigger, setTrigger] = useState(false);
     let [answered, setAnswered] = useState(false);
 
+    let history = useHistory();
+
     // let answered = false;
     let answer = '';
 
@@ -119,14 +121,24 @@ function GameComponent(props: IGameProps) {
               //@ts-ignore
               let playersDocArr = await getPlayers(props.currentGameId, playersRef);
               let playersArr : Player[] = [];
-              //@ts-ignore
+
+              let playerNotKicked = false;
               playersDocArr.forEach(player => {
                 // console.log('Player:', player);
                 playersArr.push(player);
+                
                 //@ts-ignore
-                if (player.name == props.currentUser?.username) setCurrentPlayer(player);
-                else console.log('ABORT: NOT THE SAME PLAYER:', player)
+                if (player.name == props.currentUser?.username) {
+                  setCurrentPlayer(player);
+                  playerNotKicked = true;
+                }
+                else console.log('ABORT: NOT THE SAME PLAYER:', player)                
               })
+              // Player has been kicked if their player data does not exist in db
+              if (!playerNotKicked) {
+                console.log('Player is not in player list, must be kicked')
+                history.push('/join-game');
+              }
 
               let newGame : GameState = {
                 id: props.currentGameId as string,
@@ -174,6 +186,7 @@ function GameComponent(props: IGameProps) {
           //@ts-ignore
           let fields = player['_document']['data']['value']['mapValue']['fields']
           let playerStructure = {
+            id: player.id,
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
             answered_at: fields.answered_at.timestampValue,
@@ -285,11 +298,8 @@ function GameComponent(props: IGameProps) {
      */
     async function clearAnswers() {
       let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);
-      //@ts-ignore
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(async player => {
-        //@ts-ignore
-
         let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
         await firestore.updateDoc(playerRef, 'answered', false);
           
@@ -303,6 +313,31 @@ function GameComponent(props: IGameProps) {
       // Trim strings and compare
       let correct = submittedAnswer.toLowerCase().replace(/\s+/g, '') === correctAnswer.toLowerCase().replace(/\s+/g, '');
       return correct
+    }
+
+    /**
+     *  Host can kick a player from the lobby
+     *  Very unoptimized (just copied from clearAnswers)
+     */
+    async function kickPlayer(player : Player) {
+      console.log(player)
+      let playersRef = firestore.collection(gamesRef, `${props.currentGameId}/players`);      
+      let playersDocArr = await firestore.getDocs(playersRef)
+      playersDocArr.forEach(async loopPlayer => {
+        if (loopPlayer.id == player.id) {
+          console.log('Need to delete this bitch')
+          let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${loopPlayer.id}`)
+          console.log(playerRef)
+          firestore.deleteDoc(playerRef);
+
+          // Send trigger update to firestore
+          let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
+          let gameDoc = await firestore.getDoc(temp);
+          //@ts-ignore
+          await firestore.updateDoc(temp, 'trigger', !gameDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+        }
+          
+      })
     }
 
     /**
@@ -325,7 +360,7 @@ function GameComponent(props: IGameProps) {
                 {console.log('Rerendered: ', props.currentGameId, game.match_state)}              
                 {/* Player List */}
                 {console.log('Players AND game in return line 187', game?.players, game)}
-                <PlayersComponent key={1} players={game?.players} user={props.currentUser} />
+                <PlayersComponent key={1} players={game?.players} user={props.currentUser} host={game.host} kickPlayer={kickPlayer}/>
 
                 {/* If game state changes to 2, start timer, set game state to 1 when timer ends */}
                 {
@@ -485,6 +520,12 @@ function PlayersComponent(props: any) {
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
                                   {player.name} | {player.points} points
+                                  {
+                                    // Host player has Kick Player buttons attached to other players
+                                    (props.user.username == props.host && player.name != props.user.username) ?
+                                    <Button onClick={() => props.kickPlayer(player)}>Kick Player</Button>
+                                    : <></>
+                                  }
                                 </td>
                             </tr>
                           })}
