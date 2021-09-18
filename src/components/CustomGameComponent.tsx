@@ -56,6 +56,12 @@ const useStyles = makeStyles({
     }
 })
 
+const buttonStyle = {
+    backgroundColor: '#5f2568',
+    border: '#5f2568',
+    color: "gold",
+  }
+
 
 function CustomGameComponent(props: IGameCustomCollectionProps) {
     let [collectionTitle , setCollectionTitle] = useState('');
@@ -302,7 +308,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>Collection Description</td>
                           <td>Author</td>
                           <td>Size</td>
-                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
+                          <td>  {/* sets target collection to users collection */} <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -315,7 +321,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
                                              <td>{C?.questionList.length.toString()}</td>
-                                             <td> <Button variant="light" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
+                                             <td> <Button style={buttonStyle} variant="light" key={i} onClick={(e) => selectCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */} 
@@ -326,7 +332,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>+</td>
                           <td>+</td>
                           <td>Size</td>
-                          <td>  {/* sets target collection to users collection */} <Button variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
+                          <td>  {/* sets target collection to users collection */} <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
                     </tr>
                    
                         {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
@@ -336,7 +342,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                              <td>{C?.description}</td>
                                              <td>{C?.author.username.toString()}</td>
                                              <td>{C?.questionList.length.toString()}</td>
-                                             <td> <Button variant="light" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
+                                             <td> <Button style={buttonStyle} variant="light" key={i} onClick={(e) => selectFavoriteCollection( e , i)}> Select</Button></td>
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */}
@@ -347,9 +353,9 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                
 
                 
-                <Button variant="light" onClick={generateRandom} > Create Random Collection</Button>
+                <Button style={buttonStyle} variant="light" onClick={generateRandom} > Create Random Collection</Button>
 
-                <table>
+                <table style={{marginLeft: "11em"}}>
                     <tbody>
                         <tr>
                             <td>
@@ -361,7 +367,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                   Set up your game
                                 </Card.Text>
-                                <Button variant="light" onClick={displayModal}>Game Settings</Button>
+                                <Button style={buttonStyle} variant="light" onClick={displayModal}>Game Settings</Button>
                                 {getModal()}
                             </Card.Body>
                             </Card> 
@@ -407,7 +413,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                 <Card.Text>
                                  See the "{currentCollection?.title}" Preview here! 
                                 </Card.Text>
-                                <Button variant="light" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
+                                <Button style={buttonStyle}  variant="light" onClick={displayQuestions} >{showQuestionListText.toString()}</Button>
                             </Card.Body>
                              <br></br>
                                 <ListGroup >
