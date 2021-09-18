@@ -19,6 +19,10 @@ interface IViewProps {
     setCollection: (nextCollection: Collections | undefined) => void
 }
 const useStyles = makeStyles({
+    Parent: {
+        position: "relative"
+
+    },
     ManageContainer: {
         backgroundColor: "black",
         opacity: .94,
@@ -29,7 +33,13 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
+        overflowY: "scroll",
+    },
+    TableStyle: {
+        display:'flex',
+        width: '100%',  
     }
+    
 }) 
 
 const buttonStyle = {
@@ -163,13 +173,15 @@ function ViewCollectionComponent(props: IViewProps) {
         props.currentUser
         ?
         <>
+        <div className={classes.Parent}>
             <div id = "manage-component" className={classes.ManageContainer} >
             <br></br>
             <br></br>  
             <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Manage "{props.collection?.title}" by {props.currentUser.username}</h1>
             <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Category: {props.collection?.category}</h6>
             <h6 style = {{color: ' #FFD93D', marginLeft: '3em'}}>Description: {props.collection?.description}</h6>
-            <Table  striped bordered hover variant="dark">
+            <div className ={classes.TableStyle}>
+            <Table striped bordered hover variant="dark">
                     <thead>
                         <tr>
                           <td>Question</td>
@@ -178,10 +190,10 @@ function ViewCollectionComponent(props: IViewProps) {
                           <td>Manage</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody >
                     {questions.map((Q : Question | undefined, i) =>{
                            
-                        return  <tr key={i}>
+                        return  <tr  key={i}>
                                     <td>{Q?.question} </td>
                                     <td>{Q?.answer}</td>
                                     <td>{Q?.value}</td>
@@ -195,8 +207,14 @@ function ViewCollectionComponent(props: IViewProps) {
                     {getComponent()}
                     </tbody>
                 </Table>
+                </div>
                 <Button style = {buttonStyle} variant="secondary" onClick={create}>Create New Question</Button>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
             </div>
+        </div>    
         </>
         :
         <Redirect to="/login"/>

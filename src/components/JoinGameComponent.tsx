@@ -39,12 +39,13 @@ const useStyles = makeStyles({
         width: "75%",
         height:"75%",
         borderRadius: "8em",
-        border: "white",
-        overflow: "hidden",
+        border:"black",
+        overflowY: "scroll",
 
     },
     TableStyle: {
-        overflowY: "scroll",
+        tableLayout: 'fixed',
+        width: '100%',
           
     }
 }) 
@@ -350,8 +351,8 @@ function JoinGameComponent(props: IJoinGameProps) {
              <div id = "jg-component" className={classes.JGameContainer}>
                 {/* Prints all active games to the screen */}
                 <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
-                <div className={classes.TableStyle}>
-                <Table  striped bordered hover variant="dark">
+                <div >
+                <Table className={classes.TableStyle} striped bordered hover variant="dark">
                     <thead>
                         <tr>
                             <td>Name</td>
@@ -421,6 +422,10 @@ function JoinGameComponent(props: IJoinGameProps) {
                 {/* </InputGroup> */}
                 
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
             </div>
         </>
     )
