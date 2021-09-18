@@ -162,6 +162,12 @@ function JoinGameComponent(props: IJoinGameProps) {
                         // Handle case of new game being created
                         case 'added':
                             console.log('A game was added, Active Games=', updateRef.current);
+                            // Check if game is in list
+                            if (updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game already in the list, do not worry bout it', newGame);
+                                return;
+                            }
+
                             // Game is no longer on state 0
                             if (newGame.match_state != 0) {
                                 deleteGameFromList();
@@ -172,6 +178,13 @@ function JoinGameComponent(props: IJoinGameProps) {
                         // Handle case of existing game being updated
                         case 'modified':
                             console.log('A game was modified');
+
+                            // Check if game is in list
+                            if (!updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game is not in the list, do not worry bout it', newGame);
+                                return;
+                            }
+                            
                             // Game is no longer on state 0
                             if (newGame.match_state != 0) {
                                 deleteGameFromList();
@@ -179,6 +192,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                             }
 
                             gameIndex = activeGames.findIndex(game => game.id == _id);
+                            console.log('Index of game being modified:', gameIndex);
                             // Game is only game in list
                             if (updateRef.current.length == 1) {
                                 setActiveGames([newGame]);
@@ -215,11 +229,17 @@ function JoinGameComponent(props: IJoinGameProps) {
                                     newGame
                                 ])
                             }
-                            console.log('activeGames:', activeGames);
+                            // console.log('activeGames:', activeGames);
                             break;
                         // Handle existing game being deleted
                         case 'removed':
                             console.log('A game was removed, activeGames=', updateRef.current);
+                            // Check if game is in list
+                            if (!updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game is not in the list, do not worry bout it', newGame);
+                                return;
+                            }
+
                             gameIndex = updateRef.current.findIndex(game => game.id == _id);
 
                             console.log('Delete Game ID:', _id)
