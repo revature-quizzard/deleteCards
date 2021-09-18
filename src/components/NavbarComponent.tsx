@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import {AppBar, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import {AppBar, Box, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
 import { Principal } from "../dtos/principal";
 
 interface INavbarProps {
@@ -9,9 +9,28 @@ interface INavbarProps {
 }
 
 const useStyles = makeStyles({
+    navbar: {
+        paddingLeft: 100,
+        paddingRight: 100
+    },
+    title: {
+        paddingRight: 30
+    },
     link: {
         textDecoration: "none",
         color: "gold"
+    },
+    leftSideLink: {
+        textDecoration: "none",
+        color: "gold",
+        // paddingLeft: 10,
+        flexGrow: 1
+    },
+    rightSideLink: {
+        textDecoration: "none",
+        color: "gold",
+        float: 'right',
+        // paddingRight: 10 
     }
 })
 
@@ -25,46 +44,43 @@ export function NavbarComponent(props: INavbarProps){
 
     return (
         <>
-            <AppBar color="primary" position="static">
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar color="primary" position="static" className={classes.navbar}>
                 <Toolbar>
-                    <Typography variant="h5" color="inherit">
-                        <List component="nav">
-                            <ListItem component="div">
-                                <Typography color="inherit" variant="h5">JASH</Typography>
-                                {
-                                    props.currentUser
-                                        ?
-                                        <>
-                                            <ListItemText inset>
-                                                <Typography color="inherit" variant="h6">
-                                                    <Link to="/home" id="home" className={classes.link}>Home</Link>
-                                                </Typography>
-                                            </ListItemText>
-                                            <ListItemText inset>
-                                                <Typography color="inherit" variant="h6" onClick={logout}>
-                                                    <Link to="/" id="logout" className={classes.link}>Logout</Link>
-                                                </Typography>
-                                            </ListItemText>
-                                        </>
-                                        :
-                                        <>
-                                            <ListItemText inset>
-                                                <Typography color="inherit" variant="h6">
-                                                    <Link to="/login" id="login" className={classes.link}>Login</Link>
-                                                </Typography>
-                                            </ListItemText>
-                                            <ListItemText inset>
-                                                <Typography color="inherit" variant="h6">
-                                                    <Link to="/register" id="register" className={classes.link}>Register</Link>
-                                                </Typography>
-                                            </ListItemText>
-                                        </>
-                                }
-                            </ListItem>
-                        </List>
-                    </Typography>
+                    <Typography color="inherit" variant="h5" component="div" className={classes.title}>JASH</Typography>
+                    {
+                        (props.currentUser)
+                        ?
+                        <>
+                            
+                                <Typography color="inherit" variant="h6" className={classes.leftSideLink}>
+                                    <Link to="/home" id="home" className={classes.link}>Home</Link>
+                                </Typography>
+                            
+                            
+                                <Typography color="inherit" variant="h6" className={classes.rightSideLink} onClick={logout}>
+                                    <Link to="/" id="logout" className={classes.link}>Logout</Link>
+                                </Typography>
+                            
+
+                        </>
+                        :
+                        <>
+                            
+                                <Typography color="inherit" variant="h6">
+                                    <Link to="/login" id="login" className={classes.link}>Login</Link>
+                                </Typography>
+                            
+                            
+                                <Typography color="inherit" variant="h6">
+                                    <Link to="/register" id="register" className={classes.link}>Register</Link>
+                                </Typography>
+                            
+                        </>
+                    }
                 </Toolbar>
             </AppBar>
+        </Box>
         </>
     )
 
