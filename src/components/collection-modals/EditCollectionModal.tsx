@@ -17,8 +17,8 @@ interface IEditCollectionProps {
 }
 
 const buttonStyle = {
-  backgroundColor: 'black',
-  border: 'black',
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
   color: "gold",
 }
 
