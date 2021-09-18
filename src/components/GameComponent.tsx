@@ -500,7 +500,7 @@ function PlayersComponent(props: any) {
                                   {/* @ts-ignore */}
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points  {(streak > 1 && players[i].name === player.name) ? <p>&#x1F525;</p> : <p></p>} 
+                                  {player.name} | {player.points} points  {streak > 1 && players[i].name === player.name ? <p>&#x1F525;</p> : <p></p>} 
                                 </td>
                             </tr>
                           })}
@@ -528,7 +528,7 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : <h1>&#x1F3C6;</h1>}
+                                  {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : numberOfCorrectAnswers === 0 ? <h1>&#x1F4A9;</h1> : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>
                           })}
