@@ -28,6 +28,7 @@ let streak : number = 0;
 let gameLength : number = 0;
 let gameProgPercentage : Number = 0;
 let numberOfCorrectAnswers : number = 0;
+let currentPlayerName : string | undefined ;
 
 interface IGameProps {
   currentUser: Principal | undefined;
@@ -180,6 +181,7 @@ function GameComponent(props: IGameProps) {
           let playerStructure = {
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
+            streak: 0,
             answered_at: fields.answered_at.timestampValue,
             points : fields.points.integerValue
           }
@@ -218,7 +220,8 @@ function GameComponent(props: IGameProps) {
 
              //@ts-ignore
              gameLength = game.collection.questionList.arrayValue.values.length as number;
-   
+             streak = 0;
+
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
@@ -282,14 +285,16 @@ function GameComponent(props: IGameProps) {
 
             // Add value of question to total number of points and update Firebase
             currentPoints += value;
+            firestore.updateDoc(playerRef, 'points',  value);
+            // for end of game display
             numberOfCorrectAnswers++;
             streak++;
-            //@ts-ignore
-            
-            firestore.updateDoc(playerRef, 'points',  currentPoints);
-               
+            firestore.updateDoc(playerRef, 'streak',  streak);
+ 
           }else{
-              streak = 0;
+            streak = 0;
+            if(currentPlayer)
+            firestore.updateDoc(playerRef, 'streak',  streak);
           }
         }
       })
@@ -500,7 +505,8 @@ function PlayersComponent(props: any) {
                                   {/* @ts-ignore */}
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points  {streak > 1 && players[i].name === player.name ? <p>&#x1F525;</p> : <p></p>} 
+                                  {player.name} | {player.points} points  {player.points > 1 ? <p>&#x1F525;</p> : <p></p>} 
+                                 
                                 </td>
                             </tr>
                           })}

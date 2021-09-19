@@ -285,6 +285,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: newPlayer.answered,
                     name: newPlayer.name,
                     points: newPlayer.points,
+                    streak: 0,
                     answered_at: newPlayer.answered_at,
                     answered_correctly: newPlayer.answered_correctly,
                     placing: newPlayer.placing,
