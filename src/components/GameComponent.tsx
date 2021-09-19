@@ -107,7 +107,7 @@ function GameComponent(props: IGameProps) {
     useEffect(() => {
       
       if(props.currentGameId) {
-        setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
+         setGameDocRef(firestore.doc(gamesRef, `${props.currentGameId}`))
       } else {
         return;
       }
