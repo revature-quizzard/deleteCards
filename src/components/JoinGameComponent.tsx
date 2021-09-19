@@ -34,12 +34,22 @@ const useStyles = makeStyles({
         justifyContent: "center",
         marginLeft: "10rem",
         marginTop: "5rem",
+        paddingTop:'5em',
+        paddingBottom:'5em',
         width: "75%",
         height:"75%",
         borderRadius: "8em",
-        border: "white",
-        overflowY: "scroll"
+        border:"black",
+        overflowY: "hidden",
+
+    },
+    TableStyle: {
+        display:'flex',
+        width: '100%',  
+        maxHeight: '600px',
+        overflowY: "scroll",
     }
+    
 }) 
 
 const buttonStyle = {
@@ -111,18 +121,80 @@ function JoinGameComponent(props: IJoinGameProps) {
                     console.log(newGame);
                     let gameIndex = 0;
                     console.log('ACTIVE GAMES BEFORE UPDATE:', updateRef.current)
+
+                    function deleteGameFromList() {
+                        // Game is only game in list
+                        if (updateRef.current.length == 1) {
+                            setActiveGames([]);
+                        }
+
+                        // game1, game2, game3
+                        // slice = game2, game3
+
+                        // Game is at beginning of list
+                        else if (gameIndex == 0) {
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(gameIndex+1)
+                            ])
+                        }
+
+                        // game 1, game 2, game 3
+                        // slice 1 = game1, slice 2 = game 3
+                        // setActiveGames(slice1, slice2)
+
+                        // Game is in middle of list
+                        else if (gameIndex < updateRef.current.length - 1 ) {
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex),
+                                ...prevGames.slice(gameIndex+1)
+                            ])
+                        }
+
+                        // Game is at end of list
+                        else if (gameIndex == updateRef.current.length - 1) {
+                            setActiveGames(prevGames => [
+                                ...prevGames.slice(0,gameIndex)
+                            ])
+                        }
+                    }
+
                     switch(doc.type) {
                         // Handle case of new game being created
-                        // TODO: Handle more cases
                         case 'added':
                             console.log('A game was added, Active Games=', updateRef.current);
+                            // Check if game is in list
+                            if (updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game is already in the list, do not worry bout it', newGame);
+                                return;
+                            }
+
+                            // Game is no longer on state 0
+                            if (newGame.match_state != 0) {
+                                deleteGameFromList();
+                                break;
+                            }
                             setActiveGames(prevGames => [...prevGames, newGame])
                             break;
                         // Handle case of existing game being updated
-                        // TODO: Handle more cases
                         case 'modified':
-                            console.log('A game was modified');
-                            gameIndex = activeGames.findIndex(game => game.id == _id);
+                            console.log('A game was modified', newGame);
+
+                            // Check if game is in list
+                            if (!updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game is not in the list, do not worry bout it', newGame);
+                                return;
+                            } else {
+                                gameIndex = updateRef.current.findIndex(game => game.id == _id);
+                                console.log('Index of game being modified:', gameIndex);
+                            }
+                            
+                            // Game is no longer on state 0
+                            if (newGame.match_state != 0) {
+                                deleteGameFromList();
+                                break;
+                            }
+
+                            
                             // Game is only game in list
                             if (updateRef.current.length == 1) {
                                 setActiveGames([newGame]);
@@ -138,7 +210,6 @@ function JoinGameComponent(props: IJoinGameProps) {
                                     ...prevGames.slice(gameIndex+1)
                                 ])
                             }
-
 
                             // game 1, game 2, game 3
                             // slice 1 = game1, slice 2 = game 3
@@ -160,11 +231,17 @@ function JoinGameComponent(props: IJoinGameProps) {
                                     newGame
                                 ])
                             }
-                            console.log('activeGames:', activeGames);
+                            // console.log('activeGames:', activeGames);
                             break;
                         // Handle existing game being deleted
                         case 'removed':
                             console.log('A game was removed, activeGames=', updateRef.current);
+                            // Check if game is in list
+                            if (!updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
+                                console.log('That game is not in the list, do not worry bout it', newGame);
+                                return;
+                            }
+
                             gameIndex = updateRef.current.findIndex(game => game.id == _id);
 
                             console.log('Delete Game ID:', _id)
@@ -173,40 +250,7 @@ function JoinGameComponent(props: IJoinGameProps) {
 
                             console.log('Active games before delete:', updateRef.current);
 
-                            // Game is only game in list
-                            if (updateRef.current.length == 1) {
-                                setActiveGames([]);
-                            }
-
-                            // game1, game2, game3
-                            // slice = game2, game3
-
-                            // Game is at beginning of list
-                            else if (gameIndex == 0) {
-                                setActiveGames(prevGames => [
-                                    ...prevGames.slice(gameIndex+1)
-                                ])
-                            }
-
-
-                            // game 1, game 2, game 3
-                            // slice 1 = game1, slice 2 = game 3
-                            // setActiveGames(slice1, slice2)
-
-                            // Game is in middle of list
-                            else if (gameIndex < updateRef.current.length - 1 ) {
-                                setActiveGames(prevGames => [
-                                    ...prevGames.slice(0,gameIndex),
-                                    ...prevGames.slice(gameIndex+1)
-                                ])
-                            }
-
-                            // Game is at end of list
-                            else if (gameIndex == updateRef.current.length - 1) {
-                                setActiveGames(prevGames => [
-                                    ...prevGames.slice(0,gameIndex)
-                                ])
-                            }
+                            deleteGameFromList();
 
                             console.log('Active games after delete:', updateRef.current)
                             
@@ -346,11 +390,10 @@ function JoinGameComponent(props: IJoinGameProps) {
         <>
             {/* {console.log('Rerendered page. activeGames: ', activeGames)} */}
              <div id = "jg-component" className={classes.JGameContainer}>
-             <br/><br/>
-             <br/><br/>
                 {/* Prints all active games to the screen */}
                 <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>JASH Games</h1>
-                <Table  striped bordered hover variant="dark">
+                <div className={classes.TableStyle}>
+                <Table striped bordered hover variant="dark">
                     <thead>
                         <tr>
                             <td>Name</td>
@@ -381,7 +424,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                             <td>
                                                 {(game.capacity > game.players.length) ?
                                                 
-                                                <Button className="btn btn-secondary" onClick={async() => joinGame(game)}>Join Game</Button>
+                                                <Button style={buttonStyle} className="btn btn-secondary" onClick={async() => joinGame(game)}>Join Game</Button>
                                                 : <></>
                                                 }
                                             </td>
@@ -392,16 +435,17 @@ function JoinGameComponent(props: IJoinGameProps) {
                     </tbody>
                     
                 </Table>
+                </div>
                 {
-                    (!activeGames)
+                    (activeGames.length == 0)
                     ?
                         <>
-                        
+                        {console.log('NO ACTIVE GAMES!')}
                         <Alert variant="warning">There are currently no active games!</Alert>
                         
                         </>                    
                     :
-                        <>
+                        <> {console.log('THERE ARE ACTIVE GAMES!', activeGames)}
                         </>
                 }
 
@@ -419,6 +463,10 @@ function JoinGameComponent(props: IJoinGameProps) {
                 {/* </InputGroup> */}
                 
                 { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
             </div>
         </>
     )
