@@ -25,6 +25,7 @@ interface IJoinGameProps {
     setCurrentGame: (game: GameState | undefined) => void;
     currentGameId: string;
     setCurrentGameId: ((gameId: string) => void);
+    userIcon: string | undefined;
 }
 
 const useStyles = makeStyles({
@@ -297,6 +298,7 @@ function JoinGameComponent(props: IJoinGameProps) {
     
     async function joinGame(game : GameState) {
         console.log('Redirecting user to new game...');
+        console.log('User has chosen this icon: ', props.userIcon)
         setErrorMessage('');
 
         // If game is valid, redirect to lobby
@@ -317,6 +319,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                 // console.log(p)
             })
 
+            let userIcon = props.userIcon ? props.userIcon : 'FaRegUserCircle';
             let playerDoc;
             if(!inGame) {
                 let newPlayer = {
@@ -326,7 +329,8 @@ function JoinGameComponent(props: IJoinGameProps) {
                     streak: 0,
                     answered_at: new firestore.Timestamp(1,1),
                     answered_correctly: false,
-                    placing: 0
+                    placing: 0,
+                    icon: userIcon
                 }
                 playerDoc = await firestore.addDoc(playersRef, newPlayer);
                 let newPlayerTemp = await firestore.getDoc(playerDoc);
@@ -338,7 +342,8 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered_at: newPlayer.answered_at,
                     answered_correctly: newPlayer.answered_correctly,
                     placing: newPlayer.placing,
-                    id: newPlayerTemp.id
+                    id: newPlayerTemp.id,
+                    icon: newPlayer.icon
                 }
             }
             

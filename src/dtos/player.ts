@@ -9,8 +9,9 @@ export class Player {
     points : number;
     streak : number;
     id : string;
+    icon : string | undefined;
 
-    constructor(answered: boolean, answered_at: Timestamp, answered_correctly: boolean, placing: number, name: string, player_id : string, points : number, streak : number ,  id : string) {
+    constructor(answered: boolean, answered_at: Timestamp, answered_correctly: boolean, placing: number, name: string, player_id : string, points : number, streak : number ,  id : string, icon : string | undefined) {
         this.answered = answered;
         this.answered_at = answered_at;
         this.answered_correctly = answered_correctly,
@@ -19,5 +20,6 @@ export class Player {
         this.points = points;
         this.streak = streak;;
         this.id = id;
+        this.icon = icon;
     }
 }
