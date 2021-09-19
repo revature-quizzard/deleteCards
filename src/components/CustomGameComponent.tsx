@@ -41,6 +41,7 @@ interface IGameCustomCollectionProps {
     setCurrentCollection: (nextCollection:  [] | undefined) => void,
     currentGameSettings_:  GameSettings | undefined,
     setCurrentGameSettings_: (nextCollection: GameSettings | undefined) => void
+    userIcon: string | undefined;
 }
 const useStyles = makeStyles({
     CreateContainer: {
@@ -101,6 +102,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             trigger: true
         };          
 
+        let userIcon = props.userIcon ? props.userIcon : 'FaRegUserCircle';
         let gameDocRef = await firestore.addDoc(gamesRef , newGame);
         console.log('Setting game Id to: ', gameDocRef.id);
         props.setCurrentGameId(gameDocRef.id);
@@ -109,7 +111,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             answered: false,
             name: props.currentUser?.username,
             points : 0,
-            answered_at: new firestore.Timestamp(1,1)
+            answered_at: new firestore.Timestamp(1,1),
+            icon : userIcon
         }
         let playerDoc = await firestore.addDoc(playersRef, newPlayer);
         history.push('/game');

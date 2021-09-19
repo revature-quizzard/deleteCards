@@ -1,11 +1,11 @@
 import { Principal } from "../dtos/principal";
-
+import data from "../util/icons.json";
 
 import { Alert, Button, Card, Carousel, Table, ListGroup, ProgressBar } from "react-bootstrap";
 
 import { Redirect , Link, useLocation } from "react-router-dom";
 import { GameState } from "../dtos/game-state";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import { CardContent, Container, Typography } from "@material-ui/core";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
@@ -19,6 +19,9 @@ import * as firestore from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Placeholder from 'react-bootstrap/Placeholder'
+
+import * as FontAwesome from "react-icons/fa";
+import * as Ionicons from "react-icons/io5";
 
 import app from '../util/Firebase';
 
@@ -77,6 +80,22 @@ const useStyles= makeStyles({
     }
 
 })
+
+const Icon = (props: any) => {
+  const { project, iconName, size, color } = props;
+  // console.log(`${project}[${iconName}]`)
+  let icon;
+  // Come back to later...having difficulty dynamically reading project
+  if (project == 'FontAwesome') {
+      //@ts-ignore
+      icon = createElement(FontAwesome[iconName]);
+  }
+  else if (project == 'Ionicons') {
+      //@ts-ignore
+      icon = createElement(Ionicons[iconName]);
+  }
+  return <div style={{ fontSize: `${size}em`, color: color }}>{icon}</div>;
+}
 
 /**
  *  The bread and butter of our application.
@@ -177,7 +196,8 @@ function GameComponent(props: IGameProps) {
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
             answered_at: fields.answered_at.timestampValue,
-            points : fields.points.integerValue
+            points : fields.points.integerValue,
+            icon : fields.icon.stringValue
           }
           playerarr.push(playerStructure)
         })
@@ -483,6 +503,15 @@ function PlayersComponent(props: any) {
                                   {/* @ts-ignore */}
 
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
+                                  {
+                                    data.map(({project, name, color}) => {
+                                      {console.log(project, name, color)}
+                                      if(name == player.icon)
+                                      return (
+                                              <Icon project={project} iconName={name} size={2} color={color} />
+                                      )
+                                  })
+                                  }
                                   {/* @ts-ignore */}
                                   {player.name} | {player.points} points
                                 </td>

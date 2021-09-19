@@ -1,6 +1,5 @@
 import {useState, createElement} from "react";
 import {Principal} from "../../dtos/principal";
-import {UserWithIcon} from "../../dtos/user-with-icon";
 import data from "../../util/icons.json";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';

@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom'
 
-import {AppBar, Box, IconButton, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import {AppBar, Box, IconButton, List, ListItem, ListItemText, Grid, Container, Select, MenuItem, Toolbar, Typography, makeStyles} from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { fas, faCog } from '@fortawesome/free-solid-svg-icons'
 import { Principal } from "../dtos/principal";
+import IconModal from "./icon-modals/IconModal";
 
 interface INavbarProps {
     currentUser: Principal | undefined,
-    setCurrentUser: (nextUser: Principal | undefined) => void
+    setCurrentUser: (nextUser: Principal | undefined) => void,
+    userIcon: string | undefined,
+    setUserIcon: (icon: string | undefined) => void
 }
 
 const useStyles = makeStyles({
@@ -40,6 +44,8 @@ export function NavbarComponent(props: INavbarProps){
 
     const classes = useStyles();
 
+    const [showIconModal, setShowIconModal] = useState(false); 
+
     function logout() {
         props.setCurrentUser(undefined);
     }
@@ -65,10 +71,8 @@ export function NavbarComponent(props: INavbarProps){
                                 </Typography>
 
                                 <IconButton aria-label="Example">
-                                    <FontAwesomeIcon icon={faCog} />
+                                    <FontAwesomeIcon icon={faCog} onClick={() => setShowIconModal(true)}/>
                                 </IconButton>
-                            
-
                         </>
                         :
                         <>
@@ -87,6 +91,7 @@ export function NavbarComponent(props: INavbarProps){
                 </Toolbar>
             </AppBar>
         </Box>
+        <IconModal current_user={props.currentUser} userIcon={props.userIcon} setUserIcon={props.setUserIcon} show={showIconModal} setShow={setShowIconModal} />
         </>
     )
 
