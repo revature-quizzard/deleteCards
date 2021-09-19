@@ -151,6 +151,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
         let playersRef = firestore.collection(gamesRef, `${gameDocRef.id}/players`);
         let newPlayer = {
             answered: false,
+            answered_correctly: false,
             name: props.currentUser?.username,
             points : 0,
             answered_at: new firestore.Timestamp(1,1),
