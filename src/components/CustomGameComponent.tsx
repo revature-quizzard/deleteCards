@@ -53,6 +53,12 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
+    },
+    TableStyle: {
+        display:'flex',
+        width: '100%',  
+        maxHeight: '300px',
+        overflowY: "scroll",
     }
 })
 
@@ -329,7 +335,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                  <br></br>
                  <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Create Game</h1>
                 {/* prints all user collections to the screen */}
-
+                <div className={classes.TableStyle}>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -338,7 +344,8 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                           <td>Collection Description</td>
                           <td>Author</td>
                           <td>Size</td>
-                          <td>  {/* sets target collection to users collection */} <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button></td>
+                          <td>  {/* sets target collection to users collection */} <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-primary" onClick={getCollection}>{`${showCollectionText.toString()}`}</Button> {  }
+                          <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`  ${showFavCollectionText.toString()}`}</Button></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -355,15 +362,6 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
                                             </tr> 
                                       })}
                      {/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+ */} 
-                     
-                     <tr>
-                          <td><h5>*Favorites*</h5></td>
-                          <td>+</td>
-                          <td>+</td>
-                          <td>+</td>
-                          <td>Size</td>
-                          <td>  {/* sets target collection to users collection */} <Button style={buttonStyle} variant="secondary" id="show-collections-btn" className="btn btn-secondary" onClick={getFavoriteCollections}>{`${showFavCollectionText.toString()}`}</Button></td>
-                    </tr>
                    
                         {targetsFavoriteCollections?.map((C : Collections | undefined , i ) =>{
                            return  <tr key={i} >
@@ -379,6 +377,7 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
 
                     </tbody>
                 </Table >
+                </div>
                
                
 
