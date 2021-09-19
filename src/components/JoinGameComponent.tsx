@@ -275,6 +275,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: false,
                     name: props.currentUser?.username,
                     points : 0,
+                    streak: 0,
                     answered_at: new firestore.Timestamp(1,1),
                     answered_correctly: false,
                     placing: 0

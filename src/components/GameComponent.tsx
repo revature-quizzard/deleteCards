@@ -268,7 +268,7 @@ function GameComponent(props: IGameProps) {
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
           //this update doesn't trigger callback
           firestore.updateDoc(playerRef, 'answered', true);
-         
+          firestore.updateDoc(playerRef, 'streak',  streak);
           // Use this functionality to trigger snapshot listener, as a change to players subcollection does not trigger it
           let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
           let gameDoc = await firestore.getDoc(temp);
@@ -369,7 +369,7 @@ function GameComponent(props: IGameProps) {
                   <Card.Title> 
                   <br></br>
                      {/* @ts-ignore */}
-                  <h4>Questions {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  <h4>Question {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
                   {/* @ts-ignore */}
                 <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={parseInt(game.question_index) + 1} />
                 </Card.Title>
@@ -427,7 +427,7 @@ function GameComponent(props: IGameProps) {
 
                             <h3 >
                               {/* @ts-ignore */}
-                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Revealed!</Badge>
+                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">{game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue} Points!</Badge>
                             </h3> 
                         
                             <br></br>
