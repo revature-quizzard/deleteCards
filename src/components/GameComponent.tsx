@@ -633,7 +633,7 @@ function GameComponent(props: IGameProps) {
                   }
                   {
                     (game.match_state == 3) ?
-                    <Button className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
+                    <Button style={buttonStyle} className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
                     : <> </>
                   }
                 </>
@@ -695,7 +695,7 @@ function PlayersComponent(props: any) {
                                   {
                                     // Host player has Kick Player buttons attached to other players
                                     (props.user.username == props.host && player.name != props.user.username) ?
-                                    <Button onClick={() => props.kickPlayer(player)}>Kick Player</Button>
+                                    <Button style={buttonStyle} onClick={() => props.kickPlayer(player)}>Kick Player</Button>
                                     : <></>
                                   }
                                 </td>
