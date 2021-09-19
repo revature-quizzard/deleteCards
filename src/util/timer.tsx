@@ -46,7 +46,7 @@ const Timer = (props: ITimerProps) => {
 
     return (
         <div>
-            {(matchState == 1 || matchState == 2) ?
+            {(matchState === 1 || matchState === 2) ?
                 <h1 style={{color:"white"}}>{minutes}:{seconds < 10 ?  `0${seconds}` : seconds}</h1>
             :
                 <>

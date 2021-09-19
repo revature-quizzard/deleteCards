@@ -323,6 +323,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: false,
                     name: props.currentUser?.username,
                     points : 0,
+                    streak: 0,
                     answered_at: new firestore.Timestamp(1,1),
                     answered_correctly: false,
                     placing: 0
@@ -333,6 +334,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     answered: newPlayer.answered,
                     name: newPlayer.name,
                     points: newPlayer.points,
+                    streak: 0,
                     answered_at: newPlayer.answered_at,
                     answered_correctly: newPlayer.answered_correctly,
                     placing: newPlayer.placing,

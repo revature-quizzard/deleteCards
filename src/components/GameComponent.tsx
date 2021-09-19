@@ -24,7 +24,11 @@ import app from '../util/Firebase';
 
 const db = firestore.getFirestore(app);
 
+let streak : number = 0;
+let gameLength : number = 0;
 let gameProgPercentage : Number = 0;
+let numberOfCorrectAnswers : number = 0;
+let currentPlayerName : string | undefined ;
 
 interface IGameProps {
   currentUser: Principal | undefined;
@@ -83,13 +87,21 @@ const useStyles= makeStyles({
 
 })
 
+const buttonStyle = {
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
+  color: "gold",
+  marginLeft: '1em',
+  marginTop: '1em'
+}
+
 /**
  *  The bread and butter of our application.
  *  
  *  We only want host to maintain match_state/question_index etc.
  * 
  */
-
+ 
 function GameComponent(props: IGameProps) {
 
     const classes = useStyles();
@@ -111,6 +123,7 @@ function GameComponent(props: IGameProps) {
     let history = useHistory();
 
     let answer = '';
+    
 
     useEffect(() => {
 
@@ -238,6 +251,7 @@ function GameComponent(props: IGameProps) {
             id: player.id,
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
+            streak: streak,
             answered_at: fields.answered_at.timestampValue,
             points : fields.points.integerValue
           }
@@ -261,6 +275,8 @@ function GameComponent(props: IGameProps) {
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
+      streak = 0;
+      
       setTrigger(trigger => !trigger);
     }
 
@@ -271,6 +287,10 @@ function GameComponent(props: IGameProps) {
      */
     function onTimeout() {
       console.log('The timer has run out');
+
+             //@ts-ignore
+             gameLength = game.collection.questionList.arrayValue.values.length as number;
+            
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
@@ -285,16 +305,20 @@ function GameComponent(props: IGameProps) {
         console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue);
         
         //@ts-ignore
-        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host)
-          firestore.updateDoc(gameDocRef, 'match_state', 3);
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host){
+           firestore.updateDoc(gameDocRef, 'match_state', 3);
+           
+        }
         else if (props.currentUser?.username == game.host) {
           firestore.updateDoc(gameDocRef, 'match_state', 2)
+
           //@ts-ignore
           let currentIndex : number = parseInt(game.question_index);
           let nextIndex : number = currentIndex + 1;
           firestore.updateDoc(gameDocRef, 'question_index', nextIndex);
           setTrigger(!trigger)
-
+           
+          //@ts-ignore
           gameProgPercentage = game.question_index as number; 
         }
 
@@ -314,7 +338,7 @@ function GameComponent(props: IGameProps) {
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
           //this update doesn't trigger callback
           firestore.updateDoc(playerRef, 'answered', true);
-
+          firestore.updateDoc(playerRef, 'streak',  streak);
           // Use this functionality to trigger snapshot listener, as a change to players subcollection does not trigger it
           let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
           let gameDoc = await firestore.getDoc(temp);
@@ -332,9 +356,15 @@ function GameComponent(props: IGameProps) {
 
             // Add value of question to total number of points and update Firebase
             currentPoints += value;
-
             firestore.updateDoc(playerRef, 'points',  currentPoints);
-               
+            // for end of game display
+            numberOfCorrectAnswers++;
+            streak++;
+            firestore.updateDoc(playerRef, 'streak',  streak);
+            console.log()
+          }else{
+            streak = 0;
+            firestore.updateDoc(playerRef, 'streak',  streak);
           }
         }
       })
@@ -442,9 +472,9 @@ function GameComponent(props: IGameProps) {
                   <Card.Title> 
                   <br></br>
                      {/* @ts-ignore */}
-                  <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  <h4>Question {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
                   {/* @ts-ignore */}
-                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={parseInt(game.question_index) + 1} />
                 </Card.Title>
                 </Card.Header>
                             <Card.Body >
@@ -472,9 +502,6 @@ function GameComponent(props: IGameProps) {
                             </Card.Body>
                       </Card> 
                       </div>
-
-
-
                 </>
                 : <></>
               }
@@ -491,9 +518,9 @@ function GameComponent(props: IGameProps) {
             <Card.Title> 
             <br></br>
               {/* @ts-ignore */}
-            <h4>Questions { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+            <h4>Question {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
             {/* @ts-ignore */}
-          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={parseInt(game.question_index) + 1} />
           </Card.Title>
           </Card.Header>
                       <Card.Body >
@@ -501,16 +528,17 @@ function GameComponent(props: IGameProps) {
                             <br></br>
                             <br></br>
                             <br></br>
-                          <br></br>
+                            <br></br>
+
                             <h3 >
                               {/* @ts-ignore */}
-                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">Correct!</Badge>
+                            {game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue}!<Badge bg="success">{game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue} Points!</Badge>
                             </h3> 
                         
                             <br></br>
-                          <br></br>
-                          <br></br>
-                          <br></br>
+                            <br></br>
+                            <br></br>
+                            <br></br>
                           </Card.Body>  
                           <Card.Footer>
                           
@@ -542,7 +570,7 @@ function GameComponent(props: IGameProps) {
                 <>
                   {
                     (game.match_state == 0) ?
-                    <Button onClick={startGame}>
+                    <Button style = {buttonStyle}  onClick={startGame}>
                     Start Game!
                     </Button>
                     : <> </>
@@ -565,6 +593,7 @@ function GameComponent(props: IGameProps) {
         <>
           {/* Game is undefined. Shouldn't happen, but we have a failsafe. */}
           {console.log('REDIRECTING TO JOIN')}
+       
           <Redirect to="/join-game"/>
         </>
     )
@@ -592,11 +621,11 @@ function PlayersComponent(props: any) {
                                 {/* DYNAMIC ID: Id will be usertrue if current user, otherwise userfalse */}
                                 {/* @ts-ignore */}
                                 <td id={"user" + (player.name == props.user.username)}>
+                                 
                                   {/* @ts-ignore */}
-
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points
+                                  {player.name} | {player.points} points  {player.streak > 1 ? <p>&#x1F525;</p> : <p></p>} 
                                   {
                                     // Host player has Kick Player buttons attached to other players
                                     (props.user.username == props.host && player.name != props.user.username) ?
@@ -630,7 +659,13 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points
+                                  {/* Global Emoji Codes */}
+                                  {/* ---------------------------*/}
+                                  {/* let poop_emoji = 1F4A9;   |*/}
+                                  {/* let trophy_emoji = 1F3C6; |*/}
+                                  {/* let crown_emoji = 1F451;  |*/}
+                                  {/* ---------------------------*/}
+                                  {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : numberOfCorrectAnswers === 0 ? <h1>&#x1F4A9;</h1> : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>
                           })}
