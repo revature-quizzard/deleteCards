@@ -245,6 +245,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button style= {buttonStyle} variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
+                                    <Link to="/discover-questions" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}
