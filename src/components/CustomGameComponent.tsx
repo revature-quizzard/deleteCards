@@ -118,6 +118,12 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             answered_at: new firestore.Timestamp(1,1)
         }
         let playerDoc = await firestore.addDoc(playersRef, newPlayer);
+
+        // Trigger update to snapshot listeners
+        let gameDoc = await firestore.getDoc(gameDocRef);              
+        //@ts-ignore
+        firestore.updateDoc(gameDocRef, 'trigger', !gameDoc['_document']['data']['value']['mapValue']['fields']['trigger'].booleanValue)
+
         history.push('/game');
     }
 
