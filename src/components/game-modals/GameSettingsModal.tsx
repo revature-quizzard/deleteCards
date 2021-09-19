@@ -16,6 +16,13 @@ interface IGameSettingsModal {
     setShow: (val: boolean) => void
 }
 
+const buttonStyle = {
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
+  color: "gold",
+  marginLeft: '1em'
+}
+
 function GameSettingsModal(props: IGameSettingsModal) {
   let [matchTimer , setMatchTimer] = useState(30);
   let [maxPlayers , setMaxPlayers] = useState(0);
@@ -78,7 +85,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
               <Modal.Title>Settings</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {`${"Time Per Question"} ${matchTimer} ${"(seconds)"} `}>
+            <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="dark" title= {`${"Time Per Question"} ${matchTimer} ${"(seconds)"} `}>
             <Dropdown.Item eventKey="1"  onClick={(e) => updateMatchTimer(e , 1)}>:15</Dropdown.Item>
             <Dropdown.Item eventKey="2"  onClick={(e) => updateMatchTimer(e , 2)}>:30</Dropdown.Item>
             <Dropdown.Item eventKey="3"  onClick={(e) => updateMatchTimer(e , 3)}>:45</Dropdown.Item>
@@ -102,7 +109,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
             <p>More Settings Coming Soon....</p>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}> Cancel</Button>
+              <Button style={buttonStyle} variant="secondary" onClick={handleClose}> Cancel</Button>
 
              { matchTimer == 0
                ? 
@@ -110,7 +117,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
                Set Match Time
               </Alert>
                :
-              <Button variant="primary" onClick={update}>Apply</Button>} 
+              <Button style={buttonStyle} variant="primary" onClick={update}>Apply</Button>} 
             </Modal.Footer>
           </Modal>
         </>
