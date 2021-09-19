@@ -46,7 +46,7 @@ function App() {
   const [selectedCollection , setSelectCollection] = useState(undefined as  Collections | undefined)
   const [currentGame, setCurrentGame] = useState(undefined as GameState | undefined)
   const [currentGameId, setCurrentGameId] = useState('')
-  const [userIcon, setUserIcon] = useState(undefined as string | undefined)
+  const [userIcon, setUserIcon] = useState("FaRegUserCircle" as string | undefined)
 
   return (
     <>

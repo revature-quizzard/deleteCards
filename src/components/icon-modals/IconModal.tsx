@@ -38,9 +38,19 @@ const Icon = (props: any) => {
     return <div style={{ fontSize: `${size}em`, color: color }}>{icon}</div>;
 }
 
+const useStyles = makeStyles({
+    modal: {
+        color: "white",
+        backgroundColor: "#1B3146"
+    },
+    modalBody: {
+        backgroundColor: "#47608E"
+    }
+})
+
 function IconModal(props: IIconModal) {
 
-    // const classes = useStyles();
+    const classes = useStyles();
     const [icon, setIcon] = useState(undefined as string | undefined)
 
     const updateIcon = (e: any) => {
@@ -61,18 +71,18 @@ function IconModal(props: IIconModal) {
     return (
       
         <>
-        <Modal show={props.show} onHide={handleClose}>
-            <Modal.Header closeButton>
+        <Modal show={props.show} onHide={handleClose} >
+            <Modal.Header closeButton className={classes.modal}>
                 <Modal.Title>Choose Your User Icon!</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className={classes.modalBody}>
 
             <Grid container spacing={2}>
                 {                    
                     data.map(({project, name, color}) => {
                         {console.log(project, name, color)}
                         return (
-                            <Grid item xs={6}>
+                            <Grid item xs={3}>
                             <IconButton aria-label="Example" id={name} onClick={updateIcon}>
                                 <Icon project={project} iconName={name} size={2} color={color} onClick={updateIcon} />
                             </IconButton>
@@ -84,7 +94,7 @@ function IconModal(props: IIconModal) {
             </Grid>
             
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer className={classes.modal}>
             <Button variant="secondary" onClick={handleClose}> Cancel</Button>
             
             <Button variant="primary" onClick={update}>Apply</Button>
