@@ -74,6 +74,11 @@ const useStyles= makeStyles({
         paddingTop : '1em',
         marginLeft : '2em',
         marginRight : '2em'
+    },
+    GameContainer: {
+      justifyContent: "center",
+      marginLeft: "37.5rem",
+      marginTop: "5rem",
     }
 
 })
@@ -429,7 +434,7 @@ function GameComponent(props: IGameProps) {
                 <>
 
                 {/* Question and Answer */}
-
+                <div className={classes.GameContainer}>
                 <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
 
                 <Card.Header as="h5" >
@@ -466,6 +471,7 @@ function GameComponent(props: IGameProps) {
                                 </Card.Footer>
                             </Card.Body>
                       </Card> 
+                      </div>
 
 
 
@@ -477,8 +483,9 @@ function GameComponent(props: IGameProps) {
                 
                 (game.match_state == 1) ?
                 <>
+                <div className={classes.GameContainer}>
           <Card style={{ width: '45rem' , backgroundColor:'white' }} className="text-center">
-
+          
           <Card.Header as="h5" >
             Welcome To *JASH*
             <Card.Title> 
@@ -510,6 +517,8 @@ function GameComponent(props: IGameProps) {
                           </Card.Footer>
                       </Card.Body>
                 </Card>
+                </div>
+                
                 </>
                 : <></>
               }
