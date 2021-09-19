@@ -1,0 +1,32 @@
+[
+    {
+        "project": "FontAwesome",
+        "name": "FaAppleAlt",
+        "color": "red"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaBaby",
+        "color": "pink"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaCanadianMapleLeaf",
+        "color": "red"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaGithub",
+        "color": "purple"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoLogoFirebase",
+        "color": "orange"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaRegUserCircle",
+        "color": "black"
+    }
+]
