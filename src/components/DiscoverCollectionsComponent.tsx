@@ -25,7 +25,16 @@ const useStyles = makeStyles({
         height:"75%",
         borderRadius: "8em",
         border: "white",
+        overflowY: "hidden",
+    },
+    TableStyle: {
+        display:'flex',
+        width: '100%',  
+        maxHeight: '600px',
+        overflowY: "scroll",
     }
+
+
 }) 
 
 const buttonStyle = {
@@ -109,7 +118,9 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
         <div id = "discover-component" className={classes.DiscoverContainer}>
             <br></br>
             <br></br>
+            <br></br>
             <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>Discover Collections</h1>
+            <div className={classes.TableStyle}>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -132,11 +143,13 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button style = {buttonStyle} variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
+                                    <Link to="/discover-questions" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}
                     </tbody>
                 </Table>
+            </div>
         </div>
         </>
         :

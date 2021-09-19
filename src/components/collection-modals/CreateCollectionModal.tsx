@@ -14,6 +14,13 @@ interface ICollectionModal {
     updateUI: (collection: Collections | undefined) => void
 }
 
+const buttonStyle = {
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
+  color: "gold",
+}
+
+
 function CreateCollectionModal(props: ICollectionModal) {
     let [collection , setCollection] = useState({title:"", description:"", category:"", author:props.current_user} as Collections | undefined);
     let [errorMessage, setErrorMessage] = useState('');
@@ -77,14 +84,14 @@ function CreateCollectionModal(props: ICollectionModal) {
 
     return (
         <>
-          <Modal show={props.show} onHide={handleClose}>
+          <Modal style={{opacity:.94}} show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>Create New Collection</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <input id="title-input" type="text" onChange={updateTitle} placeholder="Title"/>
               <br/><br/>
-              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="primary" title= {collection?.category}>
+              <DropdownButton as={ButtonGroup} key={1} id={`dropdown-variants-primary`} variant="dark" title= {collection?.category}>
               <Dropdown.Item eventKey="1"  onClick={(e) => updateCategory(e , 1)}>Entertainment</Dropdown.Item>
                 <Dropdown.Item eventKey="2"  onClick={(e) => updateCategory(e , 2)}>Education</Dropdown.Item>
                 <Dropdown.Item eventKey="3"  onClick={(e) => updateCategory(e , 3)}>Food</Dropdown.Item>
@@ -96,10 +103,10 @@ function CreateCollectionModal(props: ICollectionModal) {
               <br/><br/>
               { errorMessage ? <ErrorMessageComponent errorMessage={errorMessage} setErrorMessage={setErrorMessage}/> : <></> }            </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+              <Button style = {buttonStyle} variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={create}>
+              <Button style = {buttonStyle} variant="primary" onClick={create}>
                 Create
               </Button>
             </Modal.Footer>

@@ -8,12 +8,9 @@ import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { FormControl, Input, InputLabel, makeStyles, Typography} from "@material-ui/core";
 
-import DeleteQuestionModal from "./question-modals/DeleteQuestionModal";
-import CreateQuestionModal from "./question-modals/CreateQuestionModal";
-import EditQuestionModal from "./question-modals/EditQuestionModal";
 
 
-interface IViewProps {
+interface IDiscoverViewProps {
     currentUser: Principal | undefined;
     collection: Collections | undefined;
     setCollection: (nextCollection: Collections | undefined) => void
@@ -47,7 +44,7 @@ const buttonStyle = {
     marginLeft: '1em'
   }
 
-function ViewCollectionComponent(props: IViewProps) {
+function DiscoverQuestionsComponent(props: IDiscoverViewProps) {
     let [questions , setQuestions] = useState([] as Question[]);
     let [hasCollection, setHasCollection] = useState(false);
     let [showDelete, setShowDelete] = useState(false);
@@ -89,82 +86,8 @@ function ViewCollectionComponent(props: IViewProps) {
         }   
     }
 
-    function edit(question : Question | undefined) {
-        if(!question) {
-            return;
-        }
 
-        setShowEdit(true);
-        setCurrentQuestion(question);
-        return undefined;
-    }
 
-    function editUI(question : Question | undefined) {
-        if(!question) {
-            return;
-        }
-        let temp = questions;
-        temp.forEach((q:Question) => {
-            if(q.id === question.id) {
-                q.answer = question.answer;
-                q.question = question.question;
-                q.category = question.category;
-                q.value = question.value;
-            }
-        })
-        setQuestions(temp);
-    }
-
-    function remove(question : Question | undefined) {
-        if(!question) {
-            return;
-        }
-
-        setShowDelete(true);
-        setCurrentQuestion(question);
-
-        return undefined;
-    }
-
-    function removeUI(question : Question | undefined) {
-        if(!question) {
-            return;
-        }
-        
-        console.log(question.id)
-        let temp = questions;
-        temp = temp.filter((q : Question) => {
-            return !(q.id === question.id)
-        })
-        console.log(temp);
-        setQuestions(temp);
-    }
-
-    async function create() {
-        setShowCreate(true);
-        return undefined;
-    }
-
-    function createUI(question : Question | undefined) {
-        if(!question) {
-            return;
-        }
-
-        let temp = questions;
-        temp.push(question);
-        console.log(temp);
-        setQuestions(temp);
-    }
-
-    function getComponent() {
-        if(showDelete) {
-            return <DeleteQuestionModal current_user={props.currentUser} question={currentQuestion} show={showDelete} setShow={setShowDelete} updateUI={removeUI}/>;
-        } else if(showCreate) {
-            return <CreateQuestionModal current_user={props.currentUser} current_collection={props.collection} show={showCreate} setShow={setShowCreate} updateUI={createUI}/>;
-        } else if(showEdit){
-            return <EditQuestionModal current_user={props.currentUser} current_collection={props.collection} question={currentQuestion} show={showEdit} setShow={setShowEdit} updateUI={editUI}/>;
-        }
-    }
 
     const classes = useStyles();
     return (
@@ -185,7 +108,6 @@ function ViewCollectionComponent(props: IViewProps) {
                           <td>Question</td>
                           <td>Answer</td>
                           <td>Difficulty</td>
-                          <td>Manage</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -204,18 +126,11 @@ function ViewCollectionComponent(props: IViewProps) {
                                     <td>{Q?.question} </td>
                                     <td>{Q?.answer}</td>
                                     <td>{Q?.value}</td>
-                                    
-                                    <td>
-                                    <Button style = {buttonStyle} variant="secondary" onClick={() => edit(Q)}>Edit</Button> {  }
-                                    <Button  style = {buttonStyle}variant="secondary" onClick={() => remove(Q)}>Delete</Button> {  }
-                                    </td>
                                 </tr> 
                     })}
-                    {getComponent()}
                     </tbody>
                 </Table>
                 </div>
-                <Button style = {buttonStyle} variant="secondary" onClick={create}>Create New Question</Button>
                 <br></br>
                 <br></br>
                 <br></br>
@@ -226,6 +141,9 @@ function ViewCollectionComponent(props: IViewProps) {
         :
         <Redirect to="/login"/>
     )
+
+
+
 }
 
-export default ViewCollectionComponent;
+export default DiscoverQuestionsComponent;

@@ -187,7 +187,7 @@ function ManageCollectionComponent(props: IManageProps) {
             <div id = "manage-component" className={classes.ManageContainer}>
             <br></br>
             <br></br>
-            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}> {props.currentUser.username}'s Collections</h1>
+            <h1 style = {{color: ' #FFD93D', marginLeft: '1em'}}>My Collections</h1>
             <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -222,7 +222,7 @@ function ManageCollectionComponent(props: IManageProps) {
                 <Button style ={buttonStyle} variant="secondary" onClick={create}>Create New Collection</Button>
 
                 <br></br>
-                <h1 style = {{color: '#FFD93D', marginLeft: '1em'}}>{props.currentUser.username}'s Favorites</h1>
+                <h1 style = {{color: '#FFD93D', marginLeft: '1em'}}>Favorites</h1>
                 <Table  striped bordered hover variant="dark">
                     <thead>
                         <tr>
@@ -245,6 +245,7 @@ function ManageCollectionComponent(props: IManageProps) {
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button style= {buttonStyle} variant="secondary" onClick={() => unfavoriteCollection(C)}>Unfavorite</Button> {  }
+                                    <Link to="/discover-questions" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}
