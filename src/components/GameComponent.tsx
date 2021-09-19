@@ -418,9 +418,25 @@ function GameComponent(props: IGameProps) {
      *  TODO: Fill out later
      */
     function validateAnswer(submittedAnswer: string, correctAnswer: string) {
+      let correct = false;
+
+      // Take note of acronyms
+      // let userAcronym = '';
+      // submittedAnswer.split(" ").forEach(word => userAcronym += word[0]);
+      // let correctAcronym = '';
+      // correctAnswer.split(" ").forEach(word => correctAcronym += word[0]);
+
       // Trim strings and compare
-      let correct = submittedAnswer.toLowerCase().replace(/\s+/g, '') === correctAnswer.toLowerCase().replace(/\s+/g, '');
-      return correct
+      let userString = submittedAnswer.toLowerCase().replace(/\s+/g, '');
+      let correctString = correctAnswer.toLowerCase().replace(/\s+/g, '');
+
+      // If answer is exactly correct
+      if (userString === correctString) correct = true;
+      // If string is of sufficient size, check if there is overlap between the two strings
+      else if (userString.length > 3 && correctString.length - userString.length < 7 )
+        correct = userString.includes(correctString) || correctString.includes(userString);
+
+      return correct;
     }
 
     /**
