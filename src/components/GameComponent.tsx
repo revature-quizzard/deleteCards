@@ -251,7 +251,7 @@ function GameComponent(props: IGameProps) {
             id: player.id,
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
-            streak: streak,
+            streak: fields.streak.integerValue,
             answered_at: fields.answered_at.timestampValue,
             points : fields.points.integerValue
           }
