@@ -14,6 +14,7 @@ import DiscoverCollectionsComponent from './components/DiscoverCollectionsCompon
 import ViewCollectionComponent from './components/ViewCollectionComponent';
 import JoinGameComponent from './components/JoinGameComponent';
 import GameComponent from './components/GameComponent';
+import DiscoverQuestionsComponent from './components/DiscoverQuestionsComponent'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { Collections } from './dtos/collection';
@@ -63,6 +64,7 @@ function App() {
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId} selectedCollection={selectedCollection} setSelectedCollection={setSelectCollection} currentCollections={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings} userIcon={userIcon}/> } />
             <Route path="/manage-collections" render={() => <ManageCollectionComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
             <Route path="/discover" render={() => <DiscoverCollectionsComponent currentUser={authUser} setCurrCollection={setCurrCollection}  /> } />
+            <Route path="/discover-questions" render={() => <DiscoverQuestionsComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}  /> } />
             <Route path="/view-collection" render={() => <ViewCollectionComponent currentUser={authUser} collection={currCollection} setCollection={setCurrCollection}/> } />
             <Route path="/join-game" render={() => <JoinGameComponent currentUser={authUser} currentGame={currentGame} setCurrentGame={setCurrentGame} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId} userIcon={userIcon}/> } />
             <Route path="/game" render={() => <GameComponent currentUser={authUser} currentGameId={currentGameId} />} />

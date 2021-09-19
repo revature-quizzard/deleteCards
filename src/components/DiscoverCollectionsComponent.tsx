@@ -143,6 +143,7 @@ function DiscoverCollectionsComponent(props: IDiscoverProps) {
                                     <td>{C?.questionList.length}</td>
                                     <td>
                                     <Button style = {buttonStyle} variant="secondary" onClick={() => favoriteCollection(C)}>Favorite</Button> {  }
+                                    <Link to="/discover-questions" style ={buttonStyle} className="btn btn-secondary" onClick={() => props.setCurrCollection(C)}>View</Link> {  }
                                     </td>
                                 </tr> 
                     })}

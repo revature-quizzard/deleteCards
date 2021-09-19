@@ -154,7 +154,9 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             name: props.currentUser?.username,
             points : 0,
             answered_at: new firestore.Timestamp(1,1),
-            icon : userIcon
+            icon : userIcon,
+            streak: 0,
+            placing: 0
         }
         let playerDoc = await firestore.addDoc(playersRef, newPlayer);
         history.push('/game');

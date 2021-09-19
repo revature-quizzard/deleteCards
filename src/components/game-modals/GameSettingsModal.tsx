@@ -17,13 +17,14 @@ interface IGameSettingsModal {
 }
 
 function GameSettingsModal(props: IGameSettingsModal) {
-  let [matchTimer , setMatchTimer] = useState(Number);
-  let [maxPlayers , setMaxPlayers] = useState(Number);
+  let [matchTimer , setMatchTimer] = useState(30);
+  let [maxPlayers , setMaxPlayers] = useState(0);
   let [category , setCategory] = useState('Category');
   let [name , setName] = useState('');
-    const handleClose = () => {
+    
+  const handleClose = () => {
       props.setShow(false);
-    }
+  }
     
 
     function updateMaxPlayers(e: any) {
@@ -64,6 +65,7 @@ function GameSettingsModal(props: IGameSettingsModal) {
       
         
         let collection : Collections | undefined = props.selectedCollection;
+        console.log('Settings before set: ', props.currentGameSettings);
         props.setCurrentGameSettings({maxPlayers   , matchTimer , collection  , category  , name });
         
       }
