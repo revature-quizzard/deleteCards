@@ -101,6 +101,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     // console.log('Returned players array', playersArr);
                     // @ts-ignore
                     let temp = doc.doc['_document']['data']['value']['mapValue']['fields'];
+                    console.log('temp:', temp);
                     if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.start_time || !temp.end_time) {
                         console.log("INVALID COLLECTION IN FIREBASE", temp);
                         return;
@@ -164,7 +165,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                             console.log('A game was added, Active Games=', updateRef.current);
                             // Check if game is in list
                             if (updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
-                                console.log('That game already in the list, do not worry bout it', newGame);
+                                console.log('That game is already in the list, do not worry bout it', newGame);
                                 return;
                             }
 
@@ -177,13 +178,18 @@ function JoinGameComponent(props: IJoinGameProps) {
                             break;
                         // Handle case of existing game being updated
                         case 'modified':
-                            console.log('A game was modified');
+                            console.log('A game was modified', newGame);
 
                             // Check if game is in list
                             if (!updateRef.current.some(tempGame => tempGame.id === newGame.id)) {
                                 console.log('That game is not in the list, do not worry bout it', newGame);
                                 return;
+                            } else {
+                                gameIndex = updateRef.current.findIndex(game => game.id == _id);
+                                console.log('Index of game being modified:', gameIndex);
                             }
+
+
                             
                             // Game is no longer on state 0
                             if (newGame.match_state != 0) {
@@ -191,8 +197,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                                 break;
                             }
 
-                            gameIndex = activeGames.findIndex(game => game.id == _id);
-                            console.log('Index of game being modified:', gameIndex);
+                            
                             // Game is only game in list
                             if (updateRef.current.length == 1) {
                                 setActiveGames([newGame]);
