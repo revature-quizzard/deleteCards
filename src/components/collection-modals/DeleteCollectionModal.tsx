@@ -12,6 +12,11 @@ interface ICollectionModal {
     setShow: (val: boolean) => void
     updateUI: (collection: Collections) => void
 }
+const buttonStyle = {
+  backgroundColor: '#5f2568',
+  border: '#5f2568',
+  color: "gold",
+}
 
 function DeleteCollectionModal(props: ICollectionModal) {
     const handleClose = () => {
@@ -35,10 +40,10 @@ function DeleteCollectionModal(props: ICollectionModal) {
             </Modal.Header>
             <Modal.Body>Do you want to delete collection "{props.collection?.title}"</Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+              <Button style ={buttonStyle} variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={remove}>
+              <Button style ={buttonStyle} variant="primary" onClick={remove}>
                 Delete
               </Button>
             </Modal.Footer>
