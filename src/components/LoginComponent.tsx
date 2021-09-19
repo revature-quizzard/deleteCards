@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {Principal} from "../dtos/principal";
 import {authenticate} from "../remote/auth-service";
 import ErrorMessageComponent from "./ErrorMessageComponent";
@@ -39,6 +39,14 @@ function LoginComponent(props: ILoginProps) {
         password: ''
     });
 
+    useEffect(() => {
+        if (sessionStorage.getItem('user')) {
+            //@ts-ignore
+            props.setCurrentUser(JSON.parse(sessionStorage.getItem('user')))
+        }
+
+    }, [])
+
     let handleChange = (e: any) => {
         const { name, value } = e.target;
         setFormData({...formData, [name]: value});
@@ -49,6 +57,7 @@ function LoginComponent(props: ILoginProps) {
             if (formData.username && formData.password) {
                 let principal = await authenticate({username: formData.username, password: formData.password});
                 props.setCurrentUser(principal);
+                sessionStorage.setItem('user', JSON.stringify(principal));
             } else {
                 setErrorMessage('You must provide a username and a password!');
             }
@@ -59,6 +68,7 @@ function LoginComponent(props: ILoginProps) {
     
     
     return(
+        
         props.currentUser ? <Redirect to="/"/> :
         <>
             <div id="login-component" className={classes.loginContainer}>
