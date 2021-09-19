@@ -220,8 +220,7 @@ function GameComponent(props: IGameProps) {
 
              //@ts-ignore
              gameLength = game.collection.questionList.arrayValue.values.length as number;
-             streak = 0;
-
+            
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
         firestore.updateDoc(gameDocRef, 'match_state', 1);
@@ -267,7 +266,7 @@ function GameComponent(props: IGameProps) {
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
           //this update doesn't trigger callback
           firestore.updateDoc(playerRef, 'answered', true);
-
+         
           // Use this functionality to trigger snapshot listener, as a change to players subcollection does not trigger it
           let temp = await firestore.doc(gamesRef, `${props.currentGameId}`);
           let gameDoc = await firestore.getDoc(temp);
@@ -285,7 +284,7 @@ function GameComponent(props: IGameProps) {
 
             // Add value of question to total number of points and update Firebase
             currentPoints += value;
-            firestore.updateDoc(playerRef, 'points',  value);
+            firestore.updateDoc(playerRef, 'points',  currentPoints);
             // for end of game display
             numberOfCorrectAnswers++;
             streak++;
@@ -413,7 +412,7 @@ function GameComponent(props: IGameProps) {
             <Card.Title> 
             <br></br>
               {/* @ts-ignore */}
-            <h4>Question { game.question_index} out of {game.collection.questionList.arrayValue.values.length}</h4>
+            <h4>Question {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
             {/* @ts-ignore */}
           <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
           </Card.Title>
@@ -505,7 +504,7 @@ function PlayersComponent(props: any) {
                                   {/* @ts-ignore */}
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {/* @ts-ignore */}
-                                  {player.name} | {player.points} points  {player.points > 1 ? <p>&#x1F525;</p> : <p></p>} 
+                                  {player.name} | {player.points} points  {player.streak > 1 ? <p>&#x1F525;</p> : <p></p>} 
                                  
                                 </td>
                             </tr>
