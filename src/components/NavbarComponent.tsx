@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 
-import {AppBar, Box, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import {AppBar, Box, IconButton, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { fas, faCog } from '@fortawesome/free-solid-svg-icons'
 import { Principal } from "../dtos/principal";
 
 interface INavbarProps {
@@ -29,7 +31,7 @@ const useStyles = makeStyles({
     rightSideLink: {
         textDecoration: "none",
         color: "gold",
-        float: 'right',
+        // float: 'right',
         // paddingRight: 10 
     }
 })
@@ -61,6 +63,10 @@ export function NavbarComponent(props: INavbarProps){
                                 <Typography color="inherit" variant="h6" className={classes.rightSideLink} onClick={logout}>
                                     <Link to="/" id="logout" className={classes.link}>Logout</Link>
                                 </Typography>
+
+                                <IconButton aria-label="Example">
+                                    <FontAwesomeIcon icon={faCog} />
+                                </IconButton>
                             
 
                         </>
