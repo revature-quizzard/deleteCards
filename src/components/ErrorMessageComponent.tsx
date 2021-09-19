@@ -19,7 +19,7 @@ function ErrorMessageComponent(props: IErrorMessageProps) {
             aria-atomic="true"
             style={{ minHeight: '240px' }}
         >
-            <Toast style={{backgroundColor: "red"}} onClose={clearMessage} show={true} delay={15000} autohide>
+            <Toast style={{backgroundColor: "red"}} onClose={clearMessage} show={true} delay={6000} autohide>
             <Toast.Header>
                 <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
                 <strong className="me-auto">Error</strong>
