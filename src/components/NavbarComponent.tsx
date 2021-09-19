@@ -21,6 +21,7 @@ export function NavbarComponent(props: INavbarProps){
 
     function logout() {
         props.setCurrentUser(undefined);
+        sessionStorage.clear();
     }
 
     return (

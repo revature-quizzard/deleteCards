@@ -56,7 +56,7 @@ function App() {
         <Switch>
             <Route exact path="/" render={() => <HomeComponent currentUser={authUser} /> } />
             <Route path="/home" render={() => <HomeComponent currentUser={authUser} /> } />
-            <Route path="/splash" render={() => <SplashComponent /> } />
+            <Route path="/splash" render={() => <SplashComponent currentUser={authUser} setCurrentUser={setAuthUser}/> } />
             <Route path="/login" render={() => <LoginComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/register" render={() => <RegisterComponent currentUser={authUser} setCurrentUser={setAuthUser} /> } />
             <Route path="/custom-game" render={() => <CustomGameComponent currentUser={authUser} currentGameId={currentGameId} setCurrentGameId={setCurrentGameId} selectedCollection={selectedCollection} setSelectedCollection={setSelectCollection} currentCollections={collection} setCurrentCollection={setCollection} currentGameSettings_={gameSettings} setCurrentGameSettings_={setGameSettings}/> } />

@@ -1,7 +1,11 @@
 import {AppBar, List, ListItem, ListItemText, makeStyles, Toolbar, Typography} from "@material-ui/core";
-import { Link } from 'react-router-dom'
-interface ISplashProps{
+import { Link, Redirect } from 'react-router-dom'
+import {useEffect} from 'react'
+import {Principal} from '../dtos/principal'
 
+interface ISplashProps{
+    currentUser: Principal | undefined,
+    setCurrentUser: (nextUser: Principal | undefined) => void
 }
 
 const styles = {
@@ -35,7 +39,16 @@ const useStyles = makeStyles({
 })
 function SplashComponent(props: ISplashProps){
     const classes = useStyles();
+
+    useEffect(() => {
+        if (sessionStorage.getItem('user')) {
+            //@ts-ignore
+            props.setCurrentUser(JSON.parse(sessionStorage.getItem('user')))
+        }
+
+    }, [])
 return (
+    props.currentUser ? <Redirect to="/" /> :
     <>
     <div style={locationStyle}>
     <Link to="/register" style ={linkStyle} id="register" className="w-25 btn btn-primary">Register</Link>
