@@ -188,8 +188,6 @@ function JoinGameComponent(props: IJoinGameProps) {
                                 gameIndex = updateRef.current.findIndex(game => game.id == _id);
                                 console.log('Index of game being modified:', gameIndex);
                             }
-
-
                             
                             // Game is no longer on state 0
                             if (newGame.match_state != 0) {
