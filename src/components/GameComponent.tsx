@@ -682,7 +682,7 @@ function PlayersComponent(props: any) {
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {
                                     data.map(({project, name, color}) => {
-                                      {console.log(project, name, color)}
+                                      // {console.log(project, name, color)}
                                       if(name == player.icon)
                                       return (
                                         <>
