@@ -378,7 +378,7 @@ function GameComponent(props: IGameProps) {
       // If answer is exactly correct
       if (userString === correctString) correct = true;
       // If string is of sufficient size, check if there is overlap between the two strings
-      else if (userString.length > 4 && correctString.length - userString.length < 7 )
+      else if (userString.length > 3 && correctString.length - userString.length < 7 )
         correct = userString.includes(correctString) || correctString.includes(userString);
 
       return correct;
