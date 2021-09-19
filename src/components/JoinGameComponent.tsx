@@ -101,8 +101,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     // console.log('Returned players array', playersArr);
                     // @ts-ignore
                     let temp = doc.doc['_document']['data']['value']['mapValue']['fields'];
-                    console.log('temp:', temp);
-                    if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.start_time || !temp.end_time) {
+                    if(!_id || !temp.name || !temp.capacity || !temp.match_state || !temp.question_index || !temp.question_timer || !temp.created_at || !temp.end_time) {
                         console.log("INVALID COLLECTION IN FIREBASE", temp);
                         return;
                     }
@@ -113,7 +112,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                         match_state: temp.match_state.integerValue,
                         question_index: temp.question_index,
                         question_timer: temp.question_timer,
-                        start_time: temp.start_time.timestampValue,
+                        created_at: temp.created_at.timestampValue,
                         end_time: temp.end_time.timestampValue,
                         host: temp.host.stringValue,
                         players: playersArr,
@@ -257,6 +256,11 @@ function JoinGameComponent(props: IJoinGameProps) {
                             
                             break;
                     }
+
+                    // Sort list of active games
+                    setActiveGames(prevGames => [
+                        ...prevGames.sort((a: GameState, b: GameState) => a.created_at > b.created_at ? -1 : 1)
+                    ])
                     console.log('Active Games after modifications (probably not accurate yet)', updateRef.current)
                     
                 })

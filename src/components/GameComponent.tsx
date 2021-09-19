@@ -174,7 +174,7 @@ function GameComponent(props: IGameProps) {
                 //@ts-ignore
                 question_timer: temp.question_timer.integerValue,
                 //@ts-ignore
-                start_time: temp.start_time.timestampValue,
+                created_at: temp.created_at.timestampValue,
                 //@ts-ignore
                 end_time: temp.end_time.timestampValue,
                 //@ts-ignore

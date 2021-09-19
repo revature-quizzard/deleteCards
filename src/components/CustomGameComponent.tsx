@@ -100,12 +100,15 @@ function CustomGameComponent(props: IGameCustomCollectionProps) {
             match_state: 0,
             question_index: 0,
             question_timer: props.currentGameSettings_.matchTimer,
-            start_time: new firestore.Timestamp(1,1),
+            created_at: firestore.Timestamp.now(),
             end_time: new firestore.Timestamp(1,1),
             host: props.currentUser?.username,
             collection: props.currentGameSettings_.collection,
             trigger: true
-        };          
+        };
+        console.log('Before new game log');
+        console.log('New game!', newGame)
+        console.log('After new game log');
 
         let gameDocRef = await firestore.addDoc(gamesRef , newGame);
         console.log('Setting game Id to: ', gameDocRef.id);
