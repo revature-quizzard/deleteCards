@@ -181,7 +181,7 @@ function GameComponent(props: IGameProps) {
           let playerStructure = {
             name: fields.name.stringValue,
             answered: fields.answered.booleanValue,
-            streak: 0,
+            streak: streak,
             answered_at: fields.answered_at.timestampValue,
             points : fields.points.integerValue
           }
@@ -205,7 +205,7 @@ function GameComponent(props: IGameProps) {
     async function startGame() {
       console.log("The game is starting right now!");
       await firestore.updateDoc(gameDocRef, 'match_state', 2);
-    
+      streak = 0;
       
       setTrigger(trigger => !trigger);
     }
@@ -235,8 +235,10 @@ function GameComponent(props: IGameProps) {
         console.log('Question at index', game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.question.stringValue);
         
         //@ts-ignore
-        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host)
-          firestore.updateDoc(gameDocRef, 'match_state', 3);
+        if (game.question_index == game.collection.questionList.arrayValue.values.length - 1 && props.currentUser?.username == game.host){
+           firestore.updateDoc(gameDocRef, 'match_state', 3);
+           
+        }
         else if (props.currentUser?.username == game.host) {
           firestore.updateDoc(gameDocRef, 'match_state', 2)
 
@@ -289,7 +291,7 @@ function GameComponent(props: IGameProps) {
             numberOfCorrectAnswers++;
             streak++;
             firestore.updateDoc(playerRef, 'streak',  streak);
- 
+            console.log()
           }else{
             streak = 0;
             if(currentPlayer)
