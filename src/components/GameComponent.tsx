@@ -294,7 +294,6 @@ function GameComponent(props: IGameProps) {
             console.log()
           }else{
             streak = 0;
-            if(currentPlayer)
             firestore.updateDoc(playerRef, 'streak',  streak);
           }
         }
@@ -370,9 +369,9 @@ function GameComponent(props: IGameProps) {
                   <Card.Title> 
                   <br></br>
                      {/* @ts-ignore */}
-                  <h4>Questions {game.question_index } out of {game.collection.questionList.arrayValue.values.length}</h4>
+                  <h4>Questions {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
                   {/* @ts-ignore */}
-                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+                <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={parseInt(game.question_index) + 1} />
                 </Card.Title>
                 </Card.Header>
                             <Card.Body >
@@ -416,7 +415,7 @@ function GameComponent(props: IGameProps) {
               {/* @ts-ignore */}
             <h4>Question {parseInt(game.question_index) + 1} out of {game.collection.questionList.arrayValue.values.length}</h4>
             {/* @ts-ignore */}
-          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={gameProgPercentage} />
+          <ProgressBar min={0} max={game.collection.questionList.arrayValue.values.length} style={{ width: '30rem' }} animated now={parseInt(game.question_index) + 1} />
           </Card.Title>
           </Card.Header>
                       <Card.Body >
@@ -535,6 +534,12 @@ function LeaderboardComponent(props: any) {
                             return <Card key={i}>
                                 <h1>
                                   {/* @ts-ignore */}
+                                  {/* Global Emoji Codes */}
+                                  {/* ---------------------------*/}
+                                  {/* let poop_emoji = 1F4A9;   |*/}
+                                  {/* let trophy_emoji = 1F3C6; |*/}
+                                  {/* let crown_emoji = 1F451;  |*/}
+                                  {/* ---------------------------*/}
                                   {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : numberOfCorrectAnswers === 0 ? <h1>&#x1F4A9;</h1> : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>
