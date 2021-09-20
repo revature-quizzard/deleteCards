@@ -80,7 +80,7 @@ function IconModal(props: IIconModal) {
             <Grid container spacing={2}>
                 {                    
                     data.map(({project, name, color}) => {
-                        {console.log(project, name, color)}
+                        // {console.log(project, name, color)}
                         return (
                             <Grid item xs={3}>
                             <IconButton aria-label="Example" id={name} onClick={updateIcon}>

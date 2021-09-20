@@ -308,8 +308,8 @@ function GameComponent(props: IGameProps) {
     function onTimeout() {
       console.log('The timer has run out');
 
-             //@ts-ignore
-             gameLength = game.collection.questionList.arrayValue.values.length as number;
+      //@ts-ignore
+      gameLength = game.collection.questionList.arrayValue.values.length;
             
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
@@ -354,7 +354,7 @@ function GameComponent(props: IGameProps) {
         //@ts-ignore
         if (player['_document']['data']['value']['mapValue']['fields'].name.stringValue == props.currentUser?.username) {
           let playerRef = firestore.doc(gameDocRef, `/players/${player.id}`)
-          // Set current timestamp to firestore (potentially used for scoring later)
+          // Send current timestamp to firestore (potentially used for scoring later)
           await firestore.updateDoc(playerRef, 'answered_at', firestore.Timestamp.now());
           //this update doesn't trigger callback
           firestore.updateDoc(playerRef, 'answered', true);
@@ -369,19 +369,11 @@ function GameComponent(props: IGameProps) {
           //@ts-ignore
           if (validateAnswer(answer, game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.answer.stringValue)) {
             // If answer is correct, add points to user
-            //@ts-ignore
-            let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
-            //@ts-ignore
-            let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
+            firestore.updateDoc(playerRef, 'answered_correctly', true)
 
-            // Add value of question to total number of points and update Firebase
-            currentPoints += value;
-            firestore.updateDoc(playerRef, 'points',  currentPoints);
             // for end of game display
             numberOfCorrectAnswers++;
             streak++;
-            firestore.updateDoc(playerRef, 'streak',  streak);
-            console.log()
           }else{
             streak = 0;
             firestore.updateDoc(playerRef, 'streak',  streak);
@@ -393,6 +385,7 @@ function GameComponent(props: IGameProps) {
 
     /**
      *  This function sets all 'answered' fields to be false after each question.
+     *  This function will also update points.
      *  Only the host will call this method.
      */
     async function clearAnswers() {
@@ -400,10 +393,35 @@ function GameComponent(props: IGameProps) {
       let playersDocArr = await firestore.getDocs(playersRef)
       playersDocArr.forEach(async player => {
         let playerRef = firestore.doc(gamesRef, `${props.currentGameId}/players/${player.id}`)
+        
+        
+        // Update points 
+        // If answer is correct, add points to user
+        //@ts-ignore
+        if (player['_document']['data']['value']['mapValue']['fields'].answered_correctly.booleanValue == true) {
+            //@ts-ignore
+            let currentPoints : number = parseInt(player['_document']['data']['value']['mapValue']['fields'].points.integerValue);
+            //@ts-ignore
+            let value = parseInt(game.collection.questionList.arrayValue.values[game.question_index].mapValue.fields.value.integerValue);
+
+            // Add value of question to total number of points and update Firebase
+            currentPoints += value;
+            firestore.updateDoc(playerRef, 'points',  currentPoints);
+            
+            //@ts-ignore
+            let currentStreak = player['_document']['data']['value']['mapValue']['fields'].streak.integerValue;
+            currentStreak++;
+            
+            await firestore.updateDoc(playerRef, 'streak',  currentStreak);
+            
+        }else{          
+          await firestore.updateDoc(playerRef, 'streak',  0);
+        }
         await firestore.updateDoc(playerRef, 'answered', false);
-          
+        await firestore.updateDoc(playerRef, 'answered_correctly', false);
       })
     }
+    
     
     /**
      *  This function is used by the host to manually close the game. All players currently
@@ -435,6 +453,8 @@ function GameComponent(props: IGameProps) {
       // If string is of sufficient size, check if there is overlap between the two strings
       else if (userString.length > 3 && correctString.length - userString.length < 7 )
         correct = userString.includes(correctString) || correctString.includes(userString);
+
+      console.log('The user answered correctly: ', correct);
 
       return correct;
     }
@@ -613,7 +633,7 @@ function GameComponent(props: IGameProps) {
                   }
                   {
                     (game.match_state == 3) ?
-                    <Button className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
+                    <Button style={buttonStyle} className="btn btn-primary" title="Close Game" onClick={closeGame}>Close Game</Button>
                     : <> </>
                   }
                 </>
@@ -662,7 +682,7 @@ function PlayersComponent(props: any) {
                                   {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
                                   {
                                     data.map(({project, name, color}) => {
-                                      {console.log(project, name, color)}
+                                      // {console.log(project, name, color)}
                                       if(name == player.icon)
                                       return (
                                         <>
@@ -675,7 +695,7 @@ function PlayersComponent(props: any) {
                                   {
                                     // Host player has Kick Player buttons attached to other players
                                     (props.user.username == props.host && player.name != props.user.username) ?
-                                    <Button onClick={() => props.kickPlayer(player)}>Kick Player</Button>
+                                    <Button style={buttonStyle} onClick={() => props.kickPlayer(player)}>Kick Player</Button>
                                     : <></>
                                   }
                                 </td>
@@ -695,8 +715,23 @@ function PlayersComponent(props: any) {
  */
 function LeaderboardComponent(props: any) {
   // Sort the players in descending order of points
+  function compare( a: Player, b: Player ) {
+    //@ts-ignore
+    if ( parseInt(a.points) > parseInt(b.points) ){
+      console.log(a, ' has more points than ', b, ' Sorting b after a')
+      return -1;
+    }
+    //@ts-ignore
+    if ( parseInt(a.points) > parseInt(b.points) ){
+      console.log(b, ' has more points than ', a, ' Sorting a after b')
+      return 1;
+    }
+    console.log(a, ' and ', b, ' have the same number of points, no sorting necessary');
+    return 0;
+  }
+
   // @ts-ignore
-  const players : Player[] = [].concat(props.players).sort((a: Player, b: Player) => a.points > b.points ? -1 : 1);
+  const players : Player[] = [].concat(props.players).sort(compare);
   console.log('Sorted players array at end of game:', players)
 
   return (
@@ -711,6 +746,9 @@ function LeaderboardComponent(props: any) {
                                   {/* let trophy_emoji = 1F3C6; |*/}
                                   {/* let crown_emoji = 1F451;  |*/}
                                   {/* ---------------------------*/}
+                                  {console.log('Player=', player)}
+                                  {console.log('GameLength=', gameLength)}
+                                  {console.log('numberOfCorrectAnswers=', numberOfCorrectAnswers)}
                                   {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : numberOfCorrectAnswers === 0 ? <h1>&#x1F4A9;</h1> : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>

@@ -96,7 +96,7 @@ export function NavbarComponent(props: INavbarProps){
                             {
                                 // Display User Icon on left side of Navbar
                                 data.map(({project, name, color}) => {
-                                    {console.log(project, name, color)}
+                                    // {console.log(project, name, color)}
                                     if(name == props.userIcon)
                                         return ( <div className={classes.icon}><Icon project={project} iconName={name} size={2.5} color={color} /></div> )
                                 })
