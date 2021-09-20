@@ -308,8 +308,8 @@ function GameComponent(props: IGameProps) {
     function onTimeout() {
       console.log('The timer has run out');
 
-             //@ts-ignore
-             gameLength = game.collection.questionList.arrayValue.values.length as number;
+      //@ts-ignore
+      gameLength = game.collection.questionList.arrayValue.values.length;
             
       // When timer runs out of time, game just finished a question
       if (game?.match_state == 2 && props.currentUser?.username == game.host) {
@@ -716,11 +716,13 @@ function PlayersComponent(props: any) {
 function LeaderboardComponent(props: any) {
   // Sort the players in descending order of points
   function compare( a: Player, b: Player ) {
-    if ( a.points > b.points ){
+    //@ts-ignore
+    if ( parseInt(a.points) > parseInt(b.points) ){
       console.log(a, ' has more points than ', b, ' Sorting b after a')
       return -1;
     }
-    if ( a.points > b.points ){
+    //@ts-ignore
+    if ( parseInt(a.points) > parseInt(b.points) ){
       console.log(b, ' has more points than ', a, ' Sorting a after b')
       return 1;
     }
@@ -744,6 +746,9 @@ function LeaderboardComponent(props: any) {
                                   {/* let trophy_emoji = 1F3C6; |*/}
                                   {/* let crown_emoji = 1F451;  |*/}
                                   {/* ---------------------------*/}
+                                  {console.log('Player=', player)}
+                                  {console.log('GameLength=', gameLength)}
+                                  {console.log('numberOfCorrectAnswers=', numberOfCorrectAnswers)}
                                   {player.name} | {player.points} points   { i > 0 ? <h1>&#x1F4A9;</h1>  : gameLength === numberOfCorrectAnswers ? <h1>&#x1F451;</h1>  : numberOfCorrectAnswers === 0 ? <h1>&#x1F4A9;</h1> : <h1>&#x1F3C6;</h1>}
                                 </h1>
                             </Card>
