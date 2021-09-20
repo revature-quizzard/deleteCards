@@ -414,7 +414,7 @@ function JoinGameComponent(props: IJoinGameProps) {
                     <tbody>
                         {console.log('ACTIVE GAMES BEFORE RENDER + FIRST GAME',activeGames, activeGames[0])}
                         {/* @ts-ignore */}
-                    {activeGames?.map((game, i) =>{ 
+                    {updateRef.current?.map((game, i) =>{ 
                         
                         return  <tr key={i} >
                                             {/* @ts-ignore */}
