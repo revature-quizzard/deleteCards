@@ -447,6 +447,8 @@ function GameComponent(props: IGameProps) {
       // Trim strings and compare
       let userString = submittedAnswer.toLowerCase().replace(/\s+/g, '');
       let correctString = correctAnswer.toLowerCase().replace(/\s+/g, '');
+      console.log('Input string=', userString);
+      console.log('Correct string=', correctString);
 
       // If answer is exactly correct
       if (userString === correctString) correct = true;
@@ -679,7 +681,7 @@ function PlayersComponent(props: any) {
                                 <td id={"user" + (player.name == props.user.username)}>
                                  
                                   {/* @ts-ignore */}
-                                  {console.log("user" + (player.name == props.user.username), player.name, props.user.username)}
+                                  {/* {console.log("user" + (player.name == props.user.username), player.name, props.user.username)} */}
                                   {
                                     data.map(({project, name, color}) => {
                                       // {console.log(project, name, color)}
