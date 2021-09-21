@@ -1,0 +1,84 @@
+[
+    {
+        "project": "FontAwesome",
+        "name": "FaRegUserCircle",
+        "color": "black"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaAppleAlt",
+        "color": "red"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaBaby",
+        "color": "pink"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaCanadianMapleLeaf",
+        "color": "red"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaGithub",
+        "color": "purple"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoLogoFirebase",
+        "color": "orange"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoFlask",
+        "color": "lightblue"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoLogoBitcoin",
+        "color": "yellow"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoLogoFacebook",
+        "color": "#1C376C"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoPlanetOutline",
+        "color": "#D58C32"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoNuclear",
+        "color": "#2B861A"
+    },
+    {
+        "project": "Ionicons",
+        "name": "IoSkullOutline",
+        "color": "black"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaRegGem",
+        "color": "#85C7BF"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaLemon",
+        "color": "#BEB33C"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaKiwiBird",
+        "color": "#75AAC9"
+    },
+    {
+        "project": "FontAwesome",
+        "name": "FaBasketballBall",
+        "color": "#D07332"
+    }
+
+    
+]
