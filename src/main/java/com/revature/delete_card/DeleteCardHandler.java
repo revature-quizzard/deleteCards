@@ -12,6 +12,8 @@ import com.revature.delete_card.Execptions.ResourceNotFoundException;
 import com.revature.delete_card.Repositories.SetRepository;
 import com.revature.delete_card.Repositories.UserRepository;
 
+import java.util.List;
+
 public class DeleteCardHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
 private final SetRepository setRepo;
@@ -57,11 +59,13 @@ public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent re
         }catch (ResourceNotFoundException rnfe) {
         responseEvent.setStatusCode(404);
         }catch (Exception e) {
+        logger.log("///////////////////////////////////// L A M B D A LOGGER MESSAGE ////////////////////////////////////////// \n");
         logger.log("RECEIVED ERROR MESSAGE: " + e.getMessage() + "\n");
         responseEvent.setStatusCode(500);
         }
 
-        logger.log("RECEIVED EVENT: " + responseEvent.getBody());
+        logger.log("RECEIVED EVENT: " + responseEvent.getBody() + "\n" );
+        logger.log("///////////////////////////////////// L A M B D A LOGGER MESSAGE ////////////////////////////////////////// \n");
         return responseEvent;
         }
 }

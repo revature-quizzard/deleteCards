@@ -1,5 +1,6 @@
 package com.revature.delete_card.Repositories;
 
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.revature.delete_card.Documents.Set;
 import com.revature.delete_card.Documents.User;
 import com.revature.delete_card.Execptions.InvalideRequestException;
@@ -24,6 +25,7 @@ public class UserRepository {
         DynamoDbClient db = DynamoDbClient.builder().httpClient(ApacheHttpClient.create()).build();
         DynamoDbEnhancedClient dbClient = DynamoDbEnhancedClient.builder().dynamoDbClient(db).build();
         userTable = dbClient.table("Users", TableSchema.fromBean(User.class));
+
     }
 
     /**
@@ -31,6 +33,9 @@ public class UserRepository {
      * @Authors Alfonso Holmes
      */
     public List<User> getAllUsers(){
+        System.out.println("FROM USER REPOSITORY : " + userTable.scan().items().stream().collect(Collectors.toList()));
+        if(userTable.scan().items().stream().collect(Collectors.toList()) == null){ throw new InvalideRequestException("Null List"); }
+
         return userTable.scan().items().stream().collect(Collectors.toList());
     }
 

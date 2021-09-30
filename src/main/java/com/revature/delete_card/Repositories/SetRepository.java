@@ -26,6 +26,7 @@ public class SetRepository {
      * Deletes a card from the target Set by id
      *
      * @param id
+     * @param card_id
      * @Authors Alfonso Holmes.
      */
     public Set deleteCardBySetId(String id , String card_id) {
