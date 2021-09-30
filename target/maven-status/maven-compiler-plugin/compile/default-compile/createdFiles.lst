@@ -1,6 +1,10 @@
-com\revature\delete_card\Documents\User.class
 com\revature\delete_card\Documents\Card.class
 com\revature\delete_card\Documents\Set.class
+com\revature\delete_card\Execptions\ResourceNotFoundException.class
+com\revature\delete_card\Documents\User.class
+com\revature\delete_card\Documents\Tag.class
+com\revature\delete_card\Repositories\SetRepository.class
+com\revature\delete_card\Documents\User$UserSetDoc.class
 com\revature\delete_card\DeleteCardHandler.class
 com\revature\delete_card\Repositories\UserRepository.class
 com\revature\delete_card\Execptions\InvalideRequestException.class
