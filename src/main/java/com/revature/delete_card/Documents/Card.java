@@ -13,6 +13,7 @@ public class Card {
 
     private String id;
     private String question;
+    private String sID;
     private String answer;
 
     @DynamoDbPartitionKey
@@ -40,5 +41,14 @@ public class Card {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    @DynamoDbAttribute("sID")
+    public String getsID() {
+        return sID;
+    }
+
+    public void setsID(String sID) {
+        this.sID = sID;
     }
 }

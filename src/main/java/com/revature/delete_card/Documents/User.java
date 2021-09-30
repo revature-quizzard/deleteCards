@@ -120,10 +120,10 @@ public class User {
 
         public UserSetDoc(Set set) {
             id = set.getId();
-            set_name = set.getSet_name();
+            set_name = set.getSetName();
             tags = set.getTags();
             author = set.getAuthor();
-            is_public = set.is_public();
+            is_public = set.isPublic();
         }
 
         public UserSetDoc() {
