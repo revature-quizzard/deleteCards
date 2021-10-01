@@ -12,26 +12,21 @@ import com.revature.delete_card.Documents.Set;
 import com.revature.delete_card.Execptions.InvalideRequestException;
 import com.revature.delete_card.Execptions.ResourceNotFoundException;
 import com.revature.delete_card.Repositories.SetRepository;
-import com.revature.delete_card.Repositories.UserRepository;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
 
 public class DeleteCardHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
 private final SetRepository setRepo;
-private final UserRepository userRepo;
 private static final Gson mapper = new GsonBuilder().setPrettyPrinting().create();
 
 public DeleteCardHandler() {
         this.setRepo = new SetRepository();
-        this.userRepo = new UserRepository();
         }
 
-public DeleteCardHandler(SetRepository setRepo, UserRepository userRepo) {
+public DeleteCardHandler(SetRepository setRepo) {
         this.setRepo = setRepo;
-        this.userRepo = userRepo;
         }
 
 /**
@@ -50,25 +45,22 @@ public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent re
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
 
         //getting id out of request body
-        String target_id = requestEvent.getQueryStringParameters().get("seID");
-        String card_id = requestEvent.getQueryStringParameters().get("cID");
+        String target_id = requestEvent.getQueryStringParameters().get("set_id");
+        String card_id = requestEvent.getQueryStringParameters().get("card_id");
 
         DeleteCardRequest delCR = mapper.fromJson(requestEvent.getBody() , DeleteCardRequest.class);
         try{
-        // deleting card from Sets table
-        Set updated_set = setRepo.deleteCardBySetId(target_id , card_id);
-        System.out.println("UPDATED SET : " + updated_set + "\n");
-        // using updated set from table to update the rest of users
-        userRepo.updateUserCollections(updated_set);
-        responseEvent.setBody(mapper.toJson(updated_set));
-        responseEvent.setStatusCode(200);
+                // deleting card from Sets table
+                Set updated_set = setRepo.deleteCardBySetId(target_id , card_id);
+                responseEvent.setBody(mapper.toJson(updated_set));
+                responseEvent.setStatusCode(200);
         }catch (ResourceNotFoundException rnfe) {
-        responseEvent.setStatusCode(404);
+                responseEvent.setStatusCode(404);
         }catch (InvalideRequestException ire){
-         responseEvent.setStatusCode(403);
+                responseEvent.setStatusCode(403);
         }catch (Exception e) {
-        logger.log("///////////////////////////////////// L A M B D A LOGGER MESSAGE ////////////////////////////////////////// \n");
-        logger.log("RECEIVED ERROR MESSAGE: " + e.getMessage() + "\n");
+                logger.log("///////////////////////////////////// L A M B D A LOGGER MESSAGE ////////////////////////////////////////// \n");
+                logger.log("RECEIVED ERROR MESSAGE: " + e.getMessage() + "\n");
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
