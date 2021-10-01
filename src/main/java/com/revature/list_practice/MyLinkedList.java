@@ -1,6 +1,8 @@
 package com.revature.list_practice;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -138,15 +140,40 @@ public class MyLinkedList<T> {
             return true;
         }
 
+        List<Object> goldNodes = new ArrayList<>();
         //this node tunnels into headNode
         Node<?> sperlunkerNode = head.nextNode;
-        // tunnel thruogh list till we hit the end
-        while(sperlunkerNode.nextNode != null)
-        {
 
+        // tunnel thruogh list till we hit the end
+        while(sperlunkerNode.nextNode != null )
+        {
+            goldNodes.add(sperlunkerNode.data);
             sperlunkerNode = sperlunkerNode.nextNode;
+
         }
-        throw new ImplementationMissingException(); // TODO: REPLACE THIS
+
+        //reverse array
+        Object[] sedoNdlog = goldNodes.toArray();
+        int start = 0;
+        int end = sedoNdlog.length;
+        Object hold = 0;
+        while(start < end)
+        {
+            hold = sedoNdlog[start];
+            sedoNdlog[start] = sedoNdlog[end];
+            start++;
+            end--;
+        }
+        //compare
+        for (int i = 0 ; i < sedoNdlog.length ; i++)
+        {
+            if(sedoNdlog[i].equals(goldNodes.get(i)) == false)
+            {
+                return sedoNdlog[i].equals(goldNodes.get(i)) == false;
+            }
+        }
+
+        return true;
     }
 
     static class Node<T> {

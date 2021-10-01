@@ -35,9 +35,6 @@ public class SetRepository {
         Set s = new Set();
         s.setId(id);
 
-
-
-
         // 2) getting target set from table
        // Set target_set = setTable.getItem(s);
         Set target_set = setTable.scan().items().stream().findFirst().orElseThrow(ResourceNotFoundException::new);
@@ -58,7 +55,7 @@ public class SetRepository {
         List<Card> valid_cards_list = target_set.getCards().stream().filter(c -> c.getId().equals(target_card_id) == false).collect(Collectors.toList());
         target_set.setCards(valid_cards_list);
         //------------------------------------------------------------------------------------
-        System.out.println( "CARD SET FROM TARGET SET FROM deleteCardBySetId METHOD : " + target_set.getCards()  + "\n");
+        System.out.println( "CARD SET FROM TARGET SET FROM deleteCardBySetId METHOD : " + target_set + "\n");
         // 5) returning updated set to the database
         setTable.putItem(target_set);
         // 6) returning target_set to use it for referential integrity

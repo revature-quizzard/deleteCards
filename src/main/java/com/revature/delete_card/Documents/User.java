@@ -1,6 +1,14 @@
 package com.revature.delete_card.Documents;
 
-
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
+import com.revature.delete_card.Converters.SetConverter;
 import lombok.Data;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
@@ -87,6 +95,8 @@ public class User {
         this.gameRecords = gameRecords;
     }
 
+    @DynamoDBTypeConverted(converter = SetConverter.class)
+    @DynamoDBAttribute(attributeName = "created_sets")
     public List<UserSetDoc> getCreated_sets() {
         return created_sets;
     }

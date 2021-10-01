@@ -30,6 +30,7 @@
         </dependency>
 
 
+
         <!-- AWS Lambda Dependencies -->
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -49,6 +50,11 @@
             <version>${aws.sdk.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>protocol-core</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
 
         <!-- JSON Parsing Dependencies -->
         <dependency>
@@ -57,12 +63,15 @@
             <version>2.8.8</version>
         </dependency>
 
+
         <!-- AWS DynamoDB SDK Dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb</artifactId>
             <version>${aws.sdk.version}</version>
         </dependency>
+
+
 
         <dependency>
             <groupId>software.amazon.awssdk</groupId>

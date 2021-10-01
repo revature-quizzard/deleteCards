@@ -41,6 +41,7 @@ public class Set {
         this.setName = set_name;
     }
 
+    @DynamoDbAttribute("tags")
     public List<Tag> getTags() {
         return tags;
     }
@@ -49,6 +50,7 @@ public class Set {
         this.tags = tags;
     }
 
+    @DynamoDbAttribute("cards")
     public List<Card> getCards() {
         return cards;
     }
