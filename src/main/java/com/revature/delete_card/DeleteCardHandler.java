@@ -15,6 +15,8 @@ import com.revature.delete_card.Repositories.SetRepository;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DeleteCardHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
@@ -43,6 +45,10 @@ public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent re
 
 
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization");
+        headers.put("Access-Control-Allow-Origin", "*");
+        responseEvent.setHeaders(headers);
 
         //getting id out of request body
         String target_id = requestEvent.getQueryStringParameters().get("set_id");
