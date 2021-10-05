@@ -7,7 +7,6 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.revature.delete_card.Documents.DeleteCardRequest;
 import com.revature.delete_card.Documents.Set;
 import com.revature.delete_card.Execptions.InvalideRequestException;
 import com.revature.delete_card.Execptions.ResourceNotFoundException;
@@ -54,7 +53,6 @@ public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent re
         String target_id = requestEvent.getQueryStringParameters().get("set_id");
         String card_id = requestEvent.getQueryStringParameters().get("card_id");
 
-        DeleteCardRequest delCR = mapper.fromJson(requestEvent.getBody() , DeleteCardRequest.class);
         try{
                 // deleting card from Sets table
                 Set updated_set = setRepo.deleteCardBySetId(target_id , card_id);
