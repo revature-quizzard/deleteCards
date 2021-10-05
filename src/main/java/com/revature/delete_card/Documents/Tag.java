@@ -1,7 +1,8 @@
 package com.revature.delete_card.Documents;
 
-
+import lombok.Builder;
 import lombok.Data;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
@@ -9,32 +10,19 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 @DynamoDbBean
 public class Tag {
 
-    private String name;
-    private String color;
+    private String tagName;
+    private String tagColor;
 
     @DynamoDbPartitionKey
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
+    public String getTagName() {
+        return tagName;
     }
 
     public Tag(String name){
-        this.name = name;
+        this.tagName = name;
     }
 
     public Tag() {
         super();
     }
-
 }
