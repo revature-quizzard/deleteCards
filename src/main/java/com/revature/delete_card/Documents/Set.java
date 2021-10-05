@@ -1,6 +1,5 @@
 package com.revature.delete_card.Documents;
 
-import lombok.Builder;
 import lombok.Data;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;

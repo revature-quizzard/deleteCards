@@ -1,11 +1,12 @@
 package com.revature.delete_card.Documents;
 
-
-import com.revature.delete_card.Converters.SetConverter;
+import lombok.Builder;
 import lombok.Data;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,14 +15,14 @@ public class User {
 
     private String id;
     private String username;
-    private String profile_picture;
+    private String profilePicture;
     private int points;
     private int wins;
     private int losses;
-    private String registration_date;
+    private String registrationDate;
     private List<String> gameRecords;
-    private List<UserSetDoc> created_sets;
-    private List<UserSetDoc> favorite_sets;
+    private List<UserSetDoc> createdSets = new ArrayList<>();
+    private List<UserSetDoc> favoriteSets = new ArrayList<>();
 
     @DynamoDbPartitionKey
     public String getId() {
@@ -40,12 +41,12 @@ public class User {
         this.username = username;
     }
 
-    public String getProfile_picture() {
-        return profile_picture;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setProfile_picture(String profile_picture) {
-        this.profile_picture = profile_picture;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public int getPoints() {
@@ -72,12 +73,12 @@ public class User {
         this.losses = losses;
     }
 
-    public String getRegistration_date() {
-        return registration_date;
+    public String getRegistrationDate() {
+        return registrationDate;
     }
 
-    public void setRegistration_date(String registration_date) {
-        this.registration_date = registration_date;
+    public void setRegistrationDate(String registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public List<String> getGameRecords() {
@@ -88,33 +89,31 @@ public class User {
         this.gameRecords = gameRecords;
     }
 
-
-    public List<UserSetDoc> getCreated_sets() {
-        return created_sets;
+    public List<UserSetDoc> getCreatedSets() {
+        return createdSets;
     }
 
-    public void setCreated_sets(List<UserSetDoc> created_sets) {
-        this.created_sets = created_sets;
+    public void setCreatedSets(List<UserSetDoc> createdSets) {
+        this.createdSets = createdSets;
     }
 
-    public List<UserSetDoc> getFavorite_sets() {
-        return favorite_sets;
+    public List<UserSetDoc> getFavoriteSets() {
+        return favoriteSets;
     }
 
-    public void setFavorite_sets(List<UserSetDoc> favorite_sets) {
-        this.favorite_sets = favorite_sets;
+    public void setFavoriteSets(List<UserSetDoc> favoriteSets) {
+        this.favoriteSets = favoriteSets;
     }
 
-    //This class represents the fields of a Set that the User Document cares about storing
+    //This class represents the fields of a Set that the User Document cares about storing (All but Cards)
     @Data
     @DynamoDbBean
     public static class UserSetDoc{
         private String id;
-        private String set_name;
+        private String setName;
         private List<Tag> tags;
-        private List<Card> cards;
         private String author;
-        private boolean is_public;
+        private boolean isPublic;
         private int views = 0;
         private int plays = 0;
         private int studies = 0;
@@ -122,10 +121,10 @@ public class User {
 
         public UserSetDoc(Set set) {
             id = set.getId();
-            set_name = set.getSetName();
+            setName = set.getSetName();
             tags = set.getTags();
             author = set.getAuthor();
-            is_public = set.isPublic();
+            isPublic = set.isPublic();
         }
 
         public UserSetDoc() {
