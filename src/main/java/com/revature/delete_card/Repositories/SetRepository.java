@@ -36,8 +36,8 @@ public class SetRepository {
         s.setId(id);
 
         // 2) getting target set from table
-       // Set target_set = setTable.getItem(s);
-        Set target_set = setTable.scan().items().stream().findFirst().orElseThrow(ResourceNotFoundException::new);
+        Set target_set = setTable.getItem(s);
+        //Set target_set = setTable.scan().items().stream().findFirst().orElseThrow(ResourceNotFoundException::new);
         System.out.println( "TARGET SET FROM deleteCardBySetId METHOD : " + target_set  + "\n");
 
         // 3) throw exception if the target set is null
